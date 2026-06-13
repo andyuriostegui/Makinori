@@ -1,105 +1,63 @@
 import { useState, useEffect, useRef } from "react";
 import { C, SectionTag, Section } from "./tokens";
+import { StarIcon, ArrowLeft01Icon, ArrowRight01Icon } from "hugeicons-react";
 
 const RESENAS = [
-  {
-    nombre: "Daniel Martínez",
-    avatar: "DM",
-    color: "#E8543A",
-    estrellas: 5,
-    fecha: "hace 2 días",
+  { nombre: "Daniel Martínez",   avatar: "DM", color: "#E8543A", estrellas: 5, fecha: "hace 2 días",
     texto: "El Dragon Roll es una experiencia aparte. Nunca pensé que en Iguala iba a encontrar sushi de este nivel. El servicio es increíble y el ambiente te transporta. Ya voy seguido con mi familia.",
-    platillo: "Dragon Roll 🐉",
-  },
-  {
-    nombre: "Andrés Uriostegui",
-    avatar: "AU",
-    color: "#1A1A18",
-    estrellas: 5,
-    fecha: "hace 1 semana",
-    texto: "Pedí el Omakase y fue la mejor decisión. El chef eligió por mí y cada tiempo fue una sorpresa. El Ramen Buldak Doble Picante casi me mata pero valió totalmente la pena 🔥",
-    platillo: "Omakase + Buldak 🍜",
-  },
-  {
-    nombre: "Alexa Yamm",
-    avatar: "AY",
-    color: "#6B6660",
-    estrellas: 5,
-    fecha: "hace 3 días",
+    platillo: "Dragon Roll" },
+  { nombre: "Andrés Uriostegui", avatar: "AU", color: "#1A1A18", estrellas: 5, fecha: "hace 1 semana",
+    texto: "Pedí el Omakase y fue la mejor decisión. El chef eligió por mí y cada tiempo fue una sorpresa. El Ramen Buldak Doble Picante casi me mata pero valió totalmente la pena.",
+    platillo: "Omakase + Buldak" },
+  { nombre: "Alexa Yamm",        avatar: "AY", color: "#6B6660", estrellas: 5, fecha: "hace 3 días",
     texto: "El ambiente es muy bonito y el sushi se ve y sabe increíble. El Philadelphia Roll es mi favorito, siempre fresco. Lo recomiendo muchísimo para una salida especial o con amigos.",
-    platillo: "Philadelphia Roll 🍣",
-  },
-  {
-    nombre: "Sofía Reyes",
-    avatar: "SR",
-    color: "#C93D22",
-    estrellas: 5,
-    fecha: "hace 5 días",
+    platillo: "Philadelphia Roll" },
+  { nombre: "Sofía Reyes",       avatar: "SR", color: "#C93D22", estrellas: 5, fecha: "hace 5 días",
     texto: "Vine con mis amigas a celebrar mi cumpleaños y fue perfecto. El trato es muy amable y la comida llegó rápido. Los Kushiagues de camarón estaban deliciosos. ¡Definitivamente regreso!",
-    platillo: "Kushiagues de Camarón 🍢",
-  },
-  {
-    nombre: "Carlos Mendoza",
-    avatar: "CM",
-    color: "#2A5C8A",
-    estrellas: 5,
-    fecha: "hace 1 semana",
+    platillo: "Kushiagues de Camarón" },
+  { nombre: "Carlos Mendoza",    avatar: "CM", color: "#2A5C8A", estrellas: 5, fecha: "hace 1 semana",
     texto: "El Snow Roll me sorprendió muchísimo. Nunca había probado algo así en la región. El Mogu Mogu de lychee es el complemento perfecto. Ya lo recomendé a todos mis compañeros del trabajo.",
-    platillo: "Snow Roll + Mogu Mogu ❄️",
-  },
-  {
-    nombre: "Valeria Torres",
-    avatar: "VT",
-    color: "#7B4F9E",
-    estrellas: 5,
-    fecha: "hace 2 semanas",
+    platillo: "Snow Roll + Mogu Mogu" },
+  { nombre: "Valeria Torres",    avatar: "VT", color: "#7B4F9E", estrellas: 5, fecha: "hace 2 semanas",
     texto: "Probé el Volcano Roll y wow, el sabor es único. No esperaba encontrar algo tan auténtico aquí. El lugar es muy limpio y los precios son justos para la calidad que ofrecen. 10/10.",
-    platillo: "Volcano Roll 🌋",
-  },
+    platillo: "Volcano Roll" },
 ];
 
-function StarIcon({ filled }) {
+function Stars({ count = 5, filled = 5 }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill={filled ? "#F59E0B" : "#E5E7EB"}>
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-    </svg>
+    <div style={{ display: "flex", gap: 2 }}>
+      {Array.from({ length: count }).map((_, i) => (
+        <StarIcon key={i} size={14} color={i < filled ? "#F59E0B" : "#E5E7EB"} />
+      ))}
+    </div>
   );
 }
 
 function ResenaCard({ resena, active }) {
   return (
     <div style={{
-      background: "#fff",
-      borderRadius: 16,
-      padding: "28px 28px 24px",
+      background: "#fff", borderRadius: 16, padding: "28px 28px 24px",
       border: `1px solid ${active ? C.coral : C.border}`,
       boxShadow: active ? "0 8px 32px rgba(232,84,58,0.12)" : "0 2px 12px rgba(26,26,24,0.05)",
       transition: "all 0.4s ease",
       opacity: active ? 1 : 0.5,
       transform: active ? "scale(1)" : "scale(0.97)",
-      minHeight: 200,
-      display: "flex", flexDirection: "column", gap: 16,
+      minHeight: 200, display: "flex", flexDirection: "column", gap: 16,
     }}>
-      {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <div style={{
-          width: 44, height: 44, borderRadius: "50%",
-          background: resena.color,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          flexShrink: 0,
+          width: 44, height: 44, borderRadius: "50%", background: resena.color,
+          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
         }}>
           <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, fontWeight: 800, color: "#fff" }}>{resena.avatar}</span>
         </div>
         <div style={{ flex: 1 }}>
           <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 14, fontWeight: 700, color: C.ink, margin: 0 }}>{resena.nombre}</p>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
-            <div style={{ display: "flex", gap: 2 }}>
-              {[1,2,3,4,5].map(s => <StarIcon key={s} filled={s <= resena.estrellas} />)}
-            </div>
+            <Stars filled={resena.estrellas} />
             <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: C.muted }}>{resena.fecha}</span>
           </div>
         </div>
-        {/* Google G */}
         <svg width="20" height="20" viewBox="0 0 24 24" style={{ flexShrink: 0, opacity: 0.4 }}>
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -108,19 +66,13 @@ function ResenaCard({ resena, active }) {
         </svg>
       </div>
 
-      {/* Texto */}
-      <p style={{
-        fontFamily: "DM Sans, sans-serif", fontSize: 13, color: C.muted,
-        lineHeight: 1.8, margin: 0, flex: 1,
-        fontStyle: "italic",
-      }}>"{resena.texto}"</p>
+      <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: C.muted, lineHeight: 1.8, margin: 0, flex: 1, fontStyle: "italic" }}>
+        "{resena.texto}"
+      </p>
 
-      {/* Platillo */}
       <div style={{
-        background: "rgba(232,84,58,0.06)",
-        border: `1px solid rgba(232,84,58,0.15)`,
-        borderRadius: 6, padding: "6px 12px",
-        display: "inline-block", alignSelf: "flex-start",
+        background: "rgba(232,84,58,0.06)", border: `1px solid rgba(232,84,58,0.15)`,
+        borderRadius: 6, padding: "6px 12px", display: "inline-block", alignSelf: "flex-start",
       }}>
         <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, fontWeight: 600, color: C.coral }}>
           {resena.platillo}
@@ -133,33 +85,36 @@ function ResenaCard({ resena, active }) {
 export default function Resenas() {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
-  const timerRef = useRef(null);
 
   const next = () => setCurrent(c => (c + 1) % RESENAS.length);
   const prev = () => setCurrent(c => (c - 1 + RESENAS.length) % RESENAS.length);
 
   useEffect(() => {
     if (paused) return;
-    timerRef.current = setInterval(next, 4000);
-    return () => clearInterval(timerRef.current);
+    const t = setInterval(next, 4000);
+    return () => clearInterval(t);
   }, [paused, current]);
 
-  // Muestra 3 cards: prev, current, next
-  const getVisible = () => {
-    const len = RESENAS.length;
-    return [
-      (current - 1 + len) % len,
-      current,
-      (current + 1) % len,
-    ];
-  };
-  const visible = getVisible();
+  const len = RESENAS.length;
+  const visible = [(current - 1 + len) % len, current, (current + 1) % len];
+
+  const navBtn = (style, onClick, Icon) => (
+    <button onClick={onClick} style={{
+      width: 40, height: 40, borderRadius: "50%",
+      border: `1.5px solid ${C.border}`, background: "#fff",
+      cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+      transition: "all 0.2s", ...style,
+    }}
+    onMouseEnter={e => { e.currentTarget.style.borderColor = C.coral; }}
+    onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; }}
+    >
+      <Icon size={16} color={C.ink} />
+    </button>
+  );
 
   return (
     <Section id="resenas" style={{ background: C.cream, overflow: "hidden" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "80px 24px" }}>
-
-        {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <SectionTag>Reseñas</SectionTag>
           <h2 style={{
@@ -171,60 +126,32 @@ export default function Resenas() {
             Lo que dicen <span style={{ color: C.coral }}>nuestros clientes</span>
           </h2>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 16 }}>
-            <div style={{ display: "flex", gap: 2 }}>
-              {[1,2,3,4,5].map(s => <StarIcon key={s} filled />)}
-            </div>
+            <Stars filled={5} />
             <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 14, fontWeight: 700, color: C.ink }}>5.0</span>
             <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: C.muted }}>· Basado en Google Reviews</span>
           </div>
         </div>
 
-        {/* Cards */}
         <div
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
           style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20, marginBottom: 40 }}
         >
-          {visible.map((idx, pos) => (
-            <ResenaCard key={idx} resena={RESENAS[idx]} active={pos === 1} />
-          ))}
+          {visible.map((idx, pos) => <ResenaCard key={idx} resena={RESENAS[idx]} active={pos === 1} />)}
         </div>
 
-        {/* Controls */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16 }}>
-          <button onClick={prev} style={{
-            width: 40, height: 40, borderRadius: "50%",
-            border: `1.5px solid ${C.border}`, background: "#fff",
-            cursor: "pointer", fontSize: 16, color: C.ink,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = C.coral; e.currentTarget.style.color = C.coral; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.ink; }}
-          >←</button>
-
+          {navBtn({}, prev, ArrowLeft01Icon)}
           <div style={{ display: "flex", gap: 6 }}>
             {RESENAS.map((_, i) => (
               <button key={i} onClick={() => setCurrent(i)} style={{
-                width: i === current ? 24 : 8, height: 8,
-                borderRadius: 4, border: "none",
-                background: i === current ? C.coral : C.border,
-                cursor: "pointer", transition: "all 0.3s",
-                padding: 0,
+                width: i === current ? 24 : 8, height: 8, borderRadius: 4,
+                border: "none", background: i === current ? C.coral : C.border,
+                cursor: "pointer", transition: "all 0.3s", padding: 0,
               }}/>
             ))}
           </div>
-
-          <button onClick={next} style={{
-            width: 40, height: 40, borderRadius: "50%",
-            border: `1.5px solid ${C.border}`, background: "#fff",
-            cursor: "pointer", fontSize: 16, color: C.ink,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = C.coral; e.currentTarget.style.color = C.coral; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.ink; }}
-          >→</button>
+          {navBtn({}, next, ArrowRight01Icon)}
         </div>
       </div>
     </Section>

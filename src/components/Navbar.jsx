@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { C } from "./tokens";
 import { useCarritoCtx } from "./Carrito";
+import { ShoppingBag01Icon, Menu01Icon, Cancel01Icon } from "hugeicons-react";
 
 const NAV_LINKS = [
   { href: "#",          label: "Inicio"    },
@@ -78,7 +79,7 @@ export default function Navbar() {
                   fontFamily: "DM Sans, sans-serif",
                   display: "flex", alignItems: "center", gap: 6,
                 }}>
-                  🛍️
+                  <ShoppingBag01Icon size={14} color={textColor} />
                   <span style={{ background: C.coral, color: C.cream, borderRadius: 20, padding: "1px 7px", fontSize: 10, fontWeight: 900 }}>{count}</span>
                 </button>
               </li>
@@ -94,20 +95,11 @@ export default function Navbar() {
 
           {/* Hamburger */}
           <button className="nav-hamburger" onClick={() => setOpen(o => !o)}
-            style={{ flexDirection: "column", gap: 5, background: "none", border: "none", cursor: "pointer", padding: 6 }}>
-            {[0,1,2].map(i => (
-              <span key={i} style={{
-                display: "block", width: 24, height: 2,
-                background: textColor, borderRadius: 2,
-                transition: "all 0.25s",
-                transform: open
-                  ? i === 0 ? "translateY(7px) rotate(45deg)"
-                  : i === 2 ? "translateY(-7px) rotate(-45deg)"
-                  : "scaleX(0)"
-                  : "none",
-                opacity: open && i === 1 ? 0 : 1,
-              }}/>
-            ))}
+            style={{ background: "none", border: "none", cursor: "pointer", padding: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {open
+              ? <Cancel01Icon size={24} color={textColor} />
+              : <Menu01Icon size={24} color={textColor} />
+            }
           </button>
         </div>
 
@@ -134,7 +126,11 @@ export default function Navbar() {
                     background: "rgba(245,240,232,0.15)", color: C.cream, border: "none",
                     padding: "10px 16px", borderRadius: 20, fontSize: 13,
                     fontWeight: 700, cursor: "pointer", fontFamily: "DM Sans, sans-serif",
-                  }}>🛍️ Pedido ({count})</button>
+                    display: "flex", alignItems: "center", gap: 6,
+                  }}>
+                    <ShoppingBag01Icon size={14} color={C.cream} />
+                    Pedido ({count})
+                  </button>
                 )}
               </li>
             </ul>
