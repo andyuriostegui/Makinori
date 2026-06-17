@@ -52,7 +52,7 @@ function ProductCard({ producto }) {
         <div style={{ marginTop: 12, display: "flex", gap: 6, flexWrap: "wrap" }}>
           {badges.map((b, i) => (
             <span key={i} style={{
-              background: badgePicante && i === 0 ? "rgba(232,84,58,0.1)" : C.paper,
+              background: badgePicante && i === 0 ? "rgba(232,145,92,0.14)" : C.paper,
               color: badgePicante && i === 0 ? C.coral : C.ink,
               fontSize: 10, padding: "2px 8px", borderRadius: 4, fontWeight: 500,
             }}>{b}</span>
@@ -68,7 +68,19 @@ function ProductCard({ producto }) {
 
 export default function Productos() {
   return (
-    <Section id="productos">
+    <Section id="productos" style={{ position: "relative", overflow: "hidden" }}>
+      <style>{`
+        .fav-side { display: block; }
+        @media (max-width: 1100px) { .fav-side { display: none !important; } }
+      `}</style>
+
+      {/* Botella Sakura flotando a la derecha */}
+      <img src="/sakura.png" alt="Sakura Beer" className="fav-side" style={{
+        position: "absolute", right: -30, top: 80,
+        width: 240, height: "auto", opacity: 1, pointerEvents: "none",
+        userSelect: "none",
+      }} />
+
       <Container>
         <div style={{ textAlign: "center", marginBottom: 20 }}>
           <SectionTag>Recomendados</SectionTag>

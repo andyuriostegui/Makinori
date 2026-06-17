@@ -7,7 +7,7 @@ const NAV_LINKS = [
   { href: "#",          label: "Inicio"    },
   { href: "#productos", label: "Favoritos" },
   { href: "#menu",      label: "Menú"      },
-  { href: "#reserva",   label: "Reserva"   },
+  { href: "#linktree",  label: "Síguenos"  },
   { href: "#ubicacion", label: "Ubicación" },
 ];
 
@@ -24,7 +24,7 @@ export default function Navbar() {
 
   const close = () => setOpen(false);
   const dark = open || scrolled;
-  const bg = dark ? "rgba(26,26,24,0.96)" : "rgba(245,240,232,0.0)";
+  const bg = dark ? "rgba(26,43,43,0.96)" : "rgba(245,240,232,0.0)";
   const textColor = dark ? C.cream : C.ink;
   const mutedColor = dark ? "rgba(245,240,232,0.45)" : C.muted;
 
@@ -54,11 +54,11 @@ export default function Navbar() {
           <a href="#" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}>
             <div style={{
               width: 36, height: 36, borderRadius: "50%",
-              border: `2px solid ${dark ? C.coral : C.ink}`,
+              border: `2px solid ${dark ? C.teal : C.ink}`,
               display: "flex", alignItems: "center", justifyContent: "center",
               transition: "border-color 0.35s",
             }}>
-              <span style={{ fontFamily: "Noto Serif JP, serif", fontSize: 13, fontWeight: 700, color: dark ? C.coral : C.ink, transition: "color 0.35s" }}>海</span>
+              <span style={{ fontFamily: "Noto Serif JP, serif", fontSize: 13, fontWeight: 700, color: dark ? C.teal : C.ink, transition: "color 0.35s" }}>海</span>
             </div>
             <div>
               <p style={{ fontWeight: 700, fontSize: 15, letterSpacing: "-0.02em", color: textColor, lineHeight: 1, margin: 0, transition: "color 0.35s" }}>Maki Nori</p>
@@ -80,16 +80,16 @@ export default function Navbar() {
                   display: "flex", alignItems: "center", gap: 6,
                 }}>
                   <ShoppingBag01Icon size={14} color={textColor} />
-                  <span style={{ background: C.coral, color: C.cream, borderRadius: 20, padding: "1px 7px", fontSize: 10, fontWeight: 900 }}>{count}</span>
+                  <span style={{ background: C.teal, color: C.cream, borderRadius: 20, padding: "1px 7px", fontSize: 10, fontWeight: 900 }}>{count}</span>
                 </button>
               </li>
             )}
             <li style={{ listStyle: "none" }}>
-              <a href="#reserva" style={{
-                background: C.coral, color: C.cream,
+              <a href="#menu" style={{
+                background: C.teal, color: C.cream,
                 padding: "8px 20px", borderRadius: 20, fontSize: 12,
                 fontWeight: 700, textDecoration: "none",
-              }}>Hacer Reserva</a>
+              }}>Ver Menú</a>
             </li>
           </ul>
 
@@ -116,11 +116,11 @@ export default function Navbar() {
                 </li>
               ))}
               <li style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <a href="#reserva" onClick={close} style={{
-                  background: C.coral, color: C.cream,
+                <a href="#menu" onClick={close} style={{
+                  background: C.teal, color: C.cream,
                   padding: "10px 24px", borderRadius: 20,
                   fontSize: 13, fontWeight: 700, textDecoration: "none",
-                }}>Hacer Reserva</a>
+                }}>Ver Menú</a>
                 {count > 0 && (
                   <button onClick={() => { setCarritoOpen(true); close(); }} style={{
                     background: "rgba(245,240,232,0.15)", color: C.cream, border: "none",
@@ -148,7 +148,7 @@ function NavLink({ href, children, textColor }) {
       <a href={href}
         onMouseEnter={() => setHov(true)}
         onMouseLeave={() => setHov(false)}
-        style={{ color: hov ? C.coral : textColor, textDecoration: "none", fontSize: 13, fontWeight: 500, transition: "color 0.2s" }}
+        style={{ color: hov ? C.teal : textColor, textDecoration: "none", fontSize: 13, fontWeight: 500, transition: "color 0.2s" }}
       >{children}</a>
     </li>
   );

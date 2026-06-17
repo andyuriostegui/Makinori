@@ -3,8 +3,6 @@ import { createContext, useContext } from "react";
 import { C } from "./tokens";
 import {
   ShoppingBag01Icon,
-  ShoppingBag02Icon,
-  DeliveryBox01Icon,
   Timer01Icon,
   Chair01Icon,
   Cancel01Icon,
@@ -79,7 +77,7 @@ export function BtnAgregar({ producto }) {
     <div style={{ marginTop: 12 }}>
       {qty === 0 ? (
         <button onClick={handleAgregar} style={{
-          background: pop ? "#C93D22" : C.coral,
+          background: pop ? C.tealD : C.teal,
           color: C.cream, border: "none", borderRadius: 6,
           padding: "8px 16px", fontSize: 12, fontWeight: 700,
           cursor: "pointer", fontFamily: "DM Sans, sans-serif",
@@ -103,7 +101,7 @@ export function BtnAgregar({ producto }) {
           </span>
           <button onClick={handleAgregar} style={{
             width: 32, height: 32, borderRadius: 6, border: "none",
-            background: C.coral, cursor: "pointer",
+            background: C.teal, cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
             transform: pop ? "scale(0.9)" : "scale(1)", transition: "transform 0.15s",
             color: C.cream, fontWeight: 700, fontSize: 16,
@@ -121,20 +119,26 @@ export function CarritoBtn() {
     <button onClick={() => setOpen(o => !o)} style={{
       position: "fixed", bottom: 92, right: 24, zIndex: 999,
       background: C.ink, color: C.cream,
-      border: "none", borderRadius: 50, padding: "14px 20px",
-      display: "flex", alignItems: "center", gap: 10,
+      border: "none", borderRadius: 50, padding: "8px 20px 8px 8px",
+      display: "flex", alignItems: "center", gap: 8,
       cursor: "pointer", fontFamily: "DM Sans, sans-serif",
       boxShadow: "0 8px 32px rgba(26,26,24,0.25)",
       transform: bounce ? "scale(1.12)" : "scale(1)",
       transition: "transform 0.2s cubic-bezier(0.34,1.56,0.64,1)",
     }}>
-      <ShoppingBag01Icon size={20} color={C.cream} />
+      <span style={{
+        width: 38, height: 38, borderRadius: "50%",
+        background: C.cream, display: "flex", alignItems: "center", justifyContent: "center",
+        flexShrink: 0, overflow: "hidden",
+      }}>
+        <img src="/sushito.png" alt="" style={{ width: 30, height: "auto" }} />
+      </span>
       <span style={{ fontSize: 13, fontWeight: 700 }}>
         {count === 0 ? "Tu pedido" : `${count} item${count > 1 ? "s" : ""}`}
       </span>
       {count > 0 && (
         <span style={{
-          background: C.coral, color: C.cream,
+          background: C.teal, color: C.cream,
           borderRadius: 20, padding: "2px 8px",
           fontSize: 11, fontWeight: 900,
         }}>{count}</span>
@@ -215,7 +219,7 @@ export function CarritoPanel() {
           {/* Countdown */}
           <div style={{
             marginTop: 12,
-            background: urgente ? "rgba(232,84,58,0.1)" : C.paper,
+            background: urgente ? "rgba(42,139,139,0.1)" : C.paper,
             border: `1px solid ${urgente ? C.coral : C.border}`,
             borderRadius: 8, padding: "8px 12px",
             display: "flex", alignItems: "center", gap: 8,
@@ -243,13 +247,13 @@ export function CarritoPanel() {
               <button key={val} onClick={() => setModo(val)} style={{
                 flex: 1, padding: "10px 8px", borderRadius: 8, fontSize: 12, fontWeight: 600,
                 cursor: "pointer", fontFamily: "DM Sans, sans-serif",
-                border: `1.5px solid ${modo === val ? C.coral : C.border}`,
-                background: modo === val ? "rgba(232,84,58,0.08)" : "transparent",
-                color: modo === val ? C.coral : C.muted,
+                border: `1.5px solid ${modo === val ? C.teal : C.border}`,
+                background: modo === val ? "rgba(42,139,139,0.08)" : "transparent",
+                color: modo === val ? C.teal : C.muted,
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                 transition: "all 0.15s",
               }}>
-                <Icon size={14} color={modo === val ? C.coral : C.muted} /> {label}
+                <Icon size={14} color={modo === val ? C.teal : C.muted} /> {label}
               </button>
             ))}
           </div>
@@ -269,10 +273,20 @@ export function CarritoPanel() {
         {/* Items */}
         <div style={{ flex: 1, padding: "16px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
           {items.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "40px 0" }}>
-              <DeliveryBox01Icon size={52} color={C.border} />
-              <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 14, fontWeight: 600, margin: "12px 0 4px", color: C.ink }}>Tu pedido está vacío</p>
-              <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, margin: 0, color: C.muted }}>Agrega algo del menú para empezar</p>
+            <div style={{ textAlign: "center", padding: "24px 0" }}>
+              <img src="/sushito.png" alt="Sushito" style={{
+                width: 130, height: "auto", margin: "0 auto 16px", display: "block",
+              }} />
+              <div style={{
+                display: "inline-block", background: "#fff",
+                border: `1.5px solid ${C.teal}`, borderRadius: 14,
+                padding: "10px 18px", marginBottom: 4,
+              }}>
+                <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, fontWeight: 700, color: C.teal, margin: 0 }}>
+                  ¡Aún no me has alimentado!
+                </p>
+              </div>
+              <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, margin: "8px 0 0", color: C.muted }}>Agrega algo del menú para empezar</p>
             </div>
           ) : items.map(item => (
             <ItemRow key={item.id} item={item}
@@ -285,7 +299,7 @@ export function CarritoPanel() {
           {/* Sugerencia */}
           {sugerencia && items.length > 0 && (
             <div style={{
-              background: "rgba(232,84,58,0.06)", border: `1px dashed ${C.coral}`,
+              background: "rgba(42,139,139,0.06)", border: `1px dashed ${C.coral}`,
               borderRadius: 10, padding: "12px 14px",
               display: "flex", alignItems: "center", gap: 12,
             }}>
@@ -296,7 +310,7 @@ export function CarritoPanel() {
               </div>
               <button onClick={() => agregar({ id: sugerencia.id, nombre: sugerencia.nombre, precio: sugerencia.precio, foto: null })}
                 style={{
-                  background: C.coral, color: C.cream, border: "none",
+                  background: C.teal, color: C.cream, border: "none",
                   borderRadius: 6, padding: "6px 12px", fontSize: 11,
                   fontWeight: 700, cursor: "pointer", fontFamily: "DM Sans, sans-serif",
                 }}>+ Sí</button>
@@ -374,7 +388,7 @@ function ItemRow({ item, onQuitar, onAgregar, onNota }) {
           <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, fontWeight: 700, minWidth: 16, textAlign: "center" }}>{item.qty}</span>
           <button onClick={onAgregar} style={{
             width: 26, height: 26, borderRadius: 6, border: "none",
-            background: C.coral, cursor: "pointer",
+            background: C.teal, cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
             color: C.cream, fontWeight: 700, fontSize: 16,
           }}>+</button>

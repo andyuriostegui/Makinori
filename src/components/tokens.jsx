@@ -1,13 +1,17 @@
 // ─── Design tokens ────────────────────────────────────────────
+// Paleta Makinori: teal (azul) protagonista + salmón suave de acento
 export const C = {
-  coral:  "#E8543A",
-  coralD: "#C93D22",
-  cream:  "#F5F0E8",
-  paper:  "#EDE8DC",
-  ink:    "#1A1A18",
-  muted:  "#6B6660",
-  border: "#C8BFB0",
-  wa:     "#25D366",
+  teal:    "#2A8B8B",   // PRINCIPAL — azul teal del logo
+  tealD:   "#1F6B6B",   // hover/oscuro del teal
+  tealL:   "#E3F0EF",   // teal muy claro para fondos suaves
+  coral:   "#E8915C",   // salmón suave (acento secundario)
+  coralD:  "#D17A45",   // hover del salmón
+  cream:   "#F5F0E8",
+  paper:   "#EDE8DC",
+  ink:     "#1A2B2B",   // tinta con tinte azulado (combina con teal)
+  muted:   "#6B7270",
+  border:  "#C8C3B8",
+  wa:      "#25D366",
 };
 
 // ─── Reusable micro-components ────────────────────────────────
@@ -18,18 +22,39 @@ export function SectionTag({ children, style = {} }) {
     <span style={{
       display: "inline-flex", alignItems: "center", gap: 8,
       fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.14em",
-      textTransform: "uppercase", color: C.coral,
+      textTransform: "uppercase", color: C.teal,
       fontFamily: "DM Sans, sans-serif",
       ...style,
     }}>
-      <span style={{ display: "block", height: 1, width: 28, background: C.coral }} />
+      <span style={{ display: "block", height: 1, width: 28, background: C.teal }} />
       {children}
-      <span style={{ display: "block", height: 1, width: 28, background: C.coral }} />
+      <span style={{ display: "block", height: 1, width: 28, background: C.teal }} />
     </span>
   );
 }
 
-/** Coral filled button / link */
+/** Teal filled button / link (acción principal) */
+export function BtnTeal({ href, onClick, children, full = false, style = {} }) {
+  const base = {
+    display: "inline-block", background: C.teal, color: C.cream,
+    padding: "12px 28px", borderRadius: 4, fontSize: 14, fontWeight: 600,
+    letterSpacing: "0.05em", textDecoration: "none", border: "none",
+    cursor: "pointer", fontFamily: "DM Sans, sans-serif",
+    transition: "background 0.2s, transform 0.15s",
+    width: full ? "100%" : undefined, textAlign: "center",
+    ...style,
+  };
+  if (href) return <a href={href} style={base}>{children}</a>;
+  return (
+    <button onClick={onClick}
+      style={base}
+      onMouseEnter={e => e.currentTarget.style.background = C.tealD}
+      onMouseLeave={e => e.currentTarget.style.background = C.teal}
+    >{children}</button>
+  );
+}
+
+/** Coral/salmón filled button / link (acento secundario) */
 export function BtnCoral({ href, onClick, children, full = false, style = {} }) {
   const base = {
     display: "inline-block", background: C.coral, color: C.cream,

@@ -4,12 +4,12 @@ import Hero from "./components/Hero";
 import Productos from "./components/Productos";
 import Menu from "./components/Menu";
 import Omakase from "./components/Omakase";
-import Reserva from "./components/Reserva";
+import Resenas from "./components/Resenas";
+import Galeria from "./components/Galeria";
+import Linktree from "./components/Linktree";
 import Ubicacion from "./components/Ubicacion";
 import Footer from "./components/Footer";
 import WAFloat from "./components/WAFloat";
-import Resenas from "./components/Resenas";
-import Galeria from "./components/Galeria";
 import { CarritoCtx, useCarrito, CarritoBtn, CarritoPanel } from "./components/Carrito";
 
 export default function App() {
@@ -24,7 +24,7 @@ export default function App() {
       <Omakase />
       <Resenas />
       <Galeria />
-      <Reserva />
+      <Linktree />
       <Ubicacion />
       <Footer />
       <WAFloat />

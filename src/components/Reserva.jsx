@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { C, SectionTag, Section, Container } from "./tokens";
+import { C, SectionTag, Section, Container } from "./Tokens";
+import { MascotaSushi } from "./Mascota";
 
 const HORAS = ["13:00","13:30","14:00","14:30","15:00","15:30","19:00","19:30","20:00","20:30","21:00","21:30"];
 const PERSONAS_OPTS = ["1","2","3","4","5-6","7-12"];
@@ -61,13 +62,13 @@ export default function Reserva() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
                 <Field label="Nombre completo">
                   <input required type="text" placeholder="Ej: María González" style={inputStyle}
-                    onFocus={e => { e.target.style.borderColor = C.coral; e.target.style.boxShadow = `0 0 0 3px rgba(232,84,58,0.1)`; }}
+                    onFocus={e => { e.target.style.borderColor = C.coral; e.target.style.boxShadow = `0 0 0 3px rgba(217,122,74,0.1)`; }}
                     onBlur={e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = "none"; }}
                   />
                 </Field>
                 <Field label="Teléfono">
                   <input required type="tel" placeholder="+52 733 000 0000" style={inputStyle}
-                    onFocus={e => { e.target.style.borderColor = C.coral; e.target.style.boxShadow = `0 0 0 3px rgba(232,84,58,0.1)`; }}
+                    onFocus={e => { e.target.style.borderColor = C.coral; e.target.style.boxShadow = `0 0 0 3px rgba(217,122,74,0.1)`; }}
                     onBlur={e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = "none"; }}
                   />
                 </Field>
@@ -76,7 +77,7 @@ export default function Reserva() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
                 <Field label="Fecha">
                   <input required type="date" style={inputStyle}
-                    onFocus={e => { e.target.style.borderColor = C.coral; e.target.style.boxShadow = `0 0 0 3px rgba(232,84,58,0.1)`; }}
+                    onFocus={e => { e.target.style.borderColor = C.coral; e.target.style.boxShadow = `0 0 0 3px rgba(217,122,74,0.1)`; }}
                     onBlur={e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = "none"; }}
                   />
                 </Field>
@@ -106,7 +107,7 @@ export default function Reserva() {
               <Field label="Nota especial (opcional)">
                 <textarea rows={3} placeholder="Alergias, celebraciones, peticiones especiales..."
                   style={{ ...inputStyle, resize: "none" }}
-                  onFocus={e => { e.target.style.borderColor = C.coral; e.target.style.boxShadow = `0 0 0 3px rgba(232,84,58,0.1)`; }}
+                  onFocus={e => { e.target.style.borderColor = C.coral; e.target.style.boxShadow = `0 0 0 3px rgba(217,122,74,0.1)`; }}
                   onBlur={e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = "none"; }}
                 />
               </Field>
@@ -128,7 +129,7 @@ export default function Reserva() {
                 cursor: "pointer", fontFamily: "DM Sans, sans-serif",
                 transition: "background 0.2s, transform 0.1s",
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#C93D22"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseEnter={e => { e.currentTarget.style.background = C.coralD; e.currentTarget.style.transform = "translateY(-1px)"; }}
               onMouseLeave={e => { e.currentTarget.style.background = C.coral; e.currentTarget.style.transform = "translateY(0)"; }}
               >Solicitar Reserva →</button>
             </form>
@@ -142,12 +143,12 @@ export default function Reserva() {
 function SuccessMsg() {
   return (
     <div style={{
-      textAlign: "center", padding: "64px 32px",
+      textAlign: "center", padding: "56px 32px",
       background: "#fff", borderRadius: 16,
       border: `1px solid ${C.border}`,
       boxShadow: "0 8px 40px rgba(26,26,24,0.06)",
     }}>
-      <div style={{ fontSize: 56, marginBottom: 20 }}>🎋</div>
+      <MascotaSushi pose="feliz" size={120} style={{ margin: "0 auto 24px" }} />
       <h3 style={{ fontSize: 26, fontWeight: 900, color: C.ink, fontFamily: "DM Sans, sans-serif", margin: "0 0 12px" }}>
         ¡Reserva enviada!
       </h3>

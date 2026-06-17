@@ -58,7 +58,33 @@ export default function Ubicacion() {
       <div style={{
         background: C.ink, padding: "32px 24px",
         display: "flex", justifyContent: "center", flexWrap: "wrap",
+        position: "relative", overflow: "hidden",
       }}>
+        <style>{`
+          .ubi-img { display: block; }
+          @media (max-width: 900px) {
+            .ubi-img {
+              height: 100% !important;
+              width: 100% !important;
+              right: 0 !important;
+              top: 0 !important;
+              object-fit: cover;
+              opacity: 0.1 !important;
+              mask-image: none !important;
+              -webkit-mask-image: none !important;
+            }
+          }
+        `}</style>
+
+        {/* Imagen ubi fundiéndose desde la derecha (fondo negro = se funde) */}
+        <img src="/ubi.png" alt="Maki Nori" className="ubi-img" style={{
+          position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)",
+          height: "180%", width: "auto", opacity: 0.85,
+          pointerEvents: "none", userSelect: "none", zIndex: 0,
+          maskImage: "linear-gradient(to left, black 60%, transparent)",
+          WebkitMaskImage: "linear-gradient(to left, black 60%, transparent)",
+        }} />
+
         {[
           { jp: "新鮮", label: "100% Fresco",  sub: "Sin congelados" },
           { jp: "手作り", label: "Hecho a mano", sub: "Cada pieza"    },
@@ -68,6 +94,7 @@ export default function Ubicacion() {
           <div key={jp} style={{
             textAlign: "center", padding: "16px 32px",
             borderRight: i < arr.length - 1 ? "1px solid rgba(245,240,232,0.1)" : "none",
+            position: "relative", zIndex: 1,
           }}>
             <p style={{ fontFamily: "Noto Serif JP, serif", fontSize: 22, color: C.coral, margin: "0 0 4px" }}>{jp}</p>
             <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, fontWeight: 700, color: C.cream, margin: "0 0 2px" }}>{label}</p>

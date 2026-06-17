@@ -13,7 +13,7 @@ const LINKS = [
   { label: "Menú",         href: "#menu"      },
   { label: "Recomendados", href: "#productos"  },
   { label: "Omakase",      href: "#omakase"   },
-  { label: "Reserva",      href: "#reserva"   },
+  { label: "Síguenos",     href: "#linktree"  },
   { label: "Ubicación",    href: "#ubicacion" },
 ];
 

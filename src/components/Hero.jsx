@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { C, BtnCoral, BtnGhost } from "./tokens";
+import { C, BtnTeal, BtnGhost } from "./tokens";
+import { MascotaSushi } from "./Mascota";
 
 const TOP_PEDIDOS = [
   { nombre: "Dragon Roll",        popularidad: 95, badge: "🔥 Casi agotado" },
@@ -10,7 +11,7 @@ const TOP_PEDIDOS = [
 function PopBar({ pct }) {
   return (
     <div style={{ height: 4, background: C.border, borderRadius: 2, overflow: "hidden", width: "100%" }}>
-      <div style={{ height: "100%", width: `${pct}%`, background: C.coral, borderRadius: 2, transition: "width 1s ease" }} />
+      <div style={{ height: "100%", width: `${pct}%`, background: C.teal, borderRadius: 2, transition: "width 1s ease" }} />
     </div>
   );
 }
@@ -24,11 +25,11 @@ function RightPanel() {
     <div style={{ width: "100%", maxWidth: 400, display: "flex", flexDirection: "column", gap: 12 }}>
       {/* Hero image */}
       <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", aspectRatio: "4/3", background: C.paper }}>
-        <img src="/sushi1.png" alt="Sushi Maki Nori"
+        <img src="/sushicomida.png" alt="Sushi Maki Nori"
           style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
         <div style={{
           position: "absolute", top: 12, left: 12,
-          background: "rgba(26,26,24,0.82)", backdropFilter: "blur(6px)",
+          background: "rgba(26,43,43,0.82)", backdropFilter: "blur(6px)",
           color: C.cream, borderRadius: 20, padding: "6px 12px",
           display: "flex", alignItems: "center", gap: 6,
           fontFamily: "DM Sans, sans-serif", fontSize: 11, fontWeight: 600,
@@ -39,13 +40,13 @@ function RightPanel() {
         </div>
         <div style={{
           position: "absolute", top: 12, right: 12,
-          background: C.coral, color: C.cream,
+          background: C.teal, color: C.cream,
           fontFamily: "Noto Serif JP, serif", fontSize: 12,
           padding: "4px 12px", borderRadius: 20, fontWeight: 700,
         }}>おすすめ</div>
         <div style={{
           position: "absolute", bottom: 0, left: 0, right: 0,
-          background: "linear-gradient(transparent, rgba(26,26,24,0.75))",
+          background: "linear-gradient(transparent, rgba(26,43,43,0.78))",
           padding: "24px 14px 12px",
           display: "flex", justifyContent: "space-between", alignItems: "flex-end",
         }}>
@@ -60,7 +61,7 @@ function RightPanel() {
       {/* Lo más pedido */}
       <div style={{ background: C.paper, borderRadius: 12, padding: "14px 16px", border: `1px solid ${C.border}` }}>
         <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.18em",
-          textTransform: "uppercase", color: C.coral, margin: "0 0 10px" }}>
+          textTransform: "uppercase", color: C.teal, margin: "0 0 10px" }}>
           🔥 Lo más pedido hoy
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -73,7 +74,7 @@ function RightPanel() {
                   </span>
                   {item.badge && (
                     <span style={{ fontSize: 9, fontWeight: 700, color: C.coral,
-                      background: "rgba(232,84,58,0.1)", padding: "1px 6px", borderRadius: 4 }}>
+                      background: "rgba(232,145,92,0.14)", padding: "1px 6px", borderRadius: 4 }}>
                       {item.badge}
                     </span>
                   )}
@@ -95,8 +96,8 @@ export default function Hero() {
       <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
 
-        {/* Coral frame */}
-        <div style={{ background: C.coral, borderRadius: 24, padding: 10 }}>
+        {/* Teal frame */}
+        <div style={{ background: C.teal, borderRadius: 24, padding: 10 }}>
           <div style={{
             background: C.cream, borderRadius: 16,
             display: "flex", flexWrap: "wrap",
@@ -110,7 +111,7 @@ export default function Hero() {
               <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
                 <div style={{
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
-                  background: C.coral, color: C.cream,
+                  background: C.teal, color: C.cream,
                   borderRadius: "50%", width: 104, height: 104, flexShrink: 0,
                   fontFamily: "Noto Serif JP, serif", fontSize: "1.7rem", fontWeight: 900,
                 }}>巻</div>
@@ -118,9 +119,10 @@ export default function Hero() {
                   <p style={{ fontFamily: "Noto Serif JP, serif", fontSize: "1.4rem", fontWeight: 900, color: C.ink, lineHeight: 1, margin: 0 }}>まき のり</p>
                   <p style={{ fontFamily: "Noto Serif JP, serif", fontSize: 11, color: C.muted, margin: "4px 0 0" }}>Maki Nori · Iguala</p>
                 </div>
+                <MascotaSushi pose="feliz" size={72} style={{ marginLeft: "auto", flexShrink: 0 }} />
               </div>
 
-              <p style={{ fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600, color: C.coral, margin: 0, fontFamily: "DM Sans, sans-serif" }}>
+              <p style={{ fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600, color: C.teal, margin: 0, fontFamily: "DM Sans, sans-serif" }}>
                 Cocina Japonesa Boutique · Iguala, Guerrero
               </p>
 
@@ -132,16 +134,16 @@ export default function Hero() {
                 textTransform: "uppercase", letterSpacing: "-0.03em", margin: 0,
               }}>
                 Maki Nori<br/>
-                <span style={{ color: C.coral }}>donde el</span><br/>
+                <span style={{ color: C.teal }}>donde el</span><br/>
                 sushi se<br/>
                 <span style={{
-                  color: C.ink,
-                  WebkitTextStroke: `2px ${C.ink}`,
+                  color: C.coral,
+                  WebkitTextStroke: `2px ${C.coral}`,
                   WebkitTextFillColor: "transparent",
                 }}>hace arte</span>
               </h1>
 
-              <div style={{ borderLeft: `3px solid ${C.coral}`, paddingLeft: 16, marginTop: 4 }}>
+              <div style={{ borderLeft: `3px solid ${C.teal}`, paddingLeft: 16, marginTop: 4 }}>
                 <p style={{ fontFamily: "Noto Serif JP, serif", fontSize: 15, fontWeight: 700, color: C.ink, margin: 0 }}>
                   おもてなし <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, fontWeight: 400, color: C.muted }}>— Omotenashi</span>
                 </p>
@@ -151,8 +153,8 @@ export default function Hero() {
               </div>
 
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 4 }}>
-                <BtnCoral href="#menu">Ver Menú →</BtnCoral>
-                <BtnGhost href="#reserva">Reservar Mesa</BtnGhost>
+                <BtnTeal href="#menu">Ver Menú →</BtnTeal>
+                <BtnGhost href="#linktree">Síguenos</BtnGhost>
               </div>
             </div>
 
