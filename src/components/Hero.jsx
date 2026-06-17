@@ -25,7 +25,7 @@ function RightPanel() {
     <div style={{ width: "100%", maxWidth: 400, display: "flex", flexDirection: "column", gap: 12 }}>
       {/* Hero image */}
       <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", aspectRatio: "4/3", background: C.paper }}>
-        <img src="/sushicomida.png" alt="Sushi Maki Nori"
+        <img src="/sushi1.png" alt="Sushi Maki Nori"
           style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
         <div style={{
           position: "absolute", top: 12, left: 12,

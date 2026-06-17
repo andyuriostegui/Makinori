@@ -1,4 +1,4 @@
-import { C } from "./Tokens";
+import { C } from "./tokens";
 
 // ─── Mascota: rollito de sushi kawaii ──────────────────────────
 // pose: "feliz" | "hambriento"
