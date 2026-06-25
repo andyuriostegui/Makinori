@@ -146,7 +146,7 @@ export default function Hero() {
                 fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase",
                 fontWeight: 600, color: C.teal, margin: 0, fontFamily: "DM Sans, sans-serif",
               }}>
-                Cocina Japonesa Boutique · Iguala, Guerrero
+                Cocina Japonesa · Iguala, Guerrero
               </p>
 
               {/* Headline */}
