@@ -21,21 +21,21 @@ const LINKS = [
   {
     label: "TikTok",
     sub: "@makinori.sushi",
-    href: "https://www.tiktok.com/@makinori.sushi",
+    href: "https://www.tiktok.com/@maki.nori1?_r=1&_t=ZS-97V2ldQ6NpE",
     Icon: TiktokIcon,
     color: "#1A2B2B",
   },
   {
     label: "Pide por WhatsApp",
     sub: "Entrega en Iguala · 30-45 min",
-    href: "https://wa.me/527331002030",
+    href: "https://wa.me/527331598996",
     Icon: WhatsappIcon,
     color: "#25D366",
   },
   {
     label: "Facebook",
     sub: "Maki Nori Iguala",
-    href: "https://facebook.com",
+    href: "https://www.facebook.com/makinorisushi/?locale=es_LA",
     Icon: Facebook01Icon,
     color: "#1877F2",
   },
@@ -58,9 +58,9 @@ const LINKS = [
 // ─── Videos (pega aquí los links de TikTok/Instagram) ─────────
 // Para cada video pon el link del post. Al dar click abre el video.
 const VIDEOS = [
-  { titulo: "Cómo hacemos el Dragon Roll", red: "TikTok",    href: "https://www.tiktok.com/@makinori.sushi", thumb: "/maki2.jpeg" },
-  { titulo: "Ramen Buldak en acción",      red: "Instagram", href: "https://www.instagram.com/sushi.makinori/", thumb: "/maki10.jpeg" },
-  { titulo: "Detrás de la barra",          red: "TikTok",    href: "https://www.tiktok.com/@makinori.sushi", thumb: "/maki5.jpeg" },
+  { titulo: "Vibra Maki Nori", red: "Instagram",    href: "https://www.instagram.com/reel/DY0uJLjtdse/?utm_source=ig_web_button_share_sheet&igsh=MzRlODBiNWFlZA==", thumb: "/vibra.png" },
+  { titulo: "Conocenos",      red: "Facebook", href: "https://www.facebook.com/share/v/1BfXyEq5mR/", thumb: "/maki10.jpeg" },
+  { titulo: "Detrás de la barra",    red: "TikTok",    href: "https://www.tiktok.com/@maki.nori1/video/7650002879431920914?is_from_webapp=1&sender_device=pc&web_id=7655232434535122450", thumb: "/maki9.jpeg" },
 ];
 
 function LinkRow({ item }) {

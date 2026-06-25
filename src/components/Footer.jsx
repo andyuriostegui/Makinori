@@ -18,9 +18,9 @@ const LINKS = [
 ];
 
 const SOCIAL = [
-  { href: "https://instagram.com/makinorimx", label: "Instagram", Icon: InstagramIcon },
-  { href: "https://facebook.com",             label: "Facebook",  Icon: Facebook01Icon },
-  { href: "https://wa.me/527331002030",        label: "WhatsApp",  Icon: WhatsappIcon  },
+  { href: "https://www.instagram.com/sushi.makinori/", label: "Instagram", Icon: InstagramIcon },
+  { href: "https://www.facebook.com/makinorisushi/?locale=es_LA",             label: "Facebook",  Icon: Facebook01Icon },
+  { href: "https://wa.me/527331598996",        label: "WhatsApp",  Icon: WhatsappIcon  },
 ];
 
 export default function Footer() {
@@ -45,7 +45,7 @@ export default function Footer() {
               </div>
             </div>
             <p style={{ fontSize: 13, color: "rgba(245,240,232,0.5)", lineHeight: 1.8, maxWidth: 280, margin: "0 0 20px" }}>
-              Cocina japonesa boutique en el corazón de Iguala, Guerrero. Rolls frescos, ramen especial y bebidas importadas.
+              Cocina japonesa en el corazón de Iguala, Guerrero. Rolls frescos, ramen especial y bebidas importadas.
             </p>
             <div style={{ display: "flex", gap: 10 }}>
               {SOCIAL.map(({ href, label, Icon }) => (
@@ -66,9 +66,8 @@ export default function Footer() {
           <div>
             <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(245,240,232,0.4)", margin: "0 0 16px" }}>Contacto</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <FooterLink href="tel:+527331002030" icon={<Call02Icon size={13} />}>+52 733 100 2030</FooterLink>
-              <FooterLink href="mailto:hola@makinori.mx" icon={<Mail01Icon size={13} />}>hola@makinori.mx</FooterLink>
-              <FooterLink href="https://wa.me/527331002030" icon={<WhatsappIcon size={13} />}>WhatsApp directo</FooterLink>
+              <FooterLink href="tel:+527331598996" icon={<Call02Icon size={13} />}>+52 733 159 89 96</FooterLink>
+              <FooterLink href="https://wa.me/527331598996" icon={<WhatsappIcon size={13} />}>WhatsApp directo</FooterLink>
             </div>
             <div style={{ marginTop: 20 }}>
               <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(245,240,232,0.4)", margin: "0 0 8px" }}>Dirección</p>

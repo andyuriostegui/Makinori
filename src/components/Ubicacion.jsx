@@ -89,7 +89,7 @@ export default function Ubicacion() {
           { jp: "新鮮", label: "100% Fresco",  sub: "Sin congelados" },
           { jp: "手作り", label: "Hecho a mano", sub: "Cada pieza"    },
           { jp: "地元", label: "Iguala",        sub: "Orgullo local"  },
-          { jp: "愛", label: "Con amor",        sub: "En cada orden"  },
+          { jp: "愛", label: "Con amor",          sub: "En cada orden"  },
         ].map(({ jp, label, sub }, i, arr) => (
           <div key={jp} style={{
             textAlign: "center", padding: "16px 32px",
@@ -120,9 +120,9 @@ export default function Ubicacion() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 40, alignItems: "start" }}>
           <div style={{ borderRadius: 16, overflow: "hidden", border: `1px solid ${C.border}`, height: 400, boxShadow: "0 8px 32px rgba(26,26,24,0.08)" }}>
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30286.95!2d-99.5395!3d18.3503!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85cdaee15ab33c8d%3A0x540ce5d45d9bb690!2sIguala%2C%20Guerrero%2C%20M%C3%A9xico!5e0!3m2!1ses!2smx!4v1"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7574.527994705546!2d-99.53425449999999!3d18.335236700000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85cc386c980e9ebd%3A0x1a0481bbae95ae92!2sMaki%20Nori%20Sushi!5e0!3m2!1ses-419!2smx!4v1782372749242!5m2!1ses-419!2smx"
               width="100%" height="400" style={{ border: 0, display: "block" }}
-              allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin"
               title="Mapa Maki Nori Iguala"
             />
           </div>
@@ -130,7 +130,7 @@ export default function Ubicacion() {
           <div style={{ display: "flex", flexDirection: "column", gap: 28, fontFamily: "DM Sans, sans-serif" }}>
 
             <InfoBlock label="Dirección" icon={<Location01Icon size={14} color={C.coral} />}>
-              <p style={{ fontWeight: 700, fontSize: 15, color: C.ink, margin: "0 0 2px" }}>Av. Bandera Nacional 120, Centro</p>
+              <p style={{ fontWeight: 700, fontSize: 15, color: C.ink, margin: "0 0 2px" }}>Perif. Sur 12, 24 de Febrero, 40000 Iguala de la Independencia, Gro.</p>
               <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>Iguala de la Independencia, Guerrero 40000, México</p>
             </InfoBlock>
 
@@ -146,14 +146,8 @@ export default function Ubicacion() {
               ))}
             </InfoBlock>
 
-            <InfoBlock label="Contacto" icon={<Call02Icon size={14} color={C.coral} />}>
-              {CONTACTO.map(({ href, label }) => {
-                const Icon = getIcon(href);
-                return <ContactLink key={href} href={href} Icon={Icon}>{label}</ContactLink>;
-              })}
-            </InfoBlock>
 
-            <a href="https://wa.me/527331002030" target="_blank" rel="noreferrer"
+            <a href="https://wa.me/527331598996" target="_blank" rel="noreferrer"
               style={{
                 display: "flex", alignItems: "center", gap: 14,
                 background: "#25D366", borderRadius: 10, padding: "16px 20px",

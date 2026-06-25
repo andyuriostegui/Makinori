@@ -5,7 +5,7 @@ export default function WAFloat() {
   const [hov, setHov] = useState(false);
   return (
     <a
-      href="https://wa.me/527331002030?text=Hola%20Maki%20Nori%2C%20quiero%20hacer%20un%20pedido%20%F0%9F%8D%A3"
+      href="https://wa.me/527331598996?text=Hola%20Maki%20Nori%2C%20quiero%20hacer%20un%20pedido%20%F0%9F%8D%A3"
       target="_blank" rel="noreferrer"
       aria-label="Pedir por WhatsApp"
       onMouseEnter={() => setHov(true)}

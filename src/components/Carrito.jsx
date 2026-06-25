@@ -177,7 +177,7 @@ export function CarritoPanel() {
     ).join("\n");
     const modoStr = modo === "mesa" ? `Mesa: ${mesa || "?"}` : "Para llevar";
     const msg = `¡Hola Maki Nori! Quiero hacer un pedido:\n\n${lineas}\n\n${modoStr}\nTotal: $${total} MXN\n\n¡Gracias!`;
-    window.open(`https://wa.me/527331002030?text=${encodeURIComponent(msg)}`, "_blank");
+    window.open(`https://wa.me/527331598996?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
   if (!open) return null;
