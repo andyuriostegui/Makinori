@@ -1,11 +1,22 @@
 import { useState } from "react";
 import { C, SectionTag, Section, Container } from "./tokens";
-import { MENU_CATS } from "./data";
+import { MENU_CATS, SNACKS } from "./data";
 import { useCarritoCtx } from "./Carrito";
 
-const CAT_LABELS = { frescos: "Frescos", empanizados: "Empanizados", ramen: "Ramen", bebidas: "Bebidas" };
+const CAT_LABELS = {
+  frescos:     "Frescos",
+  empanizados: "Empanizados",
+  ramen:       "Ramen",
+  snacks:      "Snacks",
+  bebidas:     "Bebidas",
+};
 
-function ItemRow({ item, index, total }) {
+const SNACKS_META = {
+  jp: "おつまみ",
+  sub: "Botanitas y entradas · Para compartir o para ti solo",
+};
+
+function ItemRow({ item, index, total, catKey }) {
   const { items, agregar, quitar } = useCarritoCtx();
   const precioNum = parseInt(item.precio.replace("$", ""));
   const enCarrito = items.find(i => i.nombre === item.nombre);
@@ -26,13 +37,11 @@ function ItemRow({ item, index, total }) {
       fontFamily: "DM Sans, sans-serif",
       gap: 12,
     }}>
-      {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 14, fontWeight: 600, color: C.ink, margin: 0 }}>{item.nombre}</p>
         <p style={{ fontSize: 12, color: C.muted, margin: 0 }}>{item.desc}</p>
       </div>
 
-      {/* Precio + controles */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
         <p style={{ fontSize: 14, fontWeight: 900, color: C.ink, margin: 0 }}>{item.precio}</p>
 
@@ -44,8 +53,7 @@ function ItemRow({ item, index, total }) {
             fontSize: 18, fontWeight: 700, cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
             transform: pop ? "scale(0.88)" : "scale(1)",
-            transition: "all 0.15s",
-            flexShrink: 0,
+            transition: "all 0.15s", flexShrink: 0,
           }}>+</button>
         ) : (
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -73,7 +81,11 @@ function ItemRow({ item, index, total }) {
 
 export default function Menu() {
   const [cat, setCat] = useState("frescos");
-  const data = MENU_CATS[cat];
+
+  const isSnacks = cat === "snacks";
+  const data = isSnacks
+    ? { ...SNACKS_META, items: SNACKS }
+    : MENU_CATS[cat];
 
   return (
     <Section id="menu" bg={C.paper} style={{ position: "relative", overflow: "hidden" }}>
@@ -85,15 +97,13 @@ export default function Menu() {
       {/* Imagen lateral izquierda — ramen */}
       <img src="/ramen.png" alt="Ramen Maki Nori" className="menu-side" style={{
         position: "absolute", left: -40, top: "50%", transform: "translateY(-50%)",
-        width: 400, height: "auto", opacity: 1, pointerEvents: "none",
-        userSelect: "none",
+        width: 400, height: "auto", opacity: 1, pointerEvents: "none", userSelect: "none",
       }} />
 
       {/* Imagen lateral derecha — nigiri */}
       <img src="/sushicomida.png" alt="Sushi Maki Nori" className="menu-side" style={{
         position: "absolute", right: -40, top: "50%", transform: "translateY(-50%)",
-        width: 380, height: "auto", opacity: 1, pointerEvents: "none",
-        userSelect: "none",
+        width: 380, height: "auto", opacity: 1, pointerEvents: "none", userSelect: "none",
       }} />
 
       <Container max={800} style={{ position: "relative", zIndex: 1 }}>
@@ -109,6 +119,7 @@ export default function Menu() {
           </h2>
         </div>
 
+        {/* Tabs */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginBottom: 48 }}>
           {Object.keys(CAT_LABELS).map(c => (
             <TabBtn key={c} active={cat === c} onClick={() => setCat(c)}>
@@ -117,6 +128,7 @@ export default function Menu() {
           ))}
         </div>
 
+        {/* Subtítulo categoría */}
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 4 }}>
             <span style={{ fontFamily: "Noto Serif JP, serif", fontSize: 12, color: C.teal, letterSpacing: "0.15em" }}>{data.jp}</span>
@@ -125,9 +137,10 @@ export default function Menu() {
           <p style={{ fontSize: 10, color: C.muted, letterSpacing: "0.15em", textTransform: "uppercase", margin: 0, fontFamily: "DM Sans, sans-serif" }}>{data.sub}</p>
         </div>
 
+        {/* Lista */}
         <div style={{ background: C.cream, borderRadius: 16, padding: "8px 28px", border: `1px solid ${C.border}` }}>
           {data.items.map((item, i) => (
-            <ItemRow key={i} item={item} index={i} total={data.items.length} />
+            <ItemRow key={i} item={item} index={i} total={data.items.length} catKey={cat} />
           ))}
         </div>
       </Container>

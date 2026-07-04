@@ -168,20 +168,6 @@ export default function Hero() {
                 </span>
               </h1>
 
-              <div style={{ borderLeft: `3px solid ${C.teal}`, paddingLeft: 16, marginTop: 4 }}>
-                <p style={{ fontFamily: "Noto Serif JP, serif", fontSize: 15, fontWeight: 700, color: C.ink, margin: 0 }}>
-                  おもてなし{" "}
-                  <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, fontWeight: 400, color: C.muted }}>
-                    — Omotenashi
-                  </span>
-                </p>
-                <p style={{
-                  fontFamily: "DM Sans, sans-serif", fontSize: 12, color: C.muted,
-                  lineHeight: 1.6, margin: "4px 0 0", maxWidth: 320,
-                }}>
-                  Más que servicio: es la devoción de nuestro itamae por anticipar cada necesidad del comensal, creando una experiencia de armonía total.
-                </p>
-              </div>
 
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 4 }}>
                 <BtnTeal href="#menu">Ver Menú →</BtnTeal>

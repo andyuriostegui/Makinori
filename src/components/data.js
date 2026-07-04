@@ -3,35 +3,35 @@ export const PRODUCTOS = [
     id: 1, tag: "CHEF'S PICK", tagDark: false,
     nombre: "Philadelphia Roll", jp: "フィラデルフィア", precio: "$100",
     desc: "Ajonjolí por fuera, por dentro: Salmon, pepino y philadelphia.",
-    badges: ["Fresco", "8 piezas"],
+    badges: ["Fresco", "10 piezas"],
     ilu: "sashimi", foto: "/maki1.jpeg",
   },
   {
     id: 2, tag: "BEST SELLER", tagDark: true,
-    nombre: "Dragon Roll", jp: "ドラゴンロール", precio: "$95",
+    nombre: "Volcán o Roll", jp: "ボルケーノ・ロール", precio: "$95",
     desc: "Aderezo tampico por fuera, por dentro: pepino, camarón, aguacate y philadelphia.",
-    badges: ["🌶 Picante suave", "8 piezas"],
+    badges: ["🌶 Picante suave", "10 piezas"],
     ilu: "dragon", foto: "/maki2.jpeg",
   },
   {
     id: 3, tag: "NUEVO", tagDark: false,
-    nombre: "Ramen Buldak Doble Picante", jp: "ブルダック", precio: "$100",
+    nombre: "Yakimeshi", jp: "焼き飯", precio: "$100",
     desc: "Preparado con cebollín rallado, tocino, hongos, ajonjolí y zanahoria finamente picada.",
     badges: ["🔥 Muy picante", "Seco"],
     ilu: "ramen", foto: "/maki5.jpeg",
   },
   {
     id: 4, tag: null,
-    nombre: "Snow Roll", jp: "スノーロール", precio: "$95",
+    nombre: "Ramen", jp: "拉麺", precio: "$95",
     desc: "Cubierta de Philadelphia y ajonjolí por fuera, por dentro: Pepino, aguacate y surimi.",
-    badges: ["Fresco", "8 piezas"],
+    badges: ["Fresco", "10 piezas"],
     ilu: "nigiri", foto: "/maki10.jpeg",
   },
   {
     id: 5, tag: null,
     nombre: "Volcano Roll", jp: "ボルカノ", precio: "$95",
     desc: "Aderezo chipotle por fuera, por dentro: carne enchilada, tocino, philadelphia y chile.",
-    badges: ["🌶 Picante", "8 piezas"],
+    badges: ["🌶 Picante", "10 piezas"],
     badgePicante: true,
     ilu: "temaki", foto: "/maki6.jpeg",
   },
@@ -154,15 +154,7 @@ export const CONTACTO = [
 
 export const JP_CONCEPTS = [
   {
-    kanji: "おもてなし", romaji: "Omotenashi", title: "Hospitalidad total",
-    desc: "Más que servicio: es la devoción del itamae por anticipar cada necesidad del comensal antes de que la exprese. Cada visita a Maki Nori está impregnada de este espíritu.",
-  },
-  {
-    kanji: "侘寂", romaji: "Wabi-sabi", title: "Belleza en lo imperfecto",
-    desc: "La perfección de nuestros rollos no es geométrica sino intencional. Cada pieza, hecha a mano, lleva la huella del artesano: sencilla, auténtica y precisa.",
-  },
-  {
     kanji: "お任せ", romaji: "Omakase", title: "Lo dejo en tus manos",
     desc: "El nivel máximo de confianza en el chef. Al pedir omakase te dejas llevar: un menú degustación con los ingredientes más frescos del día, elegido para ti en el momento.",
-  },
+  }
 ];

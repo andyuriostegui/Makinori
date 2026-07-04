@@ -94,23 +94,7 @@ export default function Productos() {
           </h2>
         </div>
 
-        <div style={{
-          maxWidth: 680, margin: "0 auto 56px",
-          display: "flex", alignItems: "flex-start", gap: 24,
-          background: C.paper, borderRadius: 12, padding: "24px 28px",
-          border: `1px solid ${C.border}`,
-        }}>
-          <div style={{ flexShrink: 0, textAlign: "center" }}>
-            <p style={{ fontFamily: "Noto Serif JP, serif", fontSize: 28, fontWeight: 900, color: C.ink, margin: 0, lineHeight: 1 }}>侘寂</p>
-            <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 10, color: C.coral, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", margin: "4px 0 0" }}>Wabi-sabi</p>
-          </div>
-          <div style={{ borderLeft: `1px solid ${C.border}`, paddingLeft: 24 }}>
-            <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: C.ink, fontWeight: 600, margin: "0 0 4px" }}>La belleza de lo imperfecto</p>
-            <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: C.muted, lineHeight: 1.7, margin: 0 }}>
-              Cada pieza sale de nuestras manos con una intención, no con una plantilla. La imprecisión natural de un rollo hecho a mano es exactamente lo que lo hace único. Simplicidad, autenticidad, precisión artesanal.
-            </p>
-          </div>
-        </div>
+      
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 24 }}>
           {PRODUCTOS.map(p => <ProductCard key={p.id} producto={p} />)}
