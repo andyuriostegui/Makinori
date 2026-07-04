@@ -74,7 +74,7 @@ export default function Footer() {
               <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
                 <Location01Icon size={13} color="rgba(245,240,232,0.3)" style={{ marginTop: 2, flexShrink: 0 }} />
                 <p style={{ fontSize: 12, color: "rgba(245,240,232,0.5)", lineHeight: 1.7, margin: 0 }}>
-                  Av. Bandera Nacional 120, Centro<br/>
+                Perif. Sur 12, 24 de Febrero, 40000 Iguala de la Independencia, Gro.<br/>
                   Iguala, Guerrero, México
                 </p>
               </div>
