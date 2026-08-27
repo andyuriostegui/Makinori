@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { C, FONT, Section, Container, SectionTitle } from "./tokens";
+import { WA_PEDIDO } from "./data";
 import {
   InstagramIcon,
   TiktokIcon,
@@ -11,6 +12,27 @@ import {
 
 // ─── Configura aquí tus links reales ──────────────────────────
 const LINKS = [
+  {
+    label: "Pide por WhatsApp",
+    sub: "Entrega en Iguala · 30-45 min",
+    href: WA_PEDIDO,
+    Icon: WhatsappIcon,
+    color: "#25D366",
+  },
+  {
+    label: "Ver menú y armar pedido",
+    sub: "Rolls, ramen, snacks y bebidas",
+    href: "#menu",
+    Icon: Menu01Icon,
+    color: C.teal,
+  },
+  {
+    label: "Cómo llegar",
+    sub: "Perif. Sur 12, 24 de Febrero, Iguala",
+    href: "#ubicacion",
+    Icon: Location01Icon,
+    color: C.coral,
+  },
   {
     label: "Instagram",
     sub: "@sushi.makinori",
@@ -26,32 +48,11 @@ const LINKS = [
     color: "#1A2B2B",
   },
   {
-    label: "Pide por WhatsApp",
-    sub: "Entrega en Iguala · 30-45 min",
-    href: "https://wa.me/527331598996",
-    Icon: WhatsappIcon,
-    color: "#25D366",
-  },
-  {
     label: "Facebook",
     sub: "Maki Nori Iguala",
     href: "https://www.facebook.com/makinorisushi/?locale=es_LA",
     Icon: Facebook01Icon,
     color: "#1877F2",
-  },
-  {
-    label: "Ver Menú completo",
-    sub: "Todos nuestros rolls y bebidas",
-    href: "#menu",
-    Icon: Menu01Icon,
-    color: C.teal,
-  },
-  {
-    label: "Cómo llegar",
-    sub: "Av. Bandera Nacional 120, Centro",
-    href: "#ubicacion",
-    Icon: Location01Icon,
-    color: C.coral,
   },
 ];
 
@@ -159,7 +160,7 @@ export default function Linktree() {
       <Container max={680}>
 
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <img src="/tree.jpg" alt="Gato ninja Maki Nori" style={{
+          <img src="/tree.jpg" alt="Gato ninja Maki Nori" loading="lazy" decoding="async" style={{
             width: 180, height: 180, objectFit: "contain",
             margin: "0 auto 16px", display: "block",
             mixBlendMode: "multiply",
@@ -167,7 +168,7 @@ export default function Linktree() {
           <SectionTitle kicker="繋がり" jp="フォロー">
             Todo Maki Nori <span style={{ color: C.teal, fontStyle: "italic" }}>en un lugar</span>
           </SectionTitle>
-          <p style={{ fontSize: 13, color: C.muted, fontFamily: FONT.sans, margin: "-36px 0 0" }}>
+          <p style={{ fontSize: 13, color: C.muted, fontFamily: FONT.sans, margin: "-20px 0 0" }}>
             Redes, pedidos y ubicación — todo a un click
           </p>
         </div>

@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { C } from "./tokens";
+import { useCarritoCtx } from "./Carrito";
+import { WA_PEDIDO } from "./data";
 
 export default function WAFloat() {
+  const { count, open } = useCarritoCtx();
   const [hov, setHov] = useState(false);
+  if (count > 0 || open) return null;
+
   return (
     <a
-      href="https://wa.me/527331598996?text=Hola%20Maki%20Nori%2C%20quiero%20hacer%20un%20pedido%20%F0%9F%8D%A3"
-      target="_blank" rel="noreferrer"
+      href={WA_PEDIDO}
+      target="_blank" rel="noopener noreferrer"
       aria-label="Pedir por WhatsApp"
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}

@@ -5,9 +5,8 @@ import { ShoppingBag01Icon, Menu01Icon, Cancel01Icon } from "hugeicons-react";
 
 const NAV_LINKS = [
   { href: "#",          label: "Inicio"    },
-  { href: "#productos", label: "Favoritos" },
   { href: "#menu",      label: "Menú"      },
-  { href: "#galeria",   label: "Galería"   },
+  { href: "#omakase",   label: "Omakase"   },
   { href: "#ubicacion", label: "Ubicación" },
 ];
 
@@ -24,15 +23,21 @@ export default function Navbar() {
 
   const close = () => setOpen(false);
   const dark = open || scrolled;
-  const bg = dark ? "rgba(22,19,17,0.94)" : "transparent";
+  const bg = dark ? "rgba(11,44,50,0.94)" : "transparent";
   const textColor = C.cream;
-  const mutedColor = "rgba(244,239,230,0.5)";
+  const mutedColor = "rgba(255,255,255,0.55)";
+
+  const pedir = () => {
+    close();
+    if (count > 0) setCarritoOpen(true);
+    else document.getElementById("menu")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <>
       <style>{`
-        .nav-desktop { display: flex; }
-        .nav-hamburger { display: none; }
+        .nav-desktop { display: flex !important; }
+        .nav-hamburger { display: none !important; }
         @media (max-width: 768px) {
           .nav-desktop { display: none !important; }
           .nav-hamburger { display: flex !important; }
@@ -82,12 +87,13 @@ export default function Navbar() {
               </li>
             )}
             <li style={{ listStyle: "none" }}>
-              <a href="#menu" style={{
-                background: C.teal, color: C.cream,
+              <button onClick={pedir} style={{
+                background: C.coral, color: "#fff",
                 padding: "8px 18px", borderRadius: 2, fontSize: 11,
-                fontWeight: 700, textDecoration: "none", letterSpacing: "0.12em",
-                textTransform: "uppercase",
-              }}>Ver Menú</a>
+                fontWeight: 700, letterSpacing: "0.12em",
+                textTransform: "uppercase", border: "none", cursor: "pointer",
+                fontFamily: FONT.sans,
+              }}>Pedir</button>
             </li>
           </ul>
 
@@ -112,12 +118,13 @@ export default function Navbar() {
                 </li>
               ))}
               <li style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <a href="#menu" onClick={close} style={{
-                  background: C.teal, color: C.cream,
+                <button onClick={pedir} style={{
+                  background: C.coral, color: "#fff",
                   padding: "10px 24px", borderRadius: 2,
-                  fontSize: 13, fontWeight: 700, textDecoration: "none",
+                  fontSize: 13, fontWeight: 700, border: "none",
                   letterSpacing: "0.1em", textTransform: "uppercase",
-                }}>Ver Menú</a>
+                  cursor: "pointer", fontFamily: FONT.sans,
+                }}>Pedir</button>
                 {count > 0 && (
                   <button onClick={() => { setCarritoOpen(true); close(); }} style={{
                     background: "rgba(244,239,230,0.12)", color: C.cream, border: "none",

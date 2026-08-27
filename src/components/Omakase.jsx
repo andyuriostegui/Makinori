@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { C, FONT, BtnCoral } from "./tokens";
+import { WA_OMAKASE } from "./data";
 import {
   HelpCircleIcon,
   Leaf01Icon,
@@ -17,8 +18,9 @@ export default function Omakase() {
 
   return (
     <section id="omakase" style={{
-      background: C.ink, color: C.cream,
+      background: C.navy, color: C.cream,
       padding: "100px 24px",
+      scrollMarginTop: 72,
       fontFamily: FONT.sans,
       position: "relative", overflow: "hidden",
     }}>
@@ -40,7 +42,7 @@ export default function Omakase() {
       `}</style>
 
       {/* Chef de fondo (fondo negro = se funde con la sección) */}
-      <img src="/chef.png" alt="Itamae Maki Nori" className="omakase-chef" style={{
+      <img src="/chef.png" alt="" className="omakase-chef" loading="lazy" decoding="async" style={{
         position: "absolute", right: 0, bottom: 0,
         height: "92%", width: "auto", opacity: 0.85,
         pointerEvents: "none", userSelect: "none",
@@ -119,9 +121,9 @@ export default function Omakase() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
-          <BtnCoral href="#linktree">Quiero que el chef elija por mí →</BtnCoral>
-          <p style={{ fontSize: 12, color: "rgba(245,240,232,0.35)", margin: 0, fontStyle: "italic" }}>
-            Escríbenos y lo armamos
+          <BtnCoral href={WA_OMAKASE}>Quiero que el chef elija por mí →</BtnCoral>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", margin: 0, fontStyle: "italic" }}>
+            Se abre WhatsApp · dinos gustos y alergias
           </p>
         </div>
       </div>

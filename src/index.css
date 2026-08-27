@@ -1,18 +1,19 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
-  --ink: #161311;
-  --ink-soft: #2A241E;
-  --cream: #F4EFE6;
-  --paper: #E8E0D2;
-  --washi: #FAF6EE;
-  --teal: #2A8B8B;
-  --teal-d: #1A5E5E;
-  --coral: #E07A4A;
-  --shu: #B33A2B;
-  --gold: #C4A36A;
-  --muted: #6B655C;
-  --border: #D0C6B4;
+  --ink: #1A1A1A;
+  --ink-soft: #0E3A42;
+  --navy: #0B2C32;
+  --cream: #FFFFFF;
+  --paper: #F3FAFB;
+  --washi: #FFFFFF;
+  --teal: #1A8A96;
+  --teal-d: #14707A;
+  --coral: #E8845C;
+  --shu: #E07048;
+  --gold: #E8845C;
+  --muted: #5A6A6E;
+  --border: #C5DCDF;
   --font-serif: "Shippori Mincho", "Noto Serif JP", "Times New Roman", serif;
   --font-jp: "Noto Serif JP", "Shippori Mincho", serif;
   --font-sans: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
@@ -44,7 +45,7 @@ img { max-width: 100%; }
 
 /* ── Seigaiha (olas) ── */
 .pattern-seigaiha {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40'%3E%3Cpath d='M0 40c10 0 10-16 20-16s10 16 20 16 10-16 20-16 10 16 20 16' fill='none' stroke='%232A8B8B' stroke-width='1.2' opacity='0.18'/%3E%3Cpath d='M0 40c10 0 10-10 20-10s10 10 20 10 10-10 20-10 10 10 20 10' fill='none' stroke='%232A8B8B' stroke-width='1' opacity='0.12'/%3E%3Cpath d='M-20 20c10 0 10-16 20-16s10 16 20 16 10-16 20-16 10 16 20 16 10-16 20-16 10 16 20 16' fill='none' stroke='%232A8B8B' stroke-width='1.2' opacity='0.18'/%3E%3Cpath d='M-20 20c10 0 10-10 20-10s10 10 20 10 10-10 20-10 10 10 20 10 10-10 20-10 10 10 20 10' fill='none' stroke='%232A8B8B' stroke-width='1' opacity='0.12'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40'%3E%3Cpath d='M0 40c10 0 10-16 20-16s10 16 20 16 10-16 20-16 10 16 20 16' fill='none' stroke='%231A8A96' stroke-width='1.2' opacity='0.18'/%3E%3Cpath d='M0 40c10 0 10-10 20-10s10 10 20 10 10-10 20-10 10 10 20 10' fill='none' stroke='%231A8A96' stroke-width='1' opacity='0.12'/%3E%3Cpath d='M-20 20c10 0 10-16 20-16s10 16 20 16 10-16 20-16 10 16 20 16 10-16 20-16 10 16 20 16' fill='none' stroke='%231A8A96' stroke-width='1.2' opacity='0.18'/%3E%3Cpath d='M-20 20c10 0 10-10 20-10s10 10 20 10 10-10 20-10 10 10 20 10 10-10 20-10 10 10 20 10' fill='none' stroke='%231A8A96' stroke-width='1' opacity='0.12'/%3E%3C/svg%3E");
   background-size: 80px 40px;
 }
 
@@ -54,7 +55,7 @@ img { max-width: 100%; }
 }
 
 .pattern-asanoha {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'%3E%3Cpath d='M28 0 L56 16 L56 48 L28 64 L0 48 L0 16 Z M28 0 L28 64 M0 16 L56 48 M56 16 L0 48' fill='none' stroke='%232A8B8B' stroke-width='0.6' opacity='0.12'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'%3E%3Cpath d='M28 0 L56 16 L56 48 L28 64 L0 48 L0 16 Z M28 0 L28 64 M0 16 L56 48 M56 16 L0 48' fill='none' stroke='%231A8A96' stroke-width='0.6' opacity='0.12'/%3E%3C/svg%3E");
   background-size: 56px 64px;
 }
 
@@ -63,10 +64,10 @@ img { max-width: 100%; }
   height: 6px;
   background: repeating-linear-gradient(
     90deg,
-    var(--shu) 0 28px,
-    var(--ink) 28px 36px,
+    var(--coral) 0 28px,
+    var(--navy) 28px 36px,
     var(--teal) 36px 64px,
-    var(--ink) 64px 72px
+    #fff 64px 72px
   );
 }
 
@@ -111,6 +112,47 @@ img { max-width: 100%; }
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
+/* ── Carta del menú ── */
+.menu-carta {
+  position: relative;
+  background: var(--washi);
+  padding: 28px 8px 12px;
+  box-shadow:
+    0 0 0 1px var(--gold),
+    0 0 0 8px var(--washi),
+    0 0 0 9px var(--ink),
+    0 28px 56px rgba(22, 19, 17, 0.12);
+}
+
+.menu-item-row {
+  transition: background 0.2s;
+}
+.menu-item-row:hover {
+  background: rgba(42, 139, 139, 0.05);
+}
+
+.productos-bento {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: minmax(0, auto);
+  gap: 22px;
+}
+.productos-bento .feat { grid-column: span 2; }
+.productos-bento .wide { grid-column: span 3; }
+.prod-card-h { display: flex; flex-direction: row; }
+.prod-card-h .prod-photo {
+  width: 48%;
+  min-height: 280px;
+  height: auto;
+  align-self: stretch;
+}
+
+@keyframes resenaIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.resena-in { animation: resenaIn 0.55s ease both; }
+
 /* ── Responsive helpers ── */
 @media (max-width: 900px) {
   .hide-mobile { display: none !important; }
@@ -122,6 +164,30 @@ img { max-width: 100%; }
   .hero-copy { padding: 108px 24px 48px !important; }
   .hero-photo { min-height: 56vh !important; width: 100% !important; position: relative !important; }
   .stats-strip { grid-template-columns: 1fr 1fr 1fr !important; }
+  .productos-bento {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .productos-bento .feat,
+  .productos-bento .wide {
+    grid-column: span 2 !important;
+    grid-row: span 1 !important;
+  }
+  .como-steps-row { grid-template-columns: 1fr !important; }
+  .prod-card-h { flex-direction: column !important; }
+  .prod-card-h .prod-photo {
+    width: 100% !important;
+    min-height: 0 !important;
+    height: 220px !important;
+  }
+  .menu-carta {
+    padding: 18px 4px 8px !important;
+    box-shadow:
+      0 0 0 1px var(--gold),
+      0 0 0 5px var(--washi),
+      0 0 0 6px var(--ink),
+      0 16px 32px rgba(22, 19, 17, 0.1) !important;
+  }
+  .prod-photo-feat { height: 220px !important; }
   .ubi-values { flex-direction: column !important; }
   .galeria-grid {
     grid-template-columns: 1fr 1fr !important;
@@ -131,4 +197,16 @@ img { max-width: 100%; }
     grid-column: span 2 !important;
     grid-row: span 2 !important;
   }
+}
+
+@media (max-width: 560px) {
+  .productos-bento {
+    grid-template-columns: 1fr !important;
+  }
+  .productos-bento .feat,
+  .productos-bento .wide {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+  }
+  .menu-dots { display: none !important; }
 }

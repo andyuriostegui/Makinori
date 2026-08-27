@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { C, FONT } from "./tokens";
+import { WA_PEDIDO } from "./data";
 import {
   InstagramIcon,
   Facebook01Icon,
@@ -20,12 +21,12 @@ const LINKS = [
 const SOCIAL = [
   { href: "https://www.instagram.com/sushi.makinori/", label: "Instagram", Icon: InstagramIcon },
   { href: "https://www.facebook.com/makinorisushi/?locale=es_LA",             label: "Facebook",  Icon: Facebook01Icon },
-  { href: "https://wa.me/527331598996",        label: "WhatsApp",  Icon: WhatsappIcon  },
+  { href: WA_PEDIDO, label: "WhatsApp",  Icon: WhatsappIcon  },
 ];
 
 export default function Footer() {
   return (
-    <footer style={{ background: C.ink, color: C.cream, fontFamily: FONT.sans }}>
+    <footer style={{ background: C.navy, color: C.cream, fontFamily: FONT.sans }}>
       <div className="noren-bar" />
       <div style={{ padding: "64px 40px 40px", maxWidth: 1200, margin: "0 auto" }}>
         <div className="footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 48 }}>
@@ -68,7 +69,7 @@ export default function Footer() {
             <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(245,240,232,0.4)", margin: "0 0 16px" }}>Contacto</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <FooterLink href="tel:+527331598996" icon={<Call02Icon size={13} />}>+52 733 159 89 96</FooterLink>
-              <FooterLink href="https://wa.me/527331598996" icon={<WhatsappIcon size={13} />}>WhatsApp directo</FooterLink>
+              <FooterLink href={WA_PEDIDO} icon={<WhatsappIcon size={13} />}>WhatsApp directo</FooterLink>
             </div>
             <div style={{ marginTop: 20 }}>
               <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(245,240,232,0.4)", margin: "0 0 8px" }}>Dirección</p>
@@ -98,6 +99,7 @@ function FooterLink({ href, children, icon }) {
   const [hov, setHov] = useState(false);
   return (
     <a href={href}
+      {...(href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{

@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { createContext, useContext } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import { C } from "./tokens";
+import { WA_NUM } from "./data";
 import {
   ShoppingBag01Icon,
   Timer01Icon,
@@ -11,26 +11,53 @@ import {
   ServingFoodIcon,
   Delete02Icon,
   HandBag01Icon,
+  Location01Icon,
 } from "hugeicons-react";
 
-// ─── Store global del carrito ────────────────────────────────
+const STORAGE_KEY = "makinori-pedido";
+const WA_URL = `https://wa.me/${WA_NUM}`;
+
+function leerPedido() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    if (!raw || !Array.isArray(raw.items)) return null;
+    return raw;
+  } catch {
+    return null;
+  }
+}
+
+function nuevoFolio() {
+  return `MN-${Math.floor(1000 + Math.random() * 9000)}`;
+}
+
 export function useCarrito() {
-  const [items, setItems] = useState([]);
-  const [modo, setModo] = useState("llevar");
-  const [mesa, setMesa] = useState("");
+  const saved = typeof window !== "undefined" ? leerPedido() : null;
+  const [items, setItems] = useState(saved?.items || []);
+  const [modo, setModo] = useState(saved?.modo || "llevar");
+  const [mesa, setMesa] = useState(saved?.mesa || "");
+  const [cliente, setCliente] = useState(saved?.cliente || { nombre: "", tel: "", direccion: "" });
   const [open, setOpen] = useState(false);
   const [bounce, setBounce] = useState(false);
+  const [folio, setFolio] = useState("");
+  const [enviado, setEnviado] = useState(false);
 
   const total = items.reduce((s, i) => s + i.precio * i.qty, 0);
   const count = items.reduce((s, i) => s + i.qty, 0);
 
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ items, modo, mesa, cliente }));
+  }, [items, modo, mesa, cliente]);
+
   const agregar = (producto) => {
+    const id = producto.id || producto.nombre;
     setItems(prev => {
-      const ex = prev.find(i => i.id === producto.id);
-      if (ex) return prev.map(i => i.id === producto.id ? { ...i, qty: i.qty + 1 } : i);
-      return [...prev, { ...producto, qty: 1, nota: "" }];
+      const ex = prev.find(i => i.id === id);
+      if (ex) return prev.map(i => i.id === id ? { ...i, qty: i.qty + 1 } : i);
+      return [...prev, { ...producto, id, qty: 1, nota: producto.nota || "" }];
     });
     setBounce(true);
+    setEnviado(false);
     setTimeout(() => setBounce(false), 400);
   };
 
@@ -40,35 +67,98 @@ export function useCarrito() {
       if (ex?.qty === 1) return prev.filter(i => i.id !== id);
       return prev.map(i => i.id === id ? { ...i, qty: i.qty - 1 } : i);
     });
+    setEnviado(false);
   };
 
   const setNota = (id, nota) => {
     setItems(prev => prev.map(i => i.id === id ? { ...i, nota } : i));
   };
 
-  const limpiar = () => setItems([]);
+  const setCampo = (k, v) => setCliente(c => ({ ...c, [k]: v }));
 
-  return { items, total, count, open, setOpen, agregar, quitar, setNota, limpiar, modo, setModo, mesa, setMesa, bounce };
+  const limpiar = () => {
+    setItems([]);
+    setFolio("");
+    setEnviado(false);
+  };
+
+  return {
+    items, total, count, open, setOpen, agregar, quitar, setNota, limpiar,
+    modo, setModo, mesa, setMesa, bounce, cliente, setCampo,
+    folio, setFolio, enviado, setEnviado,
+  };
 }
 
 export const CarritoCtx = createContext(null);
 export const useCarritoCtx = () => useContext(CarritoCtx);
 
-const SUGERENCIAS = {
-  2: { id: 8, nombre: "Mogu Mogu",        precio: 67, msg: "¿Le agregas un Mogu Mogu?"  },
-  1: { id: 7, nombre: "Aros de Cebolla",  precio: 65, msg: "¿Unos aros para acompañar?" },
-  3: { id: 9, nombre: "Palomitas Grande", precio: 80, msg: "¿Unas palomitas también?"   },
-};
+function pickSugerencia(items) {
+  if (!items.length) return null;
+  const names = items.map(i => i.nombre);
+  const inCart = n => names.includes(n);
+  const has = re => items.some(i => re.test(i.nombre));
+  const drink = /mogu|ramune|calpis|cerveza|refresco|soju|soyu|sake|mojito|colada|cuba|clericot|hidromiel|boing|agua |café/i;
+  const snack = /aros|palomitas|kushi|pops|papiux|onigiri/i;
+  const ramen = /ramen|buldak|kang/i;
+  const roll = /roll/i;
 
-// ─── BtnAgregar ──────────────────────────────────────────────
+  if (has(roll) && !has(drink) && !inCart("Mogu Mogu")) {
+    return { id: "Mogu Mogu", nombre: "Mogu Mogu", precio: 67, foto: "/bebida.jpeg", msg: "¿Un Mogu Mogu para acompañar?" };
+  }
+  if (has(ramen) && !has(snack) && !inCart("Aros de Cebolla")) {
+    return { id: "Aros de Cebolla", nombre: "Aros de Cebolla", precio: 65, foto: "/IMG_7072.jpg", msg: "¿Unos aros de cebolla?" };
+  }
+  if (has(roll) && !has(snack) && !inCart("Kushiagues Q+Camarón")) {
+    return { id: "Kushiagues Q+Camarón", nombre: "Kushiagues Q+Camarón", precio: 55, foto: "/IMG_7094.jpg", msg: "¿Kushiagues de camarón para la mesa?" };
+  }
+  if (!has(drink) && !inCart("Ramunes")) {
+    return { id: "Ramunes", nombre: "Ramunes", precio: 67, foto: "/bebida.jpeg", msg: "¿Una Ramune bien fría?" };
+  }
+  return null;
+}
+
+function armarMensaje({ items, total, modo, mesa, cliente, folio }) {
+  const modoStr = modo === "mesa"
+    ? `En mesa ${mesa.trim()}`
+    : modo === "domicilio"
+      ? "A domicilio"
+      : "Para llevar";
+
+  const lineas = items.map(i => {
+    const row = `• ${i.qty}x ${i.nombre} — $${i.precio} c/u = $${i.precio * i.qty}`;
+    return i.nota ? `${row}\n  nota: ${i.nota}` : row;
+  }).join("\n");
+
+  const quien = [
+    cliente.nombre?.trim() && `👤 ${cliente.nombre.trim()}`,
+    cliente.tel?.trim() && `📱 ${cliente.tel.trim()}`,
+    modo === "domicilio" && cliente.direccion?.trim() && `📍 ${cliente.direccion.trim()}`,
+  ].filter(Boolean).join("\n");
+
+  return [
+    `🍣 *Pedido Maki Nori*`,
+    `Folio: *#${folio}*`,
+    "",
+    quien,
+    `Modo: *${modoStr}*`,
+    "",
+    lineas,
+    "",
+    `*Total: $${total} MXN*`,
+    "",
+    "Confirmo cuando me contesten. ¡Gracias!",
+  ].filter(block => block !== "").join("\n").replace(/\n{3,}/g, "\n\n");
+}
+
 export function BtnAgregar({ producto }) {
   const { items, agregar, quitar } = useCarritoCtx();
-  const item = items.find(i => i.id === producto.id);
+  const id = producto.id || producto.nombre;
+  const item = items.find(i => i.id === id);
   const qty = item?.qty || 0;
   const [pop, setPop] = useState(false);
 
   const handleAgregar = () => {
-    agregar(producto);
+    agregar({ ...producto, id });
     setPop(true);
     setTimeout(() => setPop(false), 300);
   };
@@ -90,7 +180,7 @@ export function BtnAgregar({ producto }) {
         </button>
       ) : (
         <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%" }}>
-          <button onClick={() => quitar(producto.id)} style={{
+          <button onClick={() => quitar(id)} aria-label="Quitar uno" style={{
             width: 32, height: 32, borderRadius: 6, border: `1.5px solid ${C.border}`,
             background: "transparent", cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
@@ -99,7 +189,7 @@ export function BtnAgregar({ producto }) {
           <span style={{ flex: 1, textAlign: "center", fontWeight: 700, fontSize: 14, color: C.ink, fontFamily: "Noto Sans JP, sans-serif" }}>
             {qty} en pedido
           </span>
-          <button onClick={handleAgregar} style={{
+          <button onClick={handleAgregar} aria-label="Agregar uno" style={{
             width: 32, height: 32, borderRadius: 6, border: "none",
             background: C.teal, cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
@@ -112,12 +202,12 @@ export function BtnAgregar({ producto }) {
   );
 }
 
-// ─── CarritoBtn flotante ──────────────────────────────────────
 export function CarritoBtn() {
-  const { count, setOpen, bounce } = useCarritoCtx();
+  const { count, setOpen, bounce, open } = useCarritoCtx();
+  if (count === 0 || open) return null;
   return (
-    <button onClick={() => setOpen(o => !o)} style={{
-      position: "fixed", bottom: 92, right: 24, zIndex: 999,
+    <button onClick={() => setOpen(true)} aria-label={`Ver pedido, ${count} platillos`} style={{
+      position: "fixed", bottom: 24, right: 24, zIndex: 999,
       background: C.ink, color: C.cream,
       border: "none", borderRadius: 50, padding: "8px 20px 8px 8px",
       display: "flex", alignItems: "center", gap: 8,
@@ -134,50 +224,63 @@ export function CarritoBtn() {
         <img src="/sushito.png" alt="" style={{ width: 30, height: "auto" }} />
       </span>
       <span style={{ fontSize: 13, fontWeight: 700 }}>
-        {count === 0 ? "Tu pedido" : `${count} item${count > 1 ? "s" : ""}`}
+        {count} platillo{count === 1 ? "" : "s"}
       </span>
-      {count > 0 && (
-        <span style={{
-          background: C.teal, color: C.cream,
-          borderRadius: 20, padding: "2px 8px",
-          fontSize: 11, fontWeight: 900,
-        }}>{count}</span>
-      )}
+      <span style={{
+        background: C.teal, color: C.cream,
+        borderRadius: 20, padding: "2px 8px",
+        fontSize: 11, fontWeight: 900,
+      }}>{count}</span>
     </button>
   );
 }
 
-// ─── Panel del carrito ────────────────────────────────────────
+const inputCss = {
+  width: "100%", padding: "10px 12px",
+  border: `1.5px solid ${C.border}`, borderRadius: 8,
+  fontSize: 13, fontFamily: "Noto Sans JP, sans-serif",
+  color: C.ink, background: "#fff", boxSizing: "border-box", outline: "none",
+};
+
 export function CarritoPanel() {
-  const { items, total, count, open, setOpen, quitar, agregar, setNota, limpiar, modo, setModo, mesa, setMesa } = useCarritoCtx();
-  const [countdown, setCountdown] = useState(720);
-  const [sugerencia, setSugerencia] = useState(null);
+  const {
+    items, total, count, open, setOpen, quitar, agregar, setNota, limpiar,
+    modo, setModo, mesa, setMesa, cliente, setCampo,
+    folio, setFolio, enviado, setEnviado,
+  } = useCarritoCtx();
+  const [error, setError] = useState("");
+  const sugerencia = pickSugerencia(items);
 
   useEffect(() => {
-    const t = setInterval(() => setCountdown(c => c > 0 ? c - 1 : 720), 1000);
-    return () => clearInterval(t);
-  }, []);
+    if (!open) return;
+    const onKey = e => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, setOpen]);
 
-  const mins = Math.floor(countdown / 60);
-  const secs = String(countdown % 60).padStart(2, "0");
-  const urgente = countdown < 180;
-
-  useEffect(() => {
-    const ids = items.map(i => i.id);
-    for (const id of ids) {
-      if (SUGERENCIAS[id]) { setSugerencia(SUGERENCIAS[id]); return; }
-    }
-    setSugerencia(null);
-  }, [items]);
+  const validar = () => {
+    if (items.length === 0) return "Agrega algo del menú";
+    if (modo === "mesa" && !mesa.trim()) return "Indica el número de mesa";
+    if (modo !== "mesa" && !cliente.nombre.trim()) return "Escribe tu nombre";
+    if (modo !== "mesa" && !cliente.tel.trim()) return "Escribe tu WhatsApp";
+    if (modo === "domicilio" && !cliente.direccion.trim()) return "Escribe colonia y calle";
+    return "";
+  };
 
   const enviarWA = () => {
-    if (items.length === 0) return;
-    const lineas = items.map(i =>
-      `• ${i.qty}x ${i.nombre} — $${i.precio * i.qty}${i.nota ? ` (${i.nota})` : ""}`
-    ).join("\n");
-    const modoStr = modo === "mesa" ? `Mesa: ${mesa || "?"}` : "Para llevar";
-    const msg = `¡Hola Maki Nori! Quiero hacer un pedido:\n\n${lineas}\n\n${modoStr}\nTotal: $${total} MXN\n\n¡Gracias!`;
-    window.open(`https://wa.me/527331598996?text=${encodeURIComponent(msg)}`, "_blank");
+    const err = validar();
+    if (err) { setError(err); return; }
+    setError("");
+    const f = folio || nuevoFolio();
+    setFolio(f);
+    const msg = armarMensaje({ items, total, modo, mesa, cliente, folio: f });
+    window.open(`${WA_URL}?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
+    setEnviado(true);
+  };
+
+  const irAlMenu = () => {
+    setOpen(false);
+    document.getElementById("menu")?.scrollIntoView({ behavior: "smooth" });
   };
 
   if (!open) return null;
@@ -189,25 +292,25 @@ export function CarritoPanel() {
         background: "rgba(26,26,24,0.5)", backdropFilter: "blur(4px)",
       }} />
 
-      <div style={{
+      <div role="dialog" aria-modal="true" aria-labelledby="pedido-titulo" style={{
         position: "relative", zIndex: 1, width: "100%", maxWidth: 420,
         background: C.cream, height: "100%",
         display: "flex", flexDirection: "column",
-        boxShadow: "-8px 0 40px rgba(26,26,24,0.15)", overflowY: "auto",
+        boxShadow: "-8px 0 40px rgba(26,26,24,0.15)",
       }}>
-        {/* Header */}
-        <div style={{ padding: "20px 24px 16px", borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ padding: "20px 24px 16px", borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <ShoppingBag01Icon size={22} color={C.ink} />
               <div>
-                <h3 style={{ fontFamily: "Noto Sans JP, sans-serif", fontWeight: 900, fontSize: 18, margin: 0, color: C.ink }}>Tu Pedido</h3>
+                <h3 id="pedido-titulo" style={{ fontFamily: "Noto Sans JP, sans-serif", fontWeight: 900, fontSize: 18, margin: 0, color: C.ink }}>Tu Pedido</h3>
                 <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>
-                  {count === 0 ? "Agrega items del menú" : `${count} item${count > 1 ? "s" : ""} seleccionados`}
+                  {count === 0 ? "Agrega platillos del menú" : `${count} platillo${count === 1 ? "" : "s"}`}
+                  {folio ? ` · #${folio}` : ""}
                 </p>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} style={{
+            <button onClick={() => setOpen(false)} aria-label="Cerrar pedido" style={{
               background: C.paper, border: "none", borderRadius: 8,
               width: 36, height: 36, cursor: "pointer",
               display: "flex", alignItems: "center", justifyContent: "center",
@@ -216,65 +319,68 @@ export function CarritoPanel() {
             </button>
           </div>
 
-          {/* Countdown */}
           <div style={{
-            marginTop: 12,
-            background: urgente ? "rgba(42,139,139,0.1)" : C.paper,
-            border: `1px solid ${urgente ? C.coral : C.border}`,
+            marginTop: 12, background: C.paper, border: `1px solid ${C.border}`,
             borderRadius: 8, padding: "8px 12px",
             display: "flex", alignItems: "center", gap: 8,
           }}>
-            <Timer01Icon size={18} color={urgente ? C.coral : C.muted} />
-            <div>
-              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, fontWeight: 700, color: urgente ? C.coral : C.ink, margin: 0 }}>
-                {urgente ? "¡Últimos minutos!" : "Pide ahora"} — entrega en 30-45 min
-              </p>
-              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 10, color: C.muted, margin: 0 }}>
-                Tiempo estimado: {mins}:{secs}
-              </p>
-            </div>
+            <Timer01Icon size={18} color={C.muted} />
+            <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, fontWeight: 700, color: C.ink, margin: 0 }}>
+              Preparación 30–45 min · Iguala y alrededores
+            </p>
           </div>
         </div>
 
-        {/* Modo mesa/llevar */}
-        <div style={{ padding: "16px 24px", borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ padding: "16px 24px", borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
           <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: C.muted, margin: "0 0 10px" }}>¿Cómo lo quieres?</p>
-          <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ display: "flex", gap: 6 }}>
             {[
-              ["llevar", "Para llevar", HandBag01Icon],
-              ["mesa",   "En mesa",     Chair01Icon],
+              ["llevar",    "Llevar",     HandBag01Icon],
+              ["mesa",      "En mesa",    Chair01Icon],
+              ["domicilio", "Domicilio",  Location01Icon],
             ].map(([val, label, Icon]) => (
-              <button key={val} onClick={() => setModo(val)} style={{
-                flex: 1, padding: "10px 8px", borderRadius: 8, fontSize: 12, fontWeight: 600,
+              <button key={val} onClick={() => { setModo(val); setError(""); }} style={{
+                flex: 1, padding: "10px 4px", borderRadius: 8, fontSize: 11, fontWeight: 600,
                 cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
                 border: `1.5px solid ${modo === val ? C.teal : C.border}`,
                 background: modo === val ? "rgba(42,139,139,0.08)" : "transparent",
                 color: modo === val ? C.teal : C.muted,
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-                transition: "all 0.15s",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 4,
               }}>
-                <Icon size={14} color={modo === val ? C.teal : C.muted} /> {label}
+                <Icon size={13} color={modo === val ? C.teal : C.muted} /> {label}
               </button>
             ))}
           </div>
+
           {modo === "mesa" && (
             <input type="text" placeholder="Número de mesa (ej: 3)"
-              value={mesa} onChange={e => setMesa(e.target.value)}
-              style={{
-                marginTop: 10, width: "100%", padding: "10px 12px",
-                border: `1.5px solid ${C.border}`, borderRadius: 8,
-                fontSize: 13, fontFamily: "Noto Sans JP, sans-serif",
-                color: C.ink, background: "#fff", boxSizing: "border-box", outline: "none",
-              }}
+              value={mesa} onChange={e => { setMesa(e.target.value); setError(""); }}
+              style={{ ...inputCss, marginTop: 10 }}
             />
+          )}
+
+          {modo !== "mesa" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 10 }}>
+              <input type="text" placeholder="Tu nombre" value={cliente.nombre}
+                onChange={e => { setCampo("nombre", e.target.value); setError(""); }}
+                style={inputCss} autoComplete="name" />
+              <input type="tel" placeholder="WhatsApp (733…)" value={cliente.tel}
+                onChange={e => { setCampo("tel", e.target.value); setError(""); }}
+                style={inputCss} autoComplete="tel" />
+              {modo === "domicilio" && (
+                <input type="text" placeholder="Colonia, calle y referencias"
+                  value={cliente.direccion}
+                  onChange={e => { setCampo("direccion", e.target.value); setError(""); }}
+                  style={inputCss} autoComplete="street-address" />
+              )}
+            </div>
           )}
         </div>
 
-        {/* Items */}
-        <div style={{ flex: 1, padding: "16px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ flex: 1, padding: "16px 24px", display: "flex", flexDirection: "column", gap: 12, overflowY: "auto" }}>
           {items.length === 0 ? (
             <div style={{ textAlign: "center", padding: "24px 0" }}>
-              <img src="/sushito.png" alt="Sushito" style={{
+              <img src="/sushito.png" alt="" style={{
                 width: 130, height: "auto", margin: "0 auto 16px", display: "block",
               }} />
               <div style={{
@@ -286,17 +392,21 @@ export function CarritoPanel() {
                   ¡Aún no me has alimentado!
                 </p>
               </div>
-              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, margin: "8px 0 0", color: C.muted }}>Agrega algo del menú para empezar</p>
+              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, margin: "8px 0 16px", color: C.muted }}>Agrega algo del menú para empezar</p>
+              <button onClick={irAlMenu} style={{
+                background: C.teal, color: C.cream, border: "none", borderRadius: 8,
+                padding: "10px 20px", fontSize: 12, fontWeight: 700, cursor: "pointer",
+                fontFamily: "Noto Sans JP, sans-serif",
+              }}>Ver el menú</button>
             </div>
           ) : items.map(item => (
             <ItemRow key={item.id} item={item}
               onQuitar={() => quitar(item.id)}
               onAgregar={() => agregar(item)}
-              onNota={(n) => setNota(item.id, n)}
+              onNota={n => setNota(item.id, n)}
             />
           ))}
 
-          {/* Sugerencia */}
           {sugerencia && items.length > 0 && (
             <div style={{
               background: "rgba(42,139,139,0.06)", border: `1px dashed ${C.coral}`,
@@ -308,7 +418,7 @@ export function CarritoPanel() {
                 <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, fontWeight: 700, color: C.coral, margin: "0 0 2px" }}>{sugerencia.msg}</p>
                 <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>{sugerencia.nombre} · ${sugerencia.precio}</p>
               </div>
-              <button onClick={() => agregar({ id: sugerencia.id, nombre: sugerencia.nombre, precio: sugerencia.precio, foto: null })}
+              <button onClick={() => agregar(sugerencia)}
                 style={{
                   background: C.teal, color: C.cream, border: "none",
                   borderRadius: 6, padding: "6px 12px", fontSize: 11,
@@ -318,37 +428,62 @@ export function CarritoPanel() {
           )}
         </div>
 
-        {/* Footer */}
         {items.length > 0 && (
-          <div style={{ padding: "16px 24px 28px", borderTop: `1px solid ${C.border}` }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+          <div style={{ padding: "16px 24px 28px", borderTop: `1px solid ${C.border}`, flexShrink: 0 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
               <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 14, color: C.muted }}>Total estimado</span>
               <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 20, fontWeight: 900, color: C.ink }}>${total} MXN</span>
             </div>
+
+            {error && (
+              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.shu, margin: "0 0 10px", fontWeight: 600 }}>
+                {error}
+              </p>
+            )}
+
+            {enviado && (
+              <div style={{
+                background: "rgba(37,211,102,0.12)", border: "1px solid #25D366",
+                borderRadius: 8, padding: "10px 12px", marginBottom: 10,
+              }}>
+                <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, fontWeight: 700, color: C.ink, margin: 0 }}>
+                  Pedido #{folio} abierto en WhatsApp. Si no saltó, pulsa de nuevo.
+                </p>
+              </div>
+            )}
+
             <button onClick={enviarWA} style={{
               width: "100%", background: "#25D366", color: "#fff",
               border: "none", borderRadius: 10, padding: "16px",
               fontSize: 14, fontWeight: 700, cursor: "pointer",
               fontFamily: "Noto Sans JP, sans-serif",
               display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-              transition: "opacity 0.2s",
-            }}
-            onMouseEnter={e => e.currentTarget.style.opacity = "0.9"}
-            onMouseLeave={e => e.currentTarget.style.opacity = "1"}
-            >
-              <WhatsappIcon size={20} color="#fff" />
-              Enviar pedido por WhatsApp
-            </button>
-            <button onClick={limpiar} style={{
-              width: "100%", background: "transparent", color: C.muted,
-              border: "none", padding: "10px", fontSize: 12,
-              cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-              marginTop: 4,
             }}>
-              <Delete02Icon size={14} color={C.muted} />
-              Limpiar pedido
+              <WhatsappIcon size={20} color="#fff" />
+              {enviado ? "Reenviar por WhatsApp" : "Enviar pedido por WhatsApp"}
             </button>
+
+            {enviado ? (
+              <button onClick={() => { limpiar(); setOpen(false); }} style={{
+                width: "100%", background: "transparent", color: C.teal,
+                border: "none", padding: "10px", fontSize: 12, fontWeight: 700,
+                cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
+                marginTop: 4,
+              }}>
+                Ya lo envié — vaciar pedido
+              </button>
+            ) : (
+              <button onClick={limpiar} style={{
+                width: "100%", background: "transparent", color: C.muted,
+                border: "none", padding: "10px", fontSize: 12,
+                cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                marginTop: 4,
+              }}>
+                <Delete02Icon size={14} color={C.muted} />
+                Limpiar pedido
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -356,7 +491,6 @@ export function CarritoPanel() {
   );
 }
 
-// ─── ItemRow ─────────────────────────────────────────────────
 function ItemRow({ item, onQuitar, onAgregar, onNota }) {
   const [editNota, setEditNota] = useState(false);
 
@@ -374,19 +508,22 @@ function ItemRow({ item, onQuitar, onAgregar, onNota }) {
           <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 13, fontWeight: 700, color: C.ink, margin: "0 0 2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
             {item.nombre}
           </p>
+          <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>
+            ${item.precio} c/u
+          </p>
           <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.coral, fontWeight: 700, margin: 0 }}>
             ${item.precio * item.qty} MXN
           </p>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-          <button onClick={onQuitar} style={{
+          <button onClick={onQuitar} aria-label="Quitar uno" style={{
             width: 26, height: 26, borderRadius: 6, border: `1px solid ${C.border}`,
             background: "transparent", cursor: "pointer", fontWeight: 700, color: C.muted,
             display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16,
           }}>−</button>
           <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 13, fontWeight: 700, minWidth: 16, textAlign: "center" }}>{item.qty}</span>
-          <button onClick={onAgregar} style={{
+          <button onClick={onAgregar} aria-label="Agregar uno" style={{
             width: 26, height: 26, borderRadius: 6, border: "none",
             background: C.teal, cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",

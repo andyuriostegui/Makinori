@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { C, FONT, SectionTag, Section, Container, SectionTitle } from "./tokens";
-import { HORARIOS, CONTACTO } from "./data";
+import { HORARIOS, WA_PEDIDO } from "./data";
 import {
   WhatsappIcon,
   Location01Icon,
@@ -29,7 +29,7 @@ export default function Ubicacion() {
     <Section id="ubicacion" style={{ background: C.paper, overflow: "hidden" }}>
 
       {/* Vision strip */}
-      <div style={{ background: C.shu, padding: "64px 24px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+      <div style={{ background: C.teal, padding: "64px 24px", textAlign: "center", position: "relative", overflow: "hidden" }}>
         <div className="pattern-seigaiha-dark" style={{ position: "absolute", inset: 0, opacity: 0.35 }} />
         <div style={{ maxWidth: 720, margin: "0 auto", position: "relative" }}>
           <p style={{
@@ -57,7 +57,7 @@ export default function Ubicacion() {
 
       {/* Values row */}
       <div className="ubi-values" style={{
-        background: C.ink, padding: "32px 24px",
+        background: C.navy, padding: "32px 24px",
         display: "flex", justifyContent: "center", flexWrap: "wrap",
         position: "relative", overflow: "hidden",
       }}>
@@ -78,7 +78,7 @@ export default function Ubicacion() {
         `}</style>
 
         {/* Imagen ubi fundiéndose desde la derecha (fondo negro = se funde) */}
-        <img src="/ubi.png" alt="Maki Nori" className="ubi-img" style={{
+        <img src="/ubi.png" alt="" className="ubi-img" loading="lazy" decoding="async" style={{
           position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)",
           height: "180%", width: "auto", opacity: 0.85,
           pointerEvents: "none", userSelect: "none", zIndex: 0,
@@ -140,7 +140,7 @@ export default function Ubicacion() {
             </InfoBlock>
 
 
-            <a href="https://wa.me/527331598996" target="_blank" rel="noreferrer"
+            <a href={WA_PEDIDO} target="_blank" rel="noopener noreferrer"
               style={{
                 display: "flex", alignItems: "center", gap: 14,
                 background: "#25D366", borderRadius: 2, padding: "16px 20px",

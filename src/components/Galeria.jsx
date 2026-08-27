@@ -12,7 +12,7 @@ export default function Galeria() {
   const [selected, setSelected] = useState(null);
 
   return (
-    <Section id="galeria" style={{ background: C.ink, overflow: "hidden", padding: 0 }}>
+    <Section id="galeria" style={{ background: C.navy, overflow: "hidden", padding: 0 }}>
       <div className="pattern-seigaiha-dark" style={{ padding: "88px 24px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
 
@@ -20,7 +20,7 @@ export default function Galeria() {
             Nuestros <span style={{ color: C.gold, fontStyle: "italic" }}>rolls</span>
           </SectionTitle>
 
-          <div style={{ textAlign: "center", marginTop: -36, marginBottom: 48 }}>
+          <div style={{ textAlign: "center", marginTop: -20, marginBottom: 48 }}>
             <a
               href="https://www.instagram.com/sushi.makinori/"
               target="_blank"
@@ -66,7 +66,9 @@ export default function Galeria() {
               >
                 <img
                   src={foto.src}
-                  alt={foto.alt}
+                  alt={`${foto.alt} — Maki Nori Iguala`}
+                  loading="lazy"
+                  decoding="async"
                   style={{
                     width: "100%", height: "100%",
                     objectFit: "cover", display: "block",
@@ -120,7 +122,7 @@ export default function Galeria() {
           onClick={() => setSelected(null)}
           style={{
             position: "fixed", inset: 0, zIndex: 2000,
-            background: "rgba(22,19,17,0.94)", backdropFilter: "blur(8px)",
+            background: "rgba(11,44,50,0.94)", backdropFilter: "blur(8px)",
             display: "flex", alignItems: "center", justifyContent: "center",
             padding: 24,
           }}

@@ -1,20 +1,21 @@
 // ─── Design tokens ────────────────────────────────────────────
-// Estética washitsu / sushi-ya: sumi, washi, teal de marca, shu y oro
+// Marca Maki Nori: azul petróleo del logo, naranja salmón, blanco
 export const C = {
-  teal:    "#2A8B8B",
-  tealD:   "#1A5E5E",
-  tealL:   "#E6F0EF",
-  coral:   "#E07A4A",
-  coralD:  "#C96538",
-  shu:     "#B33A2B",
-  cream:   "#F4EFE6",
-  paper:   "#E8E0D2",
-  washi:   "#FAF6EE",
-  ink:     "#161311",
-  inkSoft: "#2A241E",
-  muted:   "#6B655C",
-  border:  "#D0C6B4",
-  gold:    "#C4A36A",
+  teal:    "#1A8A96",
+  tealD:   "#14707A",
+  tealL:   "#E8F6F8",
+  coral:   "#E8845C",
+  coralD:  "#D46A42",
+  shu:     "#E07048",
+  cream:   "#FFFFFF",
+  paper:   "#F3FAFB",
+  washi:   "#FFFFFF",
+  ink:     "#1A1A1A",
+  inkSoft: "#0E3A42",
+  navy:    "#0B2C32",
+  muted:   "#5A6A6E",
+  border:  "#C5DCDF",
+  gold:    "#E8845C",
   wa:      "#25D366",
 };
 
@@ -23,6 +24,45 @@ export const FONT = {
   jp:    '"Noto Serif JP", "Shippori Mincho", serif',
   sans:  '"Noto Sans JP", sans-serif',
 };
+
+export function FrameCorners({ color = C.gold, size = 18, thick = 2, inset = 8 }) {
+  const arm = {
+    position: "absolute", width: size, height: size,
+    pointerEvents: "none", zIndex: 3,
+  };
+  const b = `${thick}px solid ${color}`;
+  return (
+    <>
+      <span aria-hidden style={{ ...arm, top: inset, left: inset, borderTop: b, borderLeft: b }} />
+      <span aria-hidden style={{ ...arm, top: inset, right: inset, borderTop: b, borderRight: b }} />
+      <span aria-hidden style={{ ...arm, bottom: inset, left: inset, borderBottom: b, borderLeft: b }} />
+      <span aria-hidden style={{ ...arm, bottom: inset, right: inset, borderBottom: b, borderRight: b }} />
+    </>
+  );
+}
+
+export function OrnamentRow({ light = false, kanji = "花" }) {
+  const color = light ? C.gold : C.teal;
+  const mute = light ? "rgba(196,163,106,0.55)" : C.gold;
+  return (
+    <div aria-hidden style={{
+      display: "flex", alignItems: "center", justifyContent: "center",
+      gap: 10, margin: "12px 0 4px",
+    }}>
+      <span style={{ width: 36, height: 1, background: `linear-gradient(90deg, transparent, ${color})` }} />
+      <span style={{
+        width: 7, height: 7, transform: "rotate(45deg)",
+        background: mute, display: "inline-block",
+      }} />
+      <span style={{ fontFamily: FONT.jp, fontSize: 11, color, letterSpacing: "0.2em" }}>{kanji}</span>
+      <span style={{
+        width: 7, height: 7, transform: "rotate(45deg)",
+        background: mute, display: "inline-block",
+      }} />
+      <span style={{ width: 36, height: 1, background: `linear-gradient(90deg, ${color}, transparent)` }} />
+    </div>
+  );
+}
 
 export function SectionTag({ children, light = false, style = {} }) {
   const color = light ? C.gold : C.teal;
@@ -48,11 +88,19 @@ export function BtnTeal({ href, onClick, children, full = false, style = {} }) {
     letterSpacing: "0.12em", textDecoration: "none", border: "none",
     cursor: "pointer", fontFamily: FONT.sans,
     textTransform: "uppercase",
+    boxShadow: "0 10px 22px rgba(26,138,150,0.28)",
     transition: "background 0.2s, transform 0.15s",
     width: full ? "100%" : undefined, textAlign: "center",
     ...style,
   };
-  if (href) return <a href={href} style={base}>{children}</a>;
+  if (href) {
+    const ext = href.startsWith("http");
+    return (
+      <a href={href} style={base}
+        {...(ext ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      >{children}</a>
+    );
+  }
   return (
     <button onClick={onClick}
       style={base}
@@ -69,15 +117,23 @@ export function BtnCoral({ href, onClick, children, full = false, style = {} }) 
     letterSpacing: "0.12em", textDecoration: "none", border: "none",
     cursor: "pointer", fontFamily: FONT.sans,
     textTransform: "uppercase",
+    boxShadow: "0 10px 22px rgba(232,132,92,0.32)",
     transition: "background 0.2s, transform 0.15s",
     width: full ? "100%" : undefined, textAlign: "center",
     ...style,
   };
-  if (href) return <a href={href} style={base}>{children}</a>;
+  if (href) {
+    const ext = href.startsWith("http");
+    return (
+      <a href={href} style={base}
+        {...(ext ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      >{children}</a>
+    );
+  }
   return (
     <button onClick={onClick}
       style={base}
-      onMouseEnter={e => e.currentTarget.style.background = "#8F2E22"}
+      onMouseEnter={e => e.currentTarget.style.background = C.coralD}
       onMouseLeave={e => e.currentTarget.style.background = C.shu}
     >{children}</button>
   );
@@ -107,6 +163,7 @@ export function Section({ id, bg, children, style = {} }) {
   return (
     <section id={id} style={{
       padding: "88px 16px",
+      scrollMarginTop: 72,
       background: bg || "transparent",
       fontFamily: FONT.sans,
       ...style,
@@ -124,15 +181,16 @@ export function Container({ max = 1200, children, style = {} }) {
   );
 }
 
-export function SectionTitle({ kicker, jp, children, light = false, align = "center" }) {
+export function SectionTitle({ kicker, jp, children, light = false, align = "center", ornament = "花" }) {
   return (
-    <div style={{ textAlign: align, marginBottom: 56 }}>
+    <div style={{ textAlign: align, marginBottom: 48 }}>
       {kicker && <SectionTag light={light}>{kicker}</SectionTag>}
+      <OrnamentRow light={light} kanji={ornament} />
       {jp && (
         <p style={{
           fontFamily: FONT.jp, fontSize: 13, letterSpacing: "0.32em",
           color: light ? "rgba(244,239,230,0.45)" : C.teal,
-          margin: kicker ? "14px 0 0" : 0,
+          margin: 0,
         }}>{jp}</p>
       )}
       <h2 style={{

@@ -1,13 +1,14 @@
-// ─── App.jsx — reemplaza tu App.jsx con esto ─────────────────
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Productos from "./components/Productos";
 import Menu from "./components/Menu";
+import ComoPedir from "./components/ComoPedir";
 import Omakase from "./components/Omakase";
 import Resenas from "./components/Resenas";
 import Galeria from "./components/Galeria";
-import Linktree from "./components/Linktree";
 import Ubicacion from "./components/Ubicacion";
+import Faq from "./components/Faq";
+import Linktree from "./components/Linktree";
 import Footer from "./components/Footer";
 import WAFloat from "./components/WAFloat";
 import { CarritoCtx, useCarrito, CarritoBtn, CarritoPanel } from "./components/Carrito";
@@ -21,11 +22,13 @@ export default function App() {
       <Hero />
       <Productos />
       <Menu />
+      <ComoPedir />
       <Omakase />
       <Resenas />
       <Galeria />
-      <Linktree />
       <Ubicacion />
+      <Faq />
+      <Linktree />
       <Footer />
       <WAFloat />
       <CarritoBtn />
