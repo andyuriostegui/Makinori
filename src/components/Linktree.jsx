@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, SectionTag, Section, Container } from "./tokens";
+import { C, FONT, Section, Container, SectionTitle } from "./tokens";
 import {
   InstagramIcon,
   TiktokIcon,
@@ -58,9 +58,9 @@ const LINKS = [
 // ─── Videos (pega aquí los links de TikTok/Instagram) ─────────
 // Para cada video pon el link del post. Al dar click abre el video.
 const VIDEOS = [
-  { titulo: "Vibra Maki Nori", red: "Instagram",    href: "https://www.instagram.com/reel/DY0uJLjtdse/?utm_source=ig_web_button_share_sheet&igsh=MzRlODBiNWFlZA==", thumb: "/vibra.png" },
-  { titulo: "Conocenos",      red: "Facebook", href: "https://www.facebook.com/share/v/1BfXyEq5mR/", thumb: "/maki10.jpeg" },
-  { titulo: "Detrás de la barra",    red: "TikTok",    href: "https://www.tiktok.com/@maki.nori1/video/7650002879431920914?is_from_webapp=1&sender_device=pc&web_id=7655232434535122450", thumb: "/maki9.jpeg" },
+  { titulo: "Vibra Maki Nori", red: "Instagram", href: "https://www.instagram.com/reel/DY0uJLjtdse/?utm_source=ig_web_button_share_sheet&igsh=MzRlODBiNWFlZA==", thumb: "/IMG_7047.jpg" },
+  { titulo: "Conócenos",      red: "Facebook",  href: "https://www.facebook.com/share/v/1BfXyEq5mR/", thumb: "/IMG_7156.jpg" },
+  { titulo: "Detrás de la barra", red: "TikTok", href: "https://www.tiktok.com/@maki.nori1/video/7650002879431920914?is_from_webapp=1&sender_device=pc&web_id=7655232434535122450", thumb: "/IMG_7289.jpg" },
 ];
 
 function LinkRow({ item }) {
@@ -78,7 +78,7 @@ function LinkRow({ item }) {
         display: "flex", alignItems: "center", gap: 16,
         background: "#fff",
         border: `1.5px solid ${hov ? color : C.border}`,
-        borderRadius: 14, padding: "14px 18px",
+        borderRadius: 2, padding: "14px 18px",
         textDecoration: "none",
         transform: hov ? "translateY(-2px)" : "translateY(0)",
         boxShadow: hov ? `0 8px 24px ${color}22` : "0 1px 4px rgba(26,43,43,0.04)",
@@ -86,15 +86,15 @@ function LinkRow({ item }) {
       }}
     >
       <span style={{
-        width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+        width: 44, height: 44, borderRadius: 2, flexShrink: 0,
         background: `${color}18`,
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
         <Icon size={22} color={color} />
       </span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 14, fontWeight: 700, color: C.ink, margin: 0 }}>{label}</p>
-        <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, color: C.muted, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{sub}</p>
+        <p style={{ fontFamily: FONT.serif, fontSize: 15, fontWeight: 700, color: C.ink, margin: 0 }}>{label}</p>
+        <p style={{ fontFamily: FONT.sans, fontSize: 12, color: C.muted, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{sub}</p>
       </div>
       <span style={{ color: hov ? color : C.muted, fontSize: 18, transition: "color 0.18s" }}>→</span>
     </a>
@@ -109,7 +109,7 @@ function VideoCard({ video }) {
       onMouseLeave={() => setHov(false)}
       style={{
         display: "block", position: "relative",
-        borderRadius: 14, overflow: "hidden",
+        borderRadius: 2, overflow: "hidden",
         aspectRatio: "9/16", background: C.ink,
         textDecoration: "none",
         border: `1.5px solid ${hov ? C.teal : C.border}`,
@@ -137,7 +137,7 @@ function VideoCard({ video }) {
         background: "rgba(26,43,43,0.78)", backdropFilter: "blur(4px)",
         color: "#fff", fontSize: 10, fontWeight: 700,
         padding: "3px 9px", borderRadius: 20,
-        fontFamily: "DM Sans, sans-serif",
+        fontFamily: FONT.sans,
       }}>{video.red}</span>
       {/* titulo */}
       <div style={{
@@ -145,7 +145,7 @@ function VideoCard({ video }) {
         background: "linear-gradient(transparent, rgba(26,43,43,0.85))",
         padding: "28px 12px 12px",
       }}>
-        <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", margin: 0, lineHeight: 1.3 }}>
+        <p style={{ fontFamily: FONT.sans, fontSize: 12, fontWeight: 700, color: "#fff", margin: 0, lineHeight: 1.3 }}>
           {video.titulo}
         </p>
       </div>
@@ -158,23 +158,16 @@ export default function Linktree() {
     <Section id="linktree" style={{ background: C.tealL }}>
       <Container max={680}>
 
-        {/* Header con gato ninja */}
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <img src="/tree.jpg" alt="Gato ninja Maki Nori" style={{
-            width: 300, height: 300, objectFit: "contain",
-            margin: "0 auto 8px", display: "block",
+            width: 180, height: 180, objectFit: "contain",
+            margin: "0 auto 16px", display: "block",
             mixBlendMode: "multiply",
           }} />
-          <SectionTag>Síguenos</SectionTag>
-          <h2 style={{
-            fontWeight: 900, fontSize: "clamp(2rem,5vw,3rem)",
-            color: C.ink, textTransform: "uppercase",
-            letterSpacing: "-0.02em", margin: "16px 0 8px",
-            fontFamily: "DM Sans, sans-serif",
-          }}>
-            Todo Maki Nori <span style={{ color: C.teal }}>en un lugar</span>
-          </h2>
-          <p style={{ fontSize: 13, color: C.muted, fontFamily: "DM Sans, sans-serif", margin: 0 }}>
+          <SectionTitle kicker="繋がり" jp="フォロー">
+            Todo Maki Nori <span style={{ color: C.teal, fontStyle: "italic" }}>en un lugar</span>
+          </SectionTitle>
+          <p style={{ fontSize: 13, color: C.muted, fontFamily: FONT.sans, margin: "-36px 0 0" }}>
             Redes, pedidos y ubicación — todo a un click
           </p>
         </div>
@@ -185,32 +178,27 @@ export default function Linktree() {
         </div>
 
         {/* Videos */}
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <SectionTag>Videos</SectionTag>
-          <h3 style={{
-            fontWeight: 900, fontSize: "clamp(1.4rem,4vw,2rem)",
-            color: C.ink, textTransform: "uppercase",
-            letterSpacing: "-0.02em", margin: "12px 0 0",
-            fontFamily: "DM Sans, sans-serif",
-          }}>
-            Mira nuestros <span style={{ color: C.coral }}>rolls</span>
-          </h3>
-        </div>
+        <SectionTitle kicker="動画" jp="ビデオ">
+          Mira nuestros <span style={{ color: C.shu, fontStyle: "italic" }}>rolls</span>
+        </SectionTitle>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14 }}>
           {VIDEOS.map((v, i) => <VideoCard key={i} video={v} />)}
         </div>
-         <iframe
-              width="560"
-              height="315"
-              src="https://www.youtube.com/embed/ZoFwQlCwd8o?si=CvY9br27vUYSPHP6"
-              title="YouTube video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-              style={{ display: "block" }}
-            />
+        <div style={{
+          marginTop: 28, position: "relative", width: "100%",
+          paddingBottom: "56.25%", height: 0, overflow: "hidden",
+          border: `1px solid ${C.border}`,
+        }}>
+          <iframe
+            src="https://www.youtube.com/embed/ZoFwQlCwd8o?si=CvY9br27vUYSPHP6"
+            title="YouTube video player"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+          />
+        </div>
 
       </Container>
     </Section>

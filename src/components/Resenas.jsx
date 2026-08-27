@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { C, SectionTag, Section } from "./tokens";
+import { C, FONT, Section, SectionTitle } from "./tokens";
 import { StarIcon, ArrowLeft01Icon, ArrowRight01Icon } from "hugeicons-react";
 
 const RESENAS = [
@@ -38,8 +38,8 @@ function ResenaCard({ resena, active }) {
     <div style={{
       background: active ? "rgba(245,240,232,0.07)" : "rgba(245,240,232,0.03)",
       borderRadius: 16, padding: "28px 28px 24px",
-      border: `1px solid ${active ? C.teal : "rgba(245,240,232,0.1)"}`,
-      boxShadow: active ? "0 8px 32px rgba(42,139,139,0.18)" : "none",
+      border: `1px solid ${active ? C.gold : "rgba(244,239,230,0.1)"}`,
+      boxShadow: active ? "0 8px 32px rgba(196,163,106,0.16)" : "none",
       transition: "all 0.4s ease",
       opacity: active ? 1 : 0.55,
       transform: active ? "scale(1)" : "scale(0.97)",
@@ -51,13 +51,13 @@ function ResenaCard({ resena, active }) {
           width: 44, height: 44, borderRadius: "50%", background: resena.color,
           display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
         }}>
-          <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, fontWeight: 800, color: "#fff" }}>{resena.avatar}</span>
+          <span style={{ fontFamily: FONT.sans, fontSize: 13, fontWeight: 700, color: "#fff" }}>{resena.avatar}</span>
         </div>
         <div style={{ flex: 1 }}>
-          <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 14, fontWeight: 700, color: C.cream, margin: 0 }}>{resena.nombre}</p>
+          <p style={{ fontFamily: FONT.serif, fontSize: 15, fontWeight: 700, color: C.cream, margin: 0 }}>{resena.nombre}</p>
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
             <Stars filled={resena.estrellas} />
-            <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: "rgba(245,240,232,0.4)" }}>{resena.fecha}</span>
+            <span style={{ fontFamily: FONT.sans, fontSize: 11, color: "rgba(244,239,230,0.4)" }}>{resena.fecha}</span>
           </div>
         </div>
         <svg width="20" height="20" viewBox="0 0 24 24" style={{ flexShrink: 0, opacity: 0.5 }}>
@@ -68,7 +68,7 @@ function ResenaCard({ resena, active }) {
         </svg>
       </div>
 
-      <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: "rgba(245,240,232,0.75)", lineHeight: 1.8, margin: 0, flex: 1, fontStyle: "italic" }}>
+      <p style={{ fontFamily: FONT.serif, fontSize: 14, color: "rgba(244,239,230,0.78)", lineHeight: 1.85, margin: 0, flex: 1, fontStyle: "italic" }}>
         "{resena.texto}"
       </p>
 
@@ -76,7 +76,7 @@ function ResenaCard({ resena, active }) {
         background: "rgba(42,139,139,0.15)", border: `1px solid rgba(42,139,139,0.3)`,
         borderRadius: 6, padding: "6px 12px", display: "inline-block", alignSelf: "flex-start",
       }}>
-        <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, fontWeight: 600, color: C.teal }}>
+        <span style={{ fontFamily: FONT.sans, fontSize: 11, fontWeight: 600, color: C.gold }}>
           {resena.platillo}
         </span>
       </div>
@@ -143,24 +143,17 @@ export default function Resenas() {
       }} />
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "80px 24px", position: "relative", zIndex: 1 }}>
-        <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <SectionTag>Reseñas</SectionTag>
-          <h2 style={{
-            fontWeight: 900, fontSize: "clamp(2rem,5vw,3rem)",
-            color: C.cream, textTransform: "uppercase",
-            letterSpacing: "-0.02em", margin: "16px 0 0",
-            fontFamily: "DM Sans, sans-serif",
-          }}>
-            Lo que dicen <span style={{ color: C.teal }}>nuestros clientes</span>
-          </h2>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 16 }}>
-            <Stars filled={5} />
-            <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 14, fontWeight: 700, color: C.cream }}>5.0</span>
-            <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, color: "rgba(245,240,232,0.5)" }}>· Basado en Google Reviews</span>
-          </div>
+        <SectionTitle kicker="口コミ" jp="レビュー" light>
+          Lo que dicen <span style={{ color: C.gold, fontStyle: "italic" }}>nuestros clientes</span>
+        </SectionTitle>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: -36, marginBottom: 48 }}>
+          <Stars filled={5} />
+          <span style={{ fontFamily: FONT.serif, fontSize: 16, fontWeight: 700, color: C.cream }}>5.0</span>
+          <span style={{ fontFamily: FONT.sans, fontSize: 13, color: "rgba(244,239,230,0.5)" }}>· Google Reviews</span>
         </div>
 
         <div
+          className="resenas-grid"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
           style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20, marginBottom: 40 }}
@@ -174,7 +167,7 @@ export default function Resenas() {
             {RESENAS.map((_, i) => (
               <button key={i} onClick={() => setCurrent(i)} style={{
                 width: i === current ? 24 : 8, height: 8, borderRadius: 4,
-                border: "none", background: i === current ? C.teal : "rgba(245,240,232,0.2)",
+                border: "none", background: i === current ? C.gold : "rgba(244,239,230,0.2)",
                 cursor: "pointer", transition: "all 0.3s", padding: 0,
               }}/>
             ))}

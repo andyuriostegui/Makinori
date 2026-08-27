@@ -11,7 +11,7 @@ export const PRODUCTOS = [
     nombre: "Volcán o Roll", jp: "ボルケーノ・ロール", precio: "$95",
     desc: "Aderezo tampico por fuera, por dentro: pepino, camarón, aguacate y philadelphia.",
     badges: ["🌶 Picante suave", "10 piezas"],
-    ilu: "dragon", foto: "/maki2.jpeg",
+    ilu: "dragon", foto: "/IMG_7027.jpg",
   },
   {
     id: 3, tag: "NUEVO", tagDark: false,
@@ -25,7 +25,7 @@ export const PRODUCTOS = [
     nombre: "Ramen", jp: "拉麺", precio: "$95",
     desc: "Cubierta de Philadelphia y ajonjolí por fuera, por dentro: Pepino, aguacate y surimi.",
     badges: ["Fresco", "10 piezas"],
-    ilu: "nigiri", foto: "/maki10.jpeg",
+    ilu: "nigiri", foto: "/IMG_7129.jpg",
   },
   {
     id: 5, tag: null,
@@ -33,7 +33,7 @@ export const PRODUCTOS = [
     desc: "Aderezo chipotle por fuera, por dentro: carne enchilada, tocino, philadelphia y chile.",
     badges: ["🌶 Picante", "10 piezas"],
     badgePicante: true,
-    ilu: "temaki", foto: "/maki6.jpeg",
+    ilu: "temaki", foto: "/IMG_6996.jpg",
   },
   {
     id: 6, tag: null,
@@ -150,6 +150,30 @@ export const CONTACTO = [
   { href: "tel:+527331002030",                label: "+52 733 100 2030"  },
   { href: "mailto:hola@makinori.mx",          label: "hola@makinori.mx" },
   { href: "https://instagram.com/makinorimx", label: "@makinorimx"      },
+];
+
+export const GALERIA_FOTOS = [
+  { src: "/IMG_7047.jpg", alt: "Roll empanizado",      span: 2 },
+  { src: "/IMG_7058.jpg", alt: "Veggi Roll",           span: 1 },
+  { src: "/IMG_7027.jpg", alt: "Mar y Tierra",         span: 1 },
+  { src: "/IMG_7156.jpg", alt: "Ramen Kang",           span: 2 },
+  { src: "/IMG_6996.jpg", alt: "Volcano Roll",         span: 1 },
+  { src: "/IMG_7009.jpg", alt: "Almond Roll",          span: 1 },
+  { src: "/IMG_7129.jpg", alt: "Buldak Carbonara",     span: 1 },
+  { src: "/IMG_7094.jpg", alt: "Kushiagues",           span: 1 },
+  { src: "/IMG_6999.jpg", alt: "Empanizado Roll",      span: 1 },
+  { src: "/IMG_7072.jpg", alt: "Aros de cebolla",      span: 1 },
+  { src: "/IMG_7006.jpg", alt: "Roll con zanahoria",   span: 1 },
+  { src: "/IMG_7289.jpg", alt: "Sake Hide",            span: 1 },
+  { src: "/IMG_7287.jpg", alt: "Sake Hide · casco",    span: 1 },
+  { src: "/IMG_7271.jpg", alt: "Soju",                 span: 2 },
+  { src: "/IMG_7322.jpg", alt: "Mojito",               span: 1 },
+  { src: "/IMG_7334.jpg", alt: "Piña Colada",          span: 1 },
+  { src: "/IMG_7318.jpg", alt: "Cóctel de la casa",    span: 1 },
+  { src: "/IMG_7297.jpg", alt: "Tsingtao",             span: 1 },
+  { src: "/IMG_7293.jpg", alt: "Buddha Beer",          span: 1 },
+  { src: "/IMG_7284.jpg", alt: "Hidromiel Rey Rurik",  span: 1 },
+  { src: "/IMG_7263.jpg", alt: "Palomitas",            span: 1 },
 ];
 
 export const JP_CONCEPTS = [

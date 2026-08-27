@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C } from "./tokens";
+import { C, FONT } from "./tokens";
 import {
   InstagramIcon,
   Facebook01Icon,
@@ -25,23 +25,24 @@ const SOCIAL = [
 
 export default function Footer() {
   return (
-    <footer style={{ background: C.ink, color: C.cream, fontFamily: "DM Sans, sans-serif" }}>
+    <footer style={{ background: C.ink, color: C.cream, fontFamily: FONT.sans }}>
+      <div className="noren-bar" />
       <div style={{ padding: "64px 40px 40px", maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 48 }}>
+        <div className="footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 48 }}>
 
           {/* Brand */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
               <div style={{
                 width: 40, height: 40, borderRadius: "50%",
-                border: `1px solid ${C.coral}`,
+                border: `1px solid ${C.gold}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
-                <span style={{ fontFamily: "Noto Serif JP, serif", fontSize: 14, color: C.coral }}>海</span>
+                <span style={{ fontFamily: FONT.jp, fontSize: 14, color: C.gold }}>海</span>
               </div>
               <div>
-                <p style={{ fontWeight: 900, fontSize: 20, letterSpacing: "-0.02em", margin: 0 }}>Maki Nori</p>
-                <p style={{ fontFamily: "Noto Serif JP, serif", fontSize: 10, color: "rgba(245,240,232,0.4)", letterSpacing: "0.15em", margin: 0 }}>巻きのり · IGUALA</p>
+                <p style={{ fontWeight: 700, fontSize: 20, letterSpacing: "0.04em", margin: 0, fontFamily: FONT.serif }}>Maki Nori</p>
+                <p style={{ fontFamily: FONT.jp, fontSize: 10, color: "rgba(244,239,230,0.4)", letterSpacing: "0.18em", margin: 0 }}>巻きのり · IGUALA</p>
               </div>
             </div>
             <p style={{ fontSize: 13, color: "rgba(245,240,232,0.5)", lineHeight: 1.8, maxWidth: 280, margin: "0 0 20px" }}>
@@ -85,8 +86,8 @@ export default function Footer() {
 
       <div style={{ borderTop: "1px solid rgba(245,240,232,0.08)", padding: "20px 40px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-          <p style={{ fontSize: 11, color: "rgba(245,240,232,0.25)", margin: 0 }}>© 2026 Maki Nori · Todos los derechos reservados</p>
-          <p style={{ fontSize: 11, color: "rgba(245,240,232,0.25)", margin: 0 }}>Hecho con <span style={{ color: C.coral }}>愛</span> en Iguala, Guerrero, México</p>
+          <p style={{ fontSize: 11, color: "rgba(244,239,230,0.25)", margin: 0 }}>© 2026 Maki Nori · Todos los derechos reservados</p>
+          <p style={{ fontSize: 11, color: "rgba(244,239,230,0.25)", margin: 0 }}>Hecho con <span style={{ color: C.gold, fontFamily: FONT.jp }}>愛</span> en Iguala, Guerrero, México</p>
         </div>
       </div>
     </footer>
@@ -101,7 +102,7 @@ function FooterLink({ href, children, icon }) {
       onMouseLeave={() => setHov(false)}
       style={{
         fontSize: 13, textDecoration: "none",
-        color: hov ? C.coral : "rgba(245,240,232,0.55)",
+        color: hov ? C.gold : "rgba(244,239,230,0.55)",
         transition: "color 0.2s",
         display: "flex", alignItems: "center", gap: 8,
       }}
@@ -121,13 +122,13 @@ function SocialBtn({ href, children, Icon }) {
       style={{
         display: "flex", alignItems: "center", justifyContent: "center",
         width: 34, height: 34, borderRadius: 8,
-        border: `1px solid ${hov ? C.coral : "rgba(245,240,232,0.2)"}`,
-        color: hov ? C.coral : "rgba(245,240,232,0.5)",
+        border: `1px solid ${hov ? C.gold : "rgba(244,239,230,0.2)"}`,
+        color: hov ? C.gold : "rgba(244,239,230,0.5)",
         transition: "all 0.2s", textDecoration: "none",
       }}
       title={children}
     >
-      <Icon size={16} color={hov ? C.coral : "rgba(245,240,232,0.5)"} />
+      <Icon size={16} color={hov ? C.gold : "rgba(244,239,230,0.5)"} />
     </a>
   );
 }

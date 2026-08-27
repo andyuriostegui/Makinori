@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, SectionTag, Section, Container } from "./tokens";
+import { C, FONT, Section, Container, SectionTitle } from "./tokens";
 import { MENU_CATS, SNACKS } from "./data";
 import { useCarritoCtx } from "./Carrito";
 
@@ -34,7 +34,7 @@ function ItemRow({ item, index, total, catKey }) {
       display: "flex", justifyContent: "space-between", alignItems: "center",
       padding: "14px 0",
       borderBottom: index < total - 1 ? `1px solid ${C.border}` : "none",
-      fontFamily: "DM Sans, sans-serif",
+      fontFamily: FONT.sans,
       gap: 12,
     }}>
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -47,7 +47,7 @@ function ItemRow({ item, index, total, catKey }) {
 
         {qty === 0 ? (
           <button onClick={handleAgregar} style={{
-            width: 32, height: 32, borderRadius: 8,
+            width: 32, height: 32, borderRadius: 2,
             background: pop ? C.ink : C.teal,
             border: "none", color: C.cream,
             fontSize: 18, fontWeight: 700, cursor: "pointer",
@@ -58,14 +58,14 @@ function ItemRow({ item, index, total, catKey }) {
         ) : (
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <button onClick={() => quitar(item.nombre)} style={{
-              width: 28, height: 28, borderRadius: 6,
+              width: 28, height: 28, borderRadius: 2,
               border: `1.5px solid ${C.border}`, background: "transparent",
               color: C.muted, fontSize: 16, fontWeight: 700,
               cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
             }}>−</button>
             <span style={{ fontSize: 13, fontWeight: 700, color: C.ink, minWidth: 16, textAlign: "center" }}>{qty}</span>
             <button onClick={handleAgregar} style={{
-              width: 28, height: 28, borderRadius: 6,
+              width: 28, height: 28, borderRadius: 2,
               border: "none", background: C.teal,
               color: C.cream, fontSize: 16, fontWeight: 700,
               cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
@@ -89,35 +89,12 @@ export default function Menu() {
 
   return (
     <Section id="menu" bg={C.paper} style={{ position: "relative", overflow: "hidden" }}>
-      <style>{`
-        .menu-side { display: block; }
-        @media (max-width: 1024px) { .menu-side { display: none !important; } }
-      `}</style>
+      <div className="pattern-seigaiha" style={{ position: "absolute", inset: 0, opacity: 0.45, pointerEvents: "none" }} />
 
-      {/* Imagen lateral izquierda — ramen */}
-      <img src="/ramen.png" alt="Ramen Maki Nori" className="menu-side" style={{
-        position: "absolute", left: -40, top: "50%", transform: "translateY(-50%)",
-        width: 400, height: "auto", opacity: 1, pointerEvents: "none", userSelect: "none",
-      }} />
-
-      {/* Imagen lateral derecha — nigiri */}
-      <img src="/sushicomida.png" alt="Sushi Maki Nori" className="menu-side" style={{
-        position: "absolute", right: -40, top: "50%", transform: "translateY(-50%)",
-        width: 380, height: "auto", opacity: 1, pointerEvents: "none", userSelect: "none",
-      }} />
-
-      <Container max={800} style={{ position: "relative", zIndex: 1 }}>
-        <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <SectionTag>お品書き</SectionTag>
-          <h2 style={{
-            fontWeight: 900, fontSize: "clamp(2rem,5vw,3rem)",
-            color: C.ink, textTransform: "uppercase",
-            letterSpacing: "-0.02em", margin: "16px 0 0",
-            fontFamily: "DM Sans, sans-serif",
-          }}>
-            Menú <span style={{ color: C.teal }}>Completo</span>
-          </h2>
-        </div>
+      <Container max={760} style={{ position: "relative", zIndex: 1 }}>
+        <SectionTitle kicker="お品書き" jp="メニュー">
+          Menú <span style={{ color: C.teal, fontStyle: "italic" }}>completo</span>
+        </SectionTitle>
 
         {/* Tabs */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginBottom: 48 }}>
@@ -131,14 +108,14 @@ export default function Menu() {
         {/* Subtítulo categoría */}
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 4 }}>
-            <span style={{ fontFamily: "Noto Serif JP, serif", fontSize: 12, color: C.teal, letterSpacing: "0.15em" }}>{data.jp}</span>
+            <span style={{ fontFamily: FONT.jp, fontSize: 13, color: C.teal, letterSpacing: "0.2em" }}>{data.jp}</span>
             <div style={{ flex: 1, height: 1, background: C.border }} />
           </div>
-          <p style={{ fontSize: 10, color: C.muted, letterSpacing: "0.15em", textTransform: "uppercase", margin: 0, fontFamily: "DM Sans, sans-serif" }}>{data.sub}</p>
+          <p style={{ fontSize: 10, color: C.muted, letterSpacing: "0.15em", textTransform: "uppercase", margin: 0, fontFamily: FONT.sans }}>{data.sub}</p>
         </div>
 
         {/* Lista */}
-        <div style={{ background: C.cream, borderRadius: 16, padding: "8px 28px", border: `1px solid ${C.border}` }}>
+        <div style={{ background: C.washi, padding: "8px 28px", border: `1px solid ${C.border}` }}>
           {data.items.map((item, i) => (
             <ItemRow key={i} item={item} index={i} total={data.items.length} catKey={cat} />
           ))}
@@ -151,12 +128,12 @@ export default function Menu() {
 function TabBtn({ active, onClick, children }) {
   return (
     <button onClick={onClick} style={{
-      padding: "8px 20px", borderRadius: 4, fontSize: 11, fontWeight: 600,
-      letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer",
-      border: `1.5px solid ${active ? C.ink : C.border}`,
+      padding: "8px 18px", borderRadius: 2, fontSize: 11, fontWeight: 600,
+      letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer",
+      border: `1px solid ${active ? C.ink : C.border}`,
       background: active ? C.ink : "transparent",
       color: active ? C.cream : C.muted,
-      fontFamily: "DM Sans, sans-serif",
+      fontFamily: FONT.sans,
       transition: "all 0.2s",
     }}>{children}</button>
   );

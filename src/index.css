@@ -1,10 +1,33 @@
 *, *::before, *::after { box-sizing: border-box; }
 
+:root {
+  --ink: #161311;
+  --ink-soft: #2A241E;
+  --cream: #F4EFE6;
+  --paper: #E8E0D2;
+  --washi: #FAF6EE;
+  --teal: #2A8B8B;
+  --teal-d: #1A5E5E;
+  --coral: #E07A4A;
+  --shu: #B33A2B;
+  --gold: #C4A36A;
+  --muted: #6B655C;
+  --border: #D0C6B4;
+  --font-serif: "Shippori Mincho", "Noto Serif JP", "Times New Roman", serif;
+  --font-jp: "Noto Serif JP", "Shippori Mincho", serif;
+  --font-sans: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
 body {
   margin: 0;
   padding: 0;
-  background: #F5F0E8;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 html, body {
@@ -15,4 +38,97 @@ html, body {
 #root {
   width: 100%;
   min-height: 100svh;
+}
+
+img { max-width: 100%; }
+
+/* ── Seigaiha (olas) ── */
+.pattern-seigaiha {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40'%3E%3Cpath d='M0 40c10 0 10-16 20-16s10 16 20 16 10-16 20-16 10 16 20 16' fill='none' stroke='%232A8B8B' stroke-width='1.2' opacity='0.18'/%3E%3Cpath d='M0 40c10 0 10-10 20-10s10 10 20 10 10-10 20-10 10 10 20 10' fill='none' stroke='%232A8B8B' stroke-width='1' opacity='0.12'/%3E%3Cpath d='M-20 20c10 0 10-16 20-16s10 16 20 16 10-16 20-16 10 16 20 16 10-16 20-16 10 16 20 16' fill='none' stroke='%232A8B8B' stroke-width='1.2' opacity='0.18'/%3E%3Cpath d='M-20 20c10 0 10-10 20-10s10 10 20 10 10-10 20-10 10 10 20 10 10-10 20-10 10 10 20 10' fill='none' stroke='%232A8B8B' stroke-width='1' opacity='0.12'/%3E%3C/svg%3E");
+  background-size: 80px 40px;
+}
+
+.pattern-seigaiha-dark {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40'%3E%3Cpath d='M0 40c10 0 10-16 20-16s10 16 20 16 10-16 20-16 10 16 20 16' fill='none' stroke='%23F4EFE6' stroke-width='1.2' opacity='0.07'/%3E%3Cpath d='M0 40c10 0 10-10 20-10s10 10 20 10 10-10 20-10 10 10 20 10' fill='none' stroke='%23F4EFE6' stroke-width='1' opacity='0.05'/%3E%3Cpath d='M-20 20c10 0 10-16 20-16s10 16 20 16 10-16 20-16 10 16 20 16 10-16 20-16 10 16 20 16' fill='none' stroke='%23F4EFE6' stroke-width='1.2' opacity='0.07'/%3E%3C/svg%3E");
+  background-size: 80px 40px;
+}
+
+.pattern-asanoha {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64' viewBox='0 0 56 64'%3E%3Cpath d='M28 0 L56 16 L56 48 L28 64 L0 48 L0 16 Z M28 0 L28 64 M0 16 L56 48 M56 16 L0 48' fill='none' stroke='%232A8B8B' stroke-width='0.6' opacity='0.12'/%3E%3C/svg%3E");
+  background-size: 56px 64px;
+}
+
+/* ── Noren stripe ── */
+.noren-bar {
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--shu) 0 28px,
+    var(--ink) 28px 36px,
+    var(--teal) 36px 64px,
+    var(--ink) 64px 72px
+  );
+}
+
+/* ── Vertical kanji ── */
+.v-kanji {
+  writing-mode: vertical-rl;
+  font-family: var(--font-jp);
+  letter-spacing: 0.35em;
+  text-orientation: mixed;
+}
+
+/* ── Hanko stamp ── */
+.hanko {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--shu);
+  color: var(--shu);
+  font-family: var(--font-jp);
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 2px 6px;
+  letter-spacing: 0.08em;
+  transform: rotate(-6deg);
+}
+
+/* ── Fade in ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.8s ease both; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── Gold hairline ── */
+.gold-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* ── Responsive helpers ── */
+@media (max-width: 900px) {
+  .hide-mobile { display: none !important; }
+  .resenas-grid { grid-template-columns: 1fr !important; }
+  .resenas-grid > div:not(:nth-child(2)) { display: none !important; }
+  .omakase-pilares { grid-template-columns: 1fr !important; }
+  .footer-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .hero-split { flex-direction: column !important; min-height: auto !important; }
+  .hero-copy { padding: 108px 24px 48px !important; }
+  .hero-photo { min-height: 56vh !important; width: 100% !important; position: relative !important; }
+  .stats-strip { grid-template-columns: 1fr 1fr 1fr !important; }
+  .ubi-values { flex-direction: column !important; }
+  .galeria-grid {
+    grid-template-columns: 1fr 1fr !important;
+    grid-auto-rows: 170px !important;
+  }
+  .galeria-grid .span-2 {
+    grid-column: span 2 !important;
+    grid-row: span 2 !important;
+  }
 }

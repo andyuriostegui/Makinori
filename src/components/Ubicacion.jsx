@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, SectionTag, Section, Container } from "./tokens";
+import { C, FONT, SectionTag, Section, Container, SectionTitle } from "./tokens";
 import { HORARIOS, CONTACTO } from "./data";
 import {
   WhatsappIcon,
@@ -29,24 +29,25 @@ export default function Ubicacion() {
     <Section id="ubicacion" style={{ background: C.paper, overflow: "hidden" }}>
 
       {/* Vision strip */}
-      <div style={{ background: C.coral, padding: "56px 24px", textAlign: "center" }}>
-        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+      <div style={{ background: C.shu, padding: "64px 24px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+        <div className="pattern-seigaiha-dark" style={{ position: "absolute", inset: 0, opacity: 0.35 }} />
+        <div style={{ maxWidth: 720, margin: "0 auto", position: "relative" }}>
           <p style={{
-            fontFamily: "Noto Serif JP, serif", fontSize: 13,
-            color: "rgba(245,240,232,0.7)", letterSpacing: "0.2em",
-            textTransform: "uppercase", margin: "0 0 16px",
+            fontFamily: FONT.jp, fontSize: 13,
+            color: "rgba(244,239,230,0.7)", letterSpacing: "0.28em",
+            margin: "0 0 16px",
           }}>理念 · Nuestra visión</p>
           <h3 style={{
-            fontFamily: "DM Sans, sans-serif", fontWeight: 900,
-            fontSize: "clamp(1.4rem,3.5vw,2.2rem)",
-            color: C.cream, lineHeight: 1.15,
-            textTransform: "uppercase", letterSpacing: "-0.02em", margin: "0 0 20px",
+            fontFamily: FONT.serif, fontWeight: 700,
+            fontSize: "clamp(1.5rem,3.5vw,2.4rem)",
+            color: C.cream, lineHeight: 1.25,
+            letterSpacing: "0.02em", margin: "0 0 20px",
           }}>
             Traer la esencia de Japón<br/>al corazón de Iguala
           </h3>
           <p style={{
-            fontFamily: "DM Sans, sans-serif", fontSize: 15,
-            color: "rgba(245,240,232,0.82)", lineHeight: 1.8,
+            fontFamily: FONT.sans, fontSize: 15,
+            color: "rgba(244,239,230,0.82)", lineHeight: 1.85,
             margin: 0, maxWidth: 580, marginInline: "auto",
           }}>
             En Maki Nori creemos que la buena comida no necesita ser importada — necesita ser hecha con intención. Cada roll, cada ramen y cada bebida sale de nuestras manos con el mismo respeto que un itamae dedica a su oficio.
@@ -55,7 +56,7 @@ export default function Ubicacion() {
       </div>
 
       {/* Values row */}
-      <div style={{
+      <div className="ubi-values" style={{
         background: C.ink, padding: "32px 24px",
         display: "flex", justifyContent: "center", flexWrap: "wrap",
         position: "relative", overflow: "hidden",
@@ -96,29 +97,21 @@ export default function Ubicacion() {
             borderRight: i < arr.length - 1 ? "1px solid rgba(245,240,232,0.1)" : "none",
             position: "relative", zIndex: 1,
           }}>
-            <p style={{ fontFamily: "Noto Serif JP, serif", fontSize: 22, color: C.coral, margin: "0 0 4px" }}>{jp}</p>
-            <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, fontWeight: 700, color: C.cream, margin: "0 0 2px" }}>{label}</p>
-            <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 10, color: "rgba(245,240,232,0.4)", margin: 0 }}>{sub}</p>
+            <p style={{ fontFamily: FONT.jp, fontSize: 24, color: C.gold, margin: "0 0 4px" }}>{jp}</p>
+            <p style={{ fontFamily: FONT.sans, fontSize: 12, fontWeight: 700, color: C.cream, margin: "0 0 2px", letterSpacing: "0.06em" }}>{label}</p>
+            <p style={{ fontFamily: FONT.sans, fontSize: 10, color: "rgba(244,239,230,0.4)", margin: 0 }}>{sub}</p>
           </div>
         ))}
       </div>
 
       {/* Map + info */}
       <Container style={{ paddingTop: 64, paddingBottom: 64 }}>
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <SectionTag>場所</SectionTag>
-          <h2 style={{
-            fontWeight: 900, fontSize: "clamp(2rem,5vw,3rem)",
-            color: C.ink, textTransform: "uppercase",
-            letterSpacing: "-0.02em", margin: "16px 0 0",
-            fontFamily: "DM Sans, sans-serif",
-          }}>
-            Visítanos <span style={{ color: C.coral }}>Pronto</span>
-          </h2>
-        </div>
+        <SectionTitle kicker="場所" jp="所在地">
+          Visítanos <span style={{ color: C.shu, fontStyle: "italic" }}>pronto</span>
+        </SectionTitle>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 40, alignItems: "start" }}>
-          <div style={{ borderRadius: 16, overflow: "hidden", border: `1px solid ${C.border}`, height: 400, boxShadow: "0 8px 32px rgba(26,26,24,0.08)" }}>
+          <div style={{ overflow: "hidden", border: `1px solid ${C.border}`, height: 400 }}>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7574.527994705546!2d-99.53425449999999!3d18.335236700000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85cc386c980e9ebd%3A0x1a0481bbae95ae92!2sMaki%20Nori%20Sushi!5e0!3m2!1ses-419!2smx!4v1782372749242!5m2!1ses-419!2smx"
               width="100%" height="400" style={{ border: 0, display: "block" }}
@@ -127,7 +120,7 @@ export default function Ubicacion() {
             />
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 28, fontFamily: "DM Sans, sans-serif" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 28, fontFamily: FONT.sans }}>
 
             <InfoBlock label="Dirección" icon={<Location01Icon size={14} color={C.coral} />}>
               <p style={{ fontWeight: 700, fontSize: 15, color: C.ink, margin: "0 0 2px" }}>Perif. Sur 12, 24 de Febrero, 40000 Iguala de la Independencia, Gro.</p>
@@ -150,7 +143,7 @@ export default function Ubicacion() {
             <a href="https://wa.me/527331598996" target="_blank" rel="noreferrer"
               style={{
                 display: "flex", alignItems: "center", gap: 14,
-                background: "#25D366", borderRadius: 10, padding: "16px 20px",
+                background: "#25D366", borderRadius: 2, padding: "16px 20px",
                 textDecoration: "none", transition: "opacity 0.2s",
               }}
               onMouseEnter={e => e.currentTarget.style.opacity = "0.9"}

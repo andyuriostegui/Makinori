@@ -9,7 +9,7 @@ const inputStyle = {
   width: "100%", padding: "14px 16px",
   border: `1.5px solid ${C.border}`, borderRadius: 8,
   fontSize: 14, color: C.ink, background: "#fff",
-  fontFamily: "DM Sans, sans-serif", boxSizing: "border-box",
+  fontFamily: "Noto Sans JP, sans-serif", boxSizing: "border-box",
   outline: "none", transition: "border-color 0.2s, box-shadow 0.2s",
 };
 
@@ -19,7 +19,7 @@ function Field({ label, children }) {
       <label style={{
         display: "block", fontSize: 10, fontWeight: 700,
         textTransform: "uppercase", letterSpacing: "0.15em",
-        color: C.muted, marginBottom: 8, fontFamily: "DM Sans, sans-serif",
+        color: C.muted, marginBottom: 8, fontFamily: "Noto Sans JP, sans-serif",
       }}>{label}</label>
       {children}
     </div>
@@ -40,11 +40,11 @@ export default function Reserva() {
             fontWeight: 900, fontSize: "clamp(2rem,5vw,3.2rem)",
             color: C.ink, textTransform: "uppercase",
             letterSpacing: "-0.02em", margin: "16px 0 0",
-            fontFamily: "DM Sans, sans-serif",
+            fontFamily: "Noto Sans JP, sans-serif",
           }}>
             Reserva <span style={{ color: C.coral }}>tu Mesa</span>
           </h2>
-          <p style={{ fontSize: 13, color: C.muted, marginTop: 12, fontFamily: "DM Sans, sans-serif" }}>
+          <p style={{ fontSize: 13, color: C.muted, marginTop: 12, fontFamily: "Noto Sans JP, sans-serif" }}>
             Confirmamos en menos de 2 horas · Grupos de hasta 12 personas
           </p>
         </div>
@@ -98,7 +98,7 @@ export default function Reserva() {
                       border: `1.5px solid ${personas === p ? C.coral : C.border}`,
                       background: personas === p ? C.coral : "transparent",
                       color: personas === p ? C.cream : C.muted,
-                      fontFamily: "DM Sans, sans-serif", transition: "all 0.15s",
+                      fontFamily: "Noto Sans JP, sans-serif", transition: "all 0.15s",
                     }}>{p}</button>
                   ))}
                 </div>
@@ -118,7 +118,7 @@ export default function Reserva() {
                 background: C.paper, borderRadius: 8, padding: "14px 16px",
               }}>
                 {["✅ Sin costo de reserva", "📱 Confirmación por WhatsApp", "❌ Cancelación gratuita 24h antes"].map(t => (
-                  <span key={t} style={{ fontSize: 11, color: C.muted, fontFamily: "DM Sans, sans-serif" }}>{t}</span>
+                  <span key={t} style={{ fontSize: 11, color: C.muted, fontFamily: "Noto Sans JP, sans-serif" }}>{t}</span>
                 ))}
               </div>
 
@@ -126,7 +126,7 @@ export default function Reserva() {
                 background: C.coral, color: C.cream, border: "none",
                 padding: "16px", borderRadius: 8, fontSize: 13, fontWeight: 700,
                 letterSpacing: "0.15em", textTransform: "uppercase",
-                cursor: "pointer", fontFamily: "DM Sans, sans-serif",
+                cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
                 transition: "background 0.2s, transform 0.1s",
               }}
               onMouseEnter={e => { e.currentTarget.style.background = C.coralD; e.currentTarget.style.transform = "translateY(-1px)"; }}
@@ -149,10 +149,10 @@ function SuccessMsg() {
       boxShadow: "0 8px 40px rgba(26,26,24,0.06)",
     }}>
       <MascotaSushi pose="feliz" size={120} style={{ margin: "0 auto 24px" }} />
-      <h3 style={{ fontSize: 26, fontWeight: 900, color: C.ink, fontFamily: "DM Sans, sans-serif", margin: "0 0 12px" }}>
+      <h3 style={{ fontSize: 26, fontWeight: 900, color: C.ink, fontFamily: "Noto Sans JP, sans-serif", margin: "0 0 12px" }}>
         ¡Reserva enviada!
       </h3>
-      <p style={{ fontSize: 14, color: C.muted, fontFamily: "DM Sans, sans-serif", lineHeight: 1.8, margin: 0 }}>
+      <p style={{ fontSize: 14, color: C.muted, fontFamily: "Noto Sans JP, sans-serif", lineHeight: 1.8, margin: 0 }}>
         Te confirmaremos por WhatsApp en menos de 2 horas.<br/>
         ¡Gracias por elegir <strong style={{ color: C.ink }}>Maki Nori</strong>!
       </p>

@@ -1,201 +1,153 @@
-import { useState, useEffect } from "react";
-import { C, BtnTeal, BtnGhost } from "./tokens";
-import { MascotaSushi } from "./Mascota";
+import { C, BtnTeal, BtnGhost, FONT } from "./tokens";
 
-const TOP_PEDIDOS = [
-  { nombre: "Dragon Roll",        popularidad: 95, badge: "🔥 Casi agotado" },
-  { nombre: "Sashimi Premium",    popularidad: 78, badge: null },
-  { nombre: "Nigiri Omakase Set", popularidad: 61, badge: null },
+const STATS = [
+  { n: "+40", l: "Variedades", jp: "種類" },
+  { n: "100%", l: "Fresco", jp: "新鮮" },
+  { n: "10+", l: "Años", jp: "年" },
 ];
-
-function PopBar({ pct }) {
-  return (
-    <div style={{ height: 4, background: C.border, borderRadius: 2, overflow: "hidden", width: "100%" }}>
-      <div style={{ height: "100%", width: `${pct}%`, background: C.teal, borderRadius: 2, transition: "width 1s ease" }} />
-    </div>
-  );
-}
-
-function RightPanel() {
-  const [tick, setTick] = useState(0);
-  useEffect(() => { const t = setInterval(() => setTick(p => p + 1), 1000); return () => clearInterval(t); }, []);
-  const mins = 18 + (tick % 3 === 0 ? 1 : 0);
-
-  return (
-    <div style={{ width: "100%", maxWidth: 400, display: "flex", flexDirection: "column", gap: 12 }}>
-      {/* Hero image */}
-      <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", aspectRatio: "4/3", background: C.paper }}>
-        <img src="/sushi1.png" alt="Sushi Maki Nori"
-          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-        <div style={{
-          position: "absolute", top: 12, left: 12,
-          background: "rgba(26,43,43,0.82)", backdropFilter: "blur(6px)",
-          color: C.cream, borderRadius: 20, padding: "6px 12px",
-          display: "flex", alignItems: "center", gap: 6,
-          fontFamily: "DM Sans, sans-serif", fontSize: 11, fontWeight: 600,
-        }}>
-          <span style={{
-            width: 7, height: 7, borderRadius: "50%", background: "#4ade80",
-            display: "inline-block", boxShadow: "0 0 0 2px rgba(74,222,128,0.4)",
-            animation: "pulse 1.5s infinite",
-          }} />
-          EN VIVO · {mins} min espera
-        </div>
-        <div style={{
-          position: "absolute", top: 12, right: 12,
-          background: C.teal, color: C.cream,
-          fontFamily: "Noto Serif JP, serif", fontSize: 12,
-          padding: "4px 12px", borderRadius: 20, fontWeight: 700,
-        }}>
-          おすすめ
-        </div>
-        <div style={{
-          position: "absolute", bottom: 0, left: 0, right: 0,
-          background: "linear-gradient(transparent, rgba(26,43,43,0.78))",
-          padding: "24px 14px 12px",
-          display: "flex", justifyContent: "space-between", alignItems: "flex-end",
-        }}>
-          <div>
-            <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, fontWeight: 700, color: "#fff", margin: 0 }}>Philadelphia Roll</p>
-            <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 10, color: "rgba(255,255,255,0.7)", margin: 0 }}>⭐⭐⭐⭐⭐ · 127 reseñas</p>
-          </div>
-          <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 16, fontWeight: 900, color: C.coral, margin: 0 }}>$100</p>
-        </div>
-      </div>
-
-      {/* Lo más pedido */}
-      <div style={{ background: C.paper, borderRadius: 12, padding: "14px 16px", border: `1px solid ${C.border}` }}>
-        <p style={{
-          fontFamily: "DM Sans, sans-serif", fontSize: 9, fontWeight: 700,
-          letterSpacing: "0.18em", textTransform: "uppercase", color: C.teal, margin: "0 0 10px",
-        }}>
-          🔥 Lo más pedido hoy
-        </p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {TOP_PEDIDOS.map((item, i) => (
-            <div key={i}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, fontWeight: 700, color: C.ink }}>
-                    {i + 1}. {item.nombre}
-                  </span>
-                  {item.badge && (
-                    <span style={{
-                      fontSize: 9, fontWeight: 700, color: C.coral,
-                      background: "rgba(232,145,92,0.14)", padding: "1px 6px", borderRadius: 4,
-                    }}>
-                      {item.badge}
-                    </span>
-                  )}
-                </div>
-                <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 10, color: C.muted }}>{item.popularidad}%</span>
-              </div>
-              <PopBar pct={item.popularidad} />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function Hero() {
   return (
-    <section style={{ paddingTop: 112, paddingBottom: 64, paddingInline: 16 }}>
-      <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+    <section style={{ position: "relative", background: C.ink, overflow: "hidden" }}>
+      <div className="noren-bar" />
 
-        {/* Teal frame */}
-        <div style={{ background: C.teal, borderRadius: 24, padding: 10 }}>
-          <div style={{
-            background: C.cream, borderRadius: 16,
-            display: "flex", flexWrap: "wrap",
-            alignItems: "center", gap: 40, padding: "56px 56px",
-            minHeight: 520,
+      <div className="hero-split" style={{
+        display: "flex", minHeight: "calc(100svh - 6px)", maxWidth: 1440, margin: "0 auto",
+      }}>
+        {/* Copy */}
+        <div className="hero-copy" style={{
+          flex: "1 1 46%",
+          display: "flex", flexDirection: "column", justifyContent: "center",
+          padding: "120px 48px 72px",
+          position: "relative",
+          background: C.ink,
+        }}>
+          <div className="pattern-seigaiha-dark" style={{
+            position: "absolute", inset: 0, opacity: 0.7, pointerEvents: "none",
+          }} />
+
+          <p className="v-kanji hide-mobile" style={{
+            position: "absolute", left: 18, top: "50%", transform: "translateY(-50%)",
+            color: "rgba(244,239,230,0.14)", fontSize: 22, fontWeight: 700,
+            pointerEvents: "none", userSelect: "none",
           }}>
-            {/* Left: copy */}
-            <div style={{ flex: 1, minWidth: 280, display: "flex", flexDirection: "column", gap: 20 }}>
+            巻きのり · イグアラ
+          </p>
 
-              {/* Brand badge */}
-              <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-
-                {/* Logo en circulo */}
-                <div style={{
-                  borderRadius: "50%",
-                  width: 104, height: 104,
-                  flexShrink: 0,
-                  overflow: "hidden",
-                  border: `3px solid ${C.teal}`,
-                }}>
-                  <img
-                    src="/icon.png"
-                    alt="Maki Nori logo"
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                  />
-                </div>
-
-                <div>
-                  <p style={{ fontFamily: "Noto Serif JP, serif", fontSize: "1.4rem", fontWeight: 900, color: C.ink, lineHeight: 1, margin: 0 }}>まき のり</p>
-                  <p style={{ fontFamily: "Noto Serif JP, serif", fontSize: 11, color: C.muted, margin: "4px 0 0" }}>Maki Nori · Iguala</p>
-                </div>
-
-                <MascotaSushi pose="feliz" size={72} style={{ marginLeft: "auto", flexShrink: 0 }} />
+          <div className="fade-up" style={{ position: "relative", zIndex: 1, maxWidth: 520 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 28 }}>
+              <div style={{
+                width: 64, height: 64, borderRadius: "50%", overflow: "hidden",
+                border: `1px solid ${C.gold}`, flexShrink: 0,
+              }}>
+                <img src="/icon.png" alt="Maki Nori" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               </div>
-
-              <p style={{
-                fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase",
-                fontWeight: 600, color: C.teal, margin: 0, fontFamily: "DM Sans, sans-serif",
-              }}>
-                Cocina Japonesa · Iguala, Guerrero
-              </p>
-
-              {/* Headline */}
-              <h1 style={{
-                fontFamily: "DM Sans, sans-serif", fontWeight: 900,
-                fontSize: "clamp(2.4rem, 5.5vw, 3.8rem)",
-                color: C.ink, lineHeight: 0.92,
-                textTransform: "uppercase", letterSpacing: "-0.03em", margin: 0,
-              }}>
-                Maki Nori<br />
-                <span style={{ color: C.teal }}>donde el</span><br />
-                sushi se<br />
-                <span style={{
-                  color: C.coral,
-                  WebkitTextStroke: `2px ${C.coral}`,
-                  WebkitTextFillColor: "transparent",
-                }}>
-                  hace arte
-                </span>
-              </h1>
-
-
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 4 }}>
-                <BtnTeal href="#menu">Ver Menú →</BtnTeal>
-                <BtnGhost href="#linktree">Síguenos</BtnGhost>
+              <div>
+                <p style={{
+                  fontFamily: FONT.jp, fontSize: 22, fontWeight: 700,
+                  color: C.cream, margin: 0, letterSpacing: "0.12em",
+                }}>まき のり</p>
+                <p style={{
+                  fontFamily: FONT.sans, fontSize: 11, color: C.gold,
+                  letterSpacing: "0.28em", margin: "4px 0 0", textTransform: "uppercase",
+                }}>Iguala · Guerrero</p>
               </div>
             </div>
 
-            {/* Right: image + top pedidos */}
-            <div style={{ flex: 1, minWidth: 280, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <RightPanel />
+            <p style={{
+              fontFamily: FONT.sans, fontSize: 11, letterSpacing: "0.28em",
+              textTransform: "uppercase", color: C.teal, margin: "0 0 18px", fontWeight: 600,
+            }}>
+              料理 · Cocina japonesa
+            </p>
+
+            <h1 style={{
+              fontFamily: FONT.serif, fontWeight: 800,
+              fontSize: "clamp(2.6rem, 6vw, 4.4rem)",
+              color: C.cream, lineHeight: 1.05,
+              letterSpacing: "0.01em", margin: "0 0 18px",
+            }}>
+              Donde el sushi<br />
+              <span style={{ color: C.gold, fontStyle: "italic", fontWeight: 600 }}>se hace arte</span>
+            </h1>
+
+            <div className="gold-line" style={{ width: 80, margin: "0 0 22px" }} />
+
+            <p style={{
+              fontFamily: FONT.sans, fontSize: 15, lineHeight: 1.85,
+              color: "rgba(244,239,230,0.62)", margin: "0 0 32px", maxWidth: 420,
+            }}>
+              Rolls hechos a mano, ramen del día y una barra con sake, soju y cócteles.
+              El espíritu de un sushi-ya, en el corazón de Iguala.
+            </p>
+
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <BtnTeal href="#menu">Ver menú</BtnTeal>
+              <BtnGhost href="#galeria" light>Galería</BtnGhost>
             </div>
           </div>
         </div>
 
-        {/* Stats strip */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginTop: 24 }}>
-          {[
-            { n: "+40", l: "Variedades" },
-            { n: "100%", l: "Fresco" },
-            { n: "10+", l: "Años de Arte" },
-          ].map(({ n, l }) => (
-            <div key={l} style={{ textAlign: "center" }}>
-              <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: "1.5rem", fontWeight: 900, color: C.ink, margin: 0 }}>{n}</p>
-              <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: C.muted, textTransform: "uppercase", letterSpacing: "0.15em", margin: 0 }}>{l}</p>
+        {/* Photo */}
+        <div className="hero-photo" style={{
+          flex: "1 1 54%", position: "relative", minHeight: "100svh", overflow: "hidden",
+        }}>
+          <img
+            src="/IMG_7047.jpg"
+            alt="Roll Maki Nori"
+            style={{
+              width: "100%", height: "100%", objectFit: "cover",
+              objectPosition: "center", display: "block",
+              position: "absolute", inset: 0,
+            }}
+          />
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "linear-gradient(90deg, rgba(22,19,17,0.45) 0%, transparent 28%)",
+          }} />
+          <div style={{
+            position: "absolute", bottom: 28, left: 28, right: 28,
+            display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 16,
+          }}>
+            <div>
+              <span className="hanko" style={{ fontSize: 11, marginBottom: 10 }}>おすすめ</span>
+              <p style={{
+                fontFamily: FONT.serif, fontSize: 18, color: "#fff", margin: "10px 0 0",
+                textShadow: "0 8px 24px rgba(0,0,0,0.45)",
+              }}>Chimmy Roll</p>
+              <p style={{
+                fontFamily: FONT.sans, fontSize: 12, color: "rgba(255,255,255,0.75)", margin: "2px 0 0",
+              }}>Hecho a mano · Iguala</p>
+            </div>
+            <p style={{
+              fontFamily: FONT.serif, fontSize: 22, color: C.gold, margin: 0, fontWeight: 700,
+              textShadow: "0 8px 24px rgba(0,0,0,0.45)",
+            }}>$95</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div style={{ background: C.cream, borderTop: `1px solid ${C.border}` }}>
+        <div className="stats-strip" style={{
+          maxWidth: 1200, margin: "0 auto",
+          display: "grid", gridTemplateColumns: "repeat(3, 1fr)",
+          padding: "28px 24px",
+        }}>
+          {STATS.map(({ n, l, jp }, i) => (
+            <div key={l} style={{
+              textAlign: "center",
+              borderRight: i < 2 ? `1px solid ${C.border}` : "none",
+            }}>
+              <p style={{ fontFamily: FONT.jp, fontSize: 11, color: C.teal, letterSpacing: "0.2em", margin: "0 0 6px" }}>{jp}</p>
+              <p style={{ fontFamily: FONT.serif, fontSize: "1.7rem", fontWeight: 700, color: C.ink, margin: 0 }}>{n}</p>
+              <p style={{
+                fontFamily: FONT.sans, fontSize: 11, color: C.muted,
+                letterSpacing: "0.16em", textTransform: "uppercase", margin: "4px 0 0",
+              }}>{l}</p>
             </div>
           ))}
         </div>
-
       </div>
     </section>
   );

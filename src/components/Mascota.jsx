@@ -95,7 +95,7 @@ export function MascotaBubble({ pose = "feliz", children, accent = C.teal }) {
         background: "#fff", border: `1.5px solid ${accent}`,
         borderRadius: 14, padding: "10px 16px",
         position: "relative", maxWidth: 260,
-        fontFamily: "DM Sans, sans-serif", fontSize: 12.5,
+        fontFamily: "Noto Sans JP, sans-serif", fontSize: 12.5,
         fontWeight: 600, color: C.ink, lineHeight: 1.5,
       }}>
         {children}

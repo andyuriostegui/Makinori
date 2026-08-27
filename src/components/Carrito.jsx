@@ -78,9 +78,9 @@ export function BtnAgregar({ producto }) {
       {qty === 0 ? (
         <button onClick={handleAgregar} style={{
           background: pop ? C.tealD : C.teal,
-          color: C.cream, border: "none", borderRadius: 6,
+          color: C.cream, border: "none", borderRadius: 2,
           padding: "8px 16px", fontSize: 12, fontWeight: 700,
-          cursor: "pointer", fontFamily: "DM Sans, sans-serif",
+          cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
           transform: pop ? "scale(0.95)" : "scale(1)",
           transition: "all 0.15s", width: "100%",
           display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
@@ -96,7 +96,7 @@ export function BtnAgregar({ producto }) {
             display: "flex", alignItems: "center", justifyContent: "center",
             color: C.ink, fontWeight: 700, fontSize: 16,
           }}>−</button>
-          <span style={{ flex: 1, textAlign: "center", fontWeight: 700, fontSize: 14, color: C.ink, fontFamily: "DM Sans, sans-serif" }}>
+          <span style={{ flex: 1, textAlign: "center", fontWeight: 700, fontSize: 14, color: C.ink, fontFamily: "Noto Sans JP, sans-serif" }}>
             {qty} en pedido
           </span>
           <button onClick={handleAgregar} style={{
@@ -121,7 +121,7 @@ export function CarritoBtn() {
       background: C.ink, color: C.cream,
       border: "none", borderRadius: 50, padding: "8px 20px 8px 8px",
       display: "flex", alignItems: "center", gap: 8,
-      cursor: "pointer", fontFamily: "DM Sans, sans-serif",
+      cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
       boxShadow: "0 8px 32px rgba(26,26,24,0.25)",
       transform: bounce ? "scale(1.12)" : "scale(1)",
       transition: "transform 0.2s cubic-bezier(0.34,1.56,0.64,1)",
@@ -201,8 +201,8 @@ export function CarritoPanel() {
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <ShoppingBag01Icon size={22} color={C.ink} />
               <div>
-                <h3 style={{ fontFamily: "DM Sans, sans-serif", fontWeight: 900, fontSize: 18, margin: 0, color: C.ink }}>Tu Pedido</h3>
-                <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>
+                <h3 style={{ fontFamily: "Noto Sans JP, sans-serif", fontWeight: 900, fontSize: 18, margin: 0, color: C.ink }}>Tu Pedido</h3>
+                <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>
                   {count === 0 ? "Agrega items del menú" : `${count} item${count > 1 ? "s" : ""} seleccionados`}
                 </p>
               </div>
@@ -226,10 +226,10 @@ export function CarritoPanel() {
           }}>
             <Timer01Icon size={18} color={urgente ? C.coral : C.muted} />
             <div>
-              <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, fontWeight: 700, color: urgente ? C.coral : C.ink, margin: 0 }}>
+              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, fontWeight: 700, color: urgente ? C.coral : C.ink, margin: 0 }}>
                 {urgente ? "¡Últimos minutos!" : "Pide ahora"} — entrega en 30-45 min
               </p>
-              <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 10, color: C.muted, margin: 0 }}>
+              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 10, color: C.muted, margin: 0 }}>
                 Tiempo estimado: {mins}:{secs}
               </p>
             </div>
@@ -238,7 +238,7 @@ export function CarritoPanel() {
 
         {/* Modo mesa/llevar */}
         <div style={{ padding: "16px 24px", borderBottom: `1px solid ${C.border}` }}>
-          <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: C.muted, margin: "0 0 10px" }}>¿Cómo lo quieres?</p>
+          <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: C.muted, margin: "0 0 10px" }}>¿Cómo lo quieres?</p>
           <div style={{ display: "flex", gap: 8 }}>
             {[
               ["llevar", "Para llevar", HandBag01Icon],
@@ -246,7 +246,7 @@ export function CarritoPanel() {
             ].map(([val, label, Icon]) => (
               <button key={val} onClick={() => setModo(val)} style={{
                 flex: 1, padding: "10px 8px", borderRadius: 8, fontSize: 12, fontWeight: 600,
-                cursor: "pointer", fontFamily: "DM Sans, sans-serif",
+                cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
                 border: `1.5px solid ${modo === val ? C.teal : C.border}`,
                 background: modo === val ? "rgba(42,139,139,0.08)" : "transparent",
                 color: modo === val ? C.teal : C.muted,
@@ -263,7 +263,7 @@ export function CarritoPanel() {
               style={{
                 marginTop: 10, width: "100%", padding: "10px 12px",
                 border: `1.5px solid ${C.border}`, borderRadius: 8,
-                fontSize: 13, fontFamily: "DM Sans, sans-serif",
+                fontSize: 13, fontFamily: "Noto Sans JP, sans-serif",
                 color: C.ink, background: "#fff", boxSizing: "border-box", outline: "none",
               }}
             />
@@ -282,11 +282,11 @@ export function CarritoPanel() {
                 border: `1.5px solid ${C.teal}`, borderRadius: 14,
                 padding: "10px 18px", marginBottom: 4,
               }}>
-                <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, fontWeight: 700, color: C.teal, margin: 0 }}>
+                <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 13, fontWeight: 700, color: C.teal, margin: 0 }}>
                   ¡Aún no me has alimentado!
                 </p>
               </div>
-              <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, margin: "8px 0 0", color: C.muted }}>Agrega algo del menú para empezar</p>
+              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, margin: "8px 0 0", color: C.muted }}>Agrega algo del menú para empezar</p>
             </div>
           ) : items.map(item => (
             <ItemRow key={item.id} item={item}
@@ -305,14 +305,14 @@ export function CarritoPanel() {
             }}>
               <ServingFoodIcon size={24} color={C.coral} />
               <div style={{ flex: 1 }}>
-                <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, fontWeight: 700, color: C.coral, margin: "0 0 2px" }}>{sugerencia.msg}</p>
-                <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>{sugerencia.nombre} · ${sugerencia.precio}</p>
+                <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, fontWeight: 700, color: C.coral, margin: "0 0 2px" }}>{sugerencia.msg}</p>
+                <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>{sugerencia.nombre} · ${sugerencia.precio}</p>
               </div>
               <button onClick={() => agregar({ id: sugerencia.id, nombre: sugerencia.nombre, precio: sugerencia.precio, foto: null })}
                 style={{
                   background: C.teal, color: C.cream, border: "none",
                   borderRadius: 6, padding: "6px 12px", fontSize: 11,
-                  fontWeight: 700, cursor: "pointer", fontFamily: "DM Sans, sans-serif",
+                  fontWeight: 700, cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
                 }}>+ Sí</button>
             </div>
           )}
@@ -322,14 +322,14 @@ export function CarritoPanel() {
         {items.length > 0 && (
           <div style={{ padding: "16px 24px 28px", borderTop: `1px solid ${C.border}` }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
-              <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 14, color: C.muted }}>Total estimado</span>
-              <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 20, fontWeight: 900, color: C.ink }}>${total} MXN</span>
+              <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 14, color: C.muted }}>Total estimado</span>
+              <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 20, fontWeight: 900, color: C.ink }}>${total} MXN</span>
             </div>
             <button onClick={enviarWA} style={{
               width: "100%", background: "#25D366", color: "#fff",
               border: "none", borderRadius: 10, padding: "16px",
               fontSize: 14, fontWeight: 700, cursor: "pointer",
-              fontFamily: "DM Sans, sans-serif",
+              fontFamily: "Noto Sans JP, sans-serif",
               display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
               transition: "opacity 0.2s",
             }}
@@ -342,7 +342,7 @@ export function CarritoPanel() {
             <button onClick={limpiar} style={{
               width: "100%", background: "transparent", color: C.muted,
               border: "none", padding: "10px", fontSize: 12,
-              cursor: "pointer", fontFamily: "DM Sans, sans-serif",
+              cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
               display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
               marginTop: 4,
             }}>
@@ -371,10 +371,10 @@ function ItemRow({ item, onQuitar, onAgregar, onNota }) {
         </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, fontWeight: 700, color: C.ink, margin: "0 0 2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 13, fontWeight: 700, color: C.ink, margin: "0 0 2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
             {item.nombre}
           </p>
-          <p style={{ fontFamily: "DM Sans, sans-serif", fontSize: 12, color: C.coral, fontWeight: 700, margin: 0 }}>
+          <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.coral, fontWeight: 700, margin: 0 }}>
             ${item.precio * item.qty} MXN
           </p>
         </div>
@@ -385,7 +385,7 @@ function ItemRow({ item, onQuitar, onAgregar, onNota }) {
             background: "transparent", cursor: "pointer", fontWeight: 700, color: C.muted,
             display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16,
           }}>−</button>
-          <span style={{ fontFamily: "DM Sans, sans-serif", fontSize: 13, fontWeight: 700, minWidth: 16, textAlign: "center" }}>{item.qty}</span>
+          <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 13, fontWeight: 700, minWidth: 16, textAlign: "center" }}>{item.qty}</span>
           <button onClick={onAgregar} style={{
             width: 26, height: 26, borderRadius: 6, border: "none",
             background: C.teal, cursor: "pointer",
@@ -403,7 +403,7 @@ function ItemRow({ item, onQuitar, onAgregar, onNota }) {
             style={{
               width: "100%", padding: "6px 10px", fontSize: 11,
               border: `1px solid ${C.coral}`, borderRadius: 6,
-              fontFamily: "DM Sans, sans-serif", color: C.ink,
+              fontFamily: "Noto Sans JP, sans-serif", color: C.ink,
               background: "#fff", boxSizing: "border-box", outline: "none",
             }}
           />
@@ -411,7 +411,7 @@ function ItemRow({ item, onQuitar, onAgregar, onNota }) {
           <button onClick={() => setEditNota(true)} style={{
             background: "none", border: "none", padding: 0,
             fontSize: 11, color: item.nota ? C.coral : C.muted,
-            cursor: "pointer", fontFamily: "DM Sans, sans-serif",
+            cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
             display: "flex", alignItems: "center", gap: 4,
           }}>
             <PencilEdit01Icon size={11} color={item.nota ? C.coral : C.muted} />

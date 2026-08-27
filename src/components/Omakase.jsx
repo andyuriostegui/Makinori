@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { C, BtnCoral } from "./tokens";
-import { MascotaSushi } from "./Mascota";
+import { C, FONT, BtnCoral } from "./tokens";
 import {
   HelpCircleIcon,
   Leaf01Icon,
@@ -20,7 +19,7 @@ export default function Omakase() {
     <section id="omakase" style={{
       background: C.ink, color: C.cream,
       padding: "100px 24px",
-      fontFamily: "DM Sans, sans-serif",
+      fontFamily: FONT.sans,
       position: "relative", overflow: "hidden",
     }}>
       <style>{`
@@ -53,7 +52,7 @@ export default function Omakase() {
       <div aria-hidden style={{
         position: "absolute", right: -20, top: "50%",
         transform: "translateY(-50%)",
-        fontFamily: "Noto Serif JP, serif",
+        fontFamily: FONT.jp,
         fontSize: "clamp(180px, 22vw, 320px)",
         fontWeight: 900, color: "rgba(245,240,232,0.03)",
         lineHeight: 1, userSelect: "none", pointerEvents: "none",
@@ -61,27 +60,24 @@ export default function Omakase() {
 
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0,
-        height: 3, background: `linear-gradient(90deg, ${C.teal}, transparent)`,
+        height: 2, background: `linear-gradient(90deg, ${C.gold}, transparent)`,
       }} />
 
       <div style={{ maxWidth: 860, margin: "0 auto", position: "relative", zIndex: 1 }}>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
           <span style={{ height: 1, width: 40, background: C.teal, display: "block" }} />
-          <span style={{ fontFamily: "Noto Serif JP, serif", fontSize: 13, color: C.teal, letterSpacing: "0.18em" }}>お任せ</span>
+          <span style={{ fontFamily: FONT.jp, fontSize: 13, color: C.gold, letterSpacing: "0.28em" }}>お任せ</span>
         </div>
 
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 20, marginBottom: 12, flexWrap: "wrap" }}>
-          <h2 style={{
-            fontWeight: 900, fontSize: "clamp(2.4rem, 6vw, 4.5rem)",
-            color: C.cream, textTransform: "uppercase",
-            letterSpacing: "-0.03em", lineHeight: 0.9, margin: 0,
-          }}>Omakase</h2>
-          <MascotaSushi pose="feliz" size={64} style={{ marginBottom: -4 }} />
-        </div>
+        <h2 style={{
+          fontFamily: FONT.serif, fontWeight: 700,
+          fontSize: "clamp(2.6rem, 6vw, 4.6rem)",
+          color: C.cream, letterSpacing: "0.04em", lineHeight: 0.95, margin: "0 0 12px",
+        }}>Omakase</h2>
 
         <p style={{
-          fontFamily: "Noto Serif JP, serif",
+          fontFamily: FONT.jp,
           fontSize: "clamp(1rem, 2.5vw, 1.3rem)",
           color: "rgba(245,240,232,0.45)",
           margin: "0 0 40px", fontStyle: "italic",
@@ -102,7 +98,7 @@ export default function Omakase() {
           </p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 52, maxWidth: 560 }}>
+        <div className="omakase-pilares" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 52, maxWidth: 560 }}>
           {PILARES.map(({ n, label, sub, Icon }) => (
             <div key={n}
               onMouseEnter={() => setHov(n)}
@@ -115,7 +111,7 @@ export default function Omakase() {
               <div style={{ marginBottom: 10 }}>
                 <Icon size={28} color={hov === n ? C.teal : "rgba(245,240,232,0.5)"} />
               </div>
-              <p style={{ fontFamily: "Noto Serif JP, serif", fontSize: 10, color: C.teal, margin: "0 0 6px", letterSpacing: "0.1em" }}>{n}</p>
+              <p style={{ fontFamily: FONT.jp, fontSize: 11, color: C.gold, margin: "0 0 6px", letterSpacing: "0.14em" }}>{n}</p>
               <p style={{ fontSize: 14, fontWeight: 700, color: C.cream, margin: "0 0 4px" }}>{label}</p>
               <p style={{ fontSize: 12, color: "rgba(245,240,232,0.4)", margin: 0 }}>{sub}</p>
             </div>
