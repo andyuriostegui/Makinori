@@ -235,12 +235,50 @@ export function CarritoBtn() {
   );
 }
 
-const inputCss = {
-  width: "100%", padding: "10px 12px",
-  border: `1.5px solid ${C.border}`, borderRadius: 8,
-  fontSize: 13, fontFamily: "Noto Sans JP, sans-serif",
-  color: C.ink, background: "#fff", boxSizing: "border-box", outline: "none",
-};
+function leerSheet() {
+  if (typeof window === "undefined") {
+    return { mobile: false, height: "100%", offsetTop: 0, keyboard: false };
+  }
+  const mobile = window.matchMedia("(max-width: 640px)").matches;
+  const vv = window.visualViewport;
+  const vh = vv?.height ?? window.innerHeight;
+  const offsetTop = vv?.offsetTop ?? 0;
+  const keyboard = mobile && window.innerHeight - vh > 80;
+  return {
+    mobile,
+    height: mobile ? `${Math.round(vh)}px` : "100%",
+    offsetTop: mobile ? offsetTop : 0,
+    keyboard,
+  };
+}
+
+function usePedidoSheet() {
+  const [sheet, setSheet] = useState(leerSheet);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const update = () => setSheet(leerSheet());
+    mq.addEventListener("change", update);
+    window.addEventListener("resize", update);
+    window.visualViewport?.addEventListener("resize", update);
+    window.visualViewport?.addEventListener("scroll", update);
+    return () => {
+      mq.removeEventListener("change", update);
+      window.removeEventListener("resize", update);
+      window.visualViewport?.removeEventListener("resize", update);
+      window.visualViewport?.removeEventListener("scroll", update);
+    };
+  }, []);
+
+  return sheet;
+}
+
+function scrollCampoVisible(e) {
+  const el = e.target;
+  window.setTimeout(() => {
+    el.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, 350);
+}
 
 export function CarritoPanel() {
   const {
@@ -250,6 +288,7 @@ export function CarritoPanel() {
   } = useCarritoCtx();
   const [error, setError] = useState("");
   const sugerencia = pickSugerencia(items);
+  const sheet = usePedidoSheet();
 
   useEffect(() => {
     if (!open) return;
@@ -257,6 +296,32 @@ export function CarritoPanel() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, setOpen]);
+
+  useEffect(() => {
+    if (!open) return;
+    const scrollY = window.scrollY;
+    const { body, documentElement: html } = document;
+    const prev = {
+      overflow: body.style.overflow,
+      position: body.style.position,
+      top: body.style.top,
+      width: body.style.width,
+      htmlOverflow: html.style.overflow,
+    };
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    html.style.overflow = "hidden";
+    return () => {
+      body.style.overflow = prev.overflow;
+      body.style.position = prev.position;
+      body.style.top = prev.top;
+      body.style.width = prev.width;
+      html.style.overflow = prev.htmlOverflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [open]);
 
   const validar = () => {
     if (items.length === 0) return "Agrega algo del menú";
@@ -286,23 +351,29 @@ export function CarritoPanel() {
   if (!open) return null;
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", justifyContent: "flex-end" }}>
-      <div onClick={() => setOpen(false)} style={{
-        position: "absolute", inset: 0,
-        background: "rgba(26,26,24,0.5)", backdropFilter: "blur(4px)",
-      }} />
+    <div className="pedido-shell">
+      <div className="pedido-backdrop" onClick={() => setOpen(false)} />
 
-      <div role="dialog" aria-modal="true" aria-labelledby="pedido-titulo" style={{
-        position: "relative", zIndex: 1, width: "100%", maxWidth: 420,
-        background: C.cream, height: "100%",
-        display: "flex", flexDirection: "column",
-        boxShadow: "-8px 0 40px rgba(26,26,24,0.15)",
-      }}>
-        <div style={{ padding: "20px 24px 16px", borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pedido-titulo"
+        className="pedido-panel"
+        style={sheet.mobile ? {
+          position: "absolute",
+          top: sheet.offsetTop,
+          left: 0,
+          right: 0,
+          height: sheet.height,
+          maxWidth: "100%",
+        } : undefined}
+      >
+        <div className="pedido-header">
+          <div className="pedido-handle" aria-hidden />
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
               <ShoppingBag01Icon size={22} color={C.ink} />
-              <div>
+              <div style={{ minWidth: 0 }}>
                 <h3 id="pedido-titulo" style={{ fontFamily: "Noto Sans JP, sans-serif", fontWeight: 900, fontSize: 18, margin: 0, color: C.ink }}>Tu Pedido</h3>
                 <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>
                   {count === 0 ? "Agrega platillos del menú" : `${count} platillo${count === 1 ? "" : "s"}`}
@@ -310,74 +381,99 @@ export function CarritoPanel() {
                 </p>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} aria-label="Cerrar pedido" style={{
+            <button className="pedido-close" onClick={() => setOpen(false)} aria-label="Cerrar pedido" style={{
               background: C.paper, border: "none", borderRadius: 8,
-              width: 36, height: 36, cursor: "pointer",
+              width: 36, height: 36, cursor: "pointer", flexShrink: 0,
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>
               <Cancel01Icon size={16} color={C.muted} />
             </button>
           </div>
-
-          <div style={{
-            marginTop: 12, background: C.paper, border: `1px solid ${C.border}`,
-            borderRadius: 8, padding: "8px 12px",
-            display: "flex", alignItems: "center", gap: 8,
-          }}>
-            <Timer01Icon size={18} color={C.muted} />
-            <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, fontWeight: 700, color: C.ink, margin: 0 }}>
-              Preparación 30–45 min · Iguala y alrededores
-            </p>
-          </div>
         </div>
 
-        <div style={{ padding: "16px 24px", borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
-          <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: C.muted, margin: "0 0 10px" }}>¿Cómo lo quieres?</p>
-          <div style={{ display: "flex", gap: 6 }}>
-            {[
-              ["llevar",    "Llevar",     HandBag01Icon],
-              ["mesa",      "En mesa",    Chair01Icon],
-              ["domicilio", "Domicilio",  Location01Icon],
-            ].map(([val, label, Icon]) => (
-              <button key={val} onClick={() => { setModo(val); setError(""); }} style={{
-                flex: 1, padding: "10px 4px", borderRadius: 8, fontSize: 11, fontWeight: 600,
-                cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
-                border: `1.5px solid ${modo === val ? C.teal : C.border}`,
-                background: modo === val ? "rgba(42,139,139,0.08)" : "transparent",
-                color: modo === val ? C.teal : C.muted,
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 4,
-              }}>
-                <Icon size={13} color={modo === val ? C.teal : C.muted} /> {label}
-              </button>
-            ))}
-          </div>
-
-          {modo === "mesa" && (
-            <input type="text" placeholder="Número de mesa (ej: 3)"
-              value={mesa} onChange={e => { setMesa(e.target.value); setError(""); }}
-              style={{ ...inputCss, marginTop: 10 }}
-            />
-          )}
-
-          {modo !== "mesa" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 10 }}>
-              <input type="text" placeholder="Tu nombre" value={cliente.nombre}
-                onChange={e => { setCampo("nombre", e.target.value); setError(""); }}
-                style={inputCss} autoComplete="name" />
-              <input type="tel" placeholder="WhatsApp (733…)" value={cliente.tel}
-                onChange={e => { setCampo("tel", e.target.value); setError(""); }}
-                style={inputCss} autoComplete="tel" />
-              {modo === "domicilio" && (
-                <input type="text" placeholder="Colonia, calle y referencias"
-                  value={cliente.direccion}
-                  onChange={e => { setCampo("direccion", e.target.value); setError(""); }}
-                  style={inputCss} autoComplete="street-address" />
-              )}
+        <div className="pedido-body">
+          <div>
+            <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: C.muted, margin: "0 0 10px" }}>¿Cómo lo quieres?</p>
+            <div className="pedido-modos">
+              {[
+                ["llevar",    "Llevar",     HandBag01Icon],
+                ["mesa",      "En mesa",    Chair01Icon],
+                ["domicilio", "Domicilio",  Location01Icon],
+              ].map(([val, label, Icon]) => (
+                <button
+                  key={val}
+                  className="pedido-modo"
+                  onClick={() => { setModo(val); setError(""); }}
+                  style={{
+                    border: `1.5px solid ${modo === val ? C.teal : C.border}`,
+                    background: modo === val ? "rgba(42,139,139,0.08)" : "transparent",
+                    color: modo === val ? C.teal : C.muted,
+                  }}
+                >
+                  <Icon size={18} color={modo === val ? C.teal : C.muted} /> {label}
+                </button>
+              ))}
             </div>
-          )}
-        </div>
 
-        <div style={{ flex: 1, padding: "16px 24px", display: "flex", flexDirection: "column", gap: 12, overflowY: "auto" }}>
+            {modo === "mesa" && (
+              <input
+                type="text"
+                className="pedido-input"
+                placeholder="Número de mesa (ej: 3)"
+                value={mesa}
+                onChange={e => { setMesa(e.target.value); setError(""); }}
+                onFocus={scrollCampoVisible}
+                style={{ marginTop: 12 }}
+                inputMode="numeric"
+              />
+            )}
+
+            {modo !== "mesa" && (
+              <div className="pedido-campos" style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 12 }}>
+                <input
+                  type="text"
+                  className="pedido-input"
+                  placeholder="Tu nombre"
+                  value={cliente.nombre}
+                  onChange={e => { setCampo("nombre", e.target.value); setError(""); }}
+                  onFocus={scrollCampoVisible}
+                  autoComplete="name"
+                />
+                <input
+                  type="tel"
+                  className="pedido-input"
+                  placeholder="WhatsApp (733…)"
+                  value={cliente.tel}
+                  onChange={e => { setCampo("tel", e.target.value); setError(""); }}
+                  onFocus={scrollCampoVisible}
+                  autoComplete="tel"
+                />
+                {modo === "domicilio" && (
+                  <input
+                    type="text"
+                    className="pedido-input"
+                    placeholder="Colonia, calle y referencias"
+                    value={cliente.direccion}
+                    onChange={e => { setCampo("direccion", e.target.value); setError(""); }}
+                    onFocus={scrollCampoVisible}
+                    autoComplete="street-address"
+                  />
+                )}
+              </div>
+            )}
+
+            <div style={{
+              marginTop: 12, background: C.paper, border: `1px solid ${C.border}`,
+              borderRadius: 8, padding: "8px 12px",
+              display: "flex", alignItems: "center", gap: 8,
+            }}>
+              <Timer01Icon size={18} color={C.muted} />
+              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, fontWeight: 700, color: C.ink, margin: 0 }}>
+                Preparación 30–45 min · Iguala y alrededores
+              </p>
+            </div>
+          </div>
+
           {items.length === 0 ? (
             <div style={{ textAlign: "center", padding: "24px 0" }}>
               <img src="/sushito.png" alt="" style={{
@@ -399,38 +495,44 @@ export function CarritoPanel() {
                 fontFamily: "Noto Sans JP, sans-serif",
               }}>Ver el menú</button>
             </div>
-          ) : items.map(item => (
-            <ItemRow key={item.id} item={item}
-              onQuitar={() => quitar(item.id)}
-              onAgregar={() => agregar(item)}
-              onNota={n => setNota(item.id, n)}
-            />
-          ))}
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: C.muted, margin: 0 }}>Tu orden</p>
+              {items.map(item => (
+                <ItemRow key={item.id} item={item}
+                  onQuitar={() => quitar(item.id)}
+                  onAgregar={() => agregar(item)}
+                  onNota={n => setNota(item.id, n)}
+                />
+              ))}
+            </div>
+          )}
 
           {sugerencia && items.length > 0 && (
-            <div style={{
+            <div className="pedido-sugerencia" style={{
               background: "rgba(42,139,139,0.06)", border: `1px dashed ${C.coral}`,
               borderRadius: 10, padding: "12px 14px",
               display: "flex", alignItems: "center", gap: 12,
             }}>
               <ServingFoodIcon size={24} color={C.coral} />
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, fontWeight: 700, color: C.coral, margin: "0 0 2px" }}>{sugerencia.msg}</p>
                 <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>{sugerencia.nombre} · ${sugerencia.precio}</p>
               </div>
               <button onClick={() => agregar(sugerencia)}
                 style={{
                   background: C.teal, color: C.cream, border: "none",
-                  borderRadius: 6, padding: "6px 12px", fontSize: 11,
+                  borderRadius: 6, padding: "10px 14px", fontSize: 12,
                   fontWeight: 700, cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
+                  flexShrink: 0,
                 }}>+ Sí</button>
             </div>
           )}
         </div>
 
         {items.length > 0 && (
-          <div style={{ padding: "16px 24px 28px", borderTop: `1px solid ${C.border}`, flexShrink: 0 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+          <div className={`pedido-footer${sheet.keyboard ? " kb-open" : ""}`}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12, gap: 12 }}>
               <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 14, color: C.muted }}>Total estimado</span>
               <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 20, fontWeight: 900, color: C.ink }}>${total} MXN</span>
             </div>
@@ -466,19 +568,19 @@ export function CarritoPanel() {
             {enviado ? (
               <button onClick={() => { limpiar(); setOpen(false); }} style={{
                 width: "100%", background: "transparent", color: C.teal,
-                border: "none", padding: "10px", fontSize: 12, fontWeight: 700,
+                border: "none", padding: "12px", fontSize: 12, fontWeight: 700,
                 cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
-                marginTop: 4,
+                marginTop: 4, minHeight: 44,
               }}>
                 Ya lo envié — vaciar pedido
               </button>
             ) : (
               <button onClick={limpiar} style={{
                 width: "100%", background: "transparent", color: C.muted,
-                border: "none", padding: "10px", fontSize: 12,
+                border: "none", padding: "12px", fontSize: 12,
                 cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-                marginTop: 4,
+                marginTop: 4, minHeight: 44,
               }}>
                 <Delete02Icon size={14} color={C.muted} />
                 Limpiar pedido
@@ -492,20 +594,18 @@ export function CarritoPanel() {
 }
 
 function ItemRow({ item, onQuitar, onAgregar, onNota }) {
-  const [editNota, setEditNota] = useState(false);
-
   return (
     <div style={{ background: "#fff", borderRadius: 10, overflow: "hidden", border: `1px solid ${C.border}` }}>
-      <div style={{ display: "flex", gap: 12, padding: "12px 12px 8px" }}>
-        <div style={{ width: 56, height: 56, borderRadius: 8, overflow: "hidden", flexShrink: 0, background: C.paper, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div className="pedido-item-top">
+        <div className="pedido-item-foto" style={{ width: 56, height: 56, borderRadius: 8, overflow: "hidden", flexShrink: 0, background: C.paper, display: "flex", alignItems: "center", justifyContent: "center" }}>
           {item.foto
             ? <img src={item.foto} alt={item.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             : <ServingFoodIcon size={24} color={C.border} />
           }
         </div>
 
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 13, fontWeight: 700, color: C.ink, margin: "0 0 2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+        <div className="pedido-item-info" style={{ flex: 1, minWidth: 0 }}>
+          <p className="pedido-item-nombre" style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 13, fontWeight: 700, color: C.ink, margin: "0 0 2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
             {item.nombre}
           </p>
           <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>
@@ -516,45 +616,35 @@ function ItemRow({ item, onQuitar, onAgregar, onNota }) {
           </p>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-          <button onClick={onQuitar} aria-label="Quitar uno" style={{
-            width: 26, height: 26, borderRadius: 6, border: `1px solid ${C.border}`,
-            background: "transparent", cursor: "pointer", fontWeight: 700, color: C.muted,
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16,
+        <div className="pedido-item-qty">
+          <span className="pedido-qty-label">Cantidad</span>
+          <button className="pedido-qty-btn" onClick={onQuitar} aria-label="Quitar uno" style={{
+            border: `1px solid ${C.border}`,
+            background: "transparent", color: C.muted,
           }}>−</button>
-          <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 13, fontWeight: 700, minWidth: 16, textAlign: "center" }}>{item.qty}</span>
-          <button onClick={onAgregar} aria-label="Agregar uno" style={{
-            width: 26, height: 26, borderRadius: 6, border: "none",
-            background: C.teal, cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: C.cream, fontWeight: 700, fontSize: 16,
+          <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 15, fontWeight: 700, minWidth: 24, textAlign: "center" }}>{item.qty}</span>
+          <button className="pedido-qty-btn" onClick={onAgregar} aria-label="Agregar uno" style={{
+            border: "none",
+            background: C.teal, color: C.cream,
           }}>+</button>
         </div>
       </div>
 
-      <div style={{ padding: "0 12px 10px" }}>
-        {editNota ? (
-          <input autoFocus type="text" placeholder="Ej: sin pepino, extra picante..."
-            value={item.nota} onChange={e => onNota(e.target.value)}
-            onBlur={() => setEditNota(false)}
-            style={{
-              width: "100%", padding: "6px 10px", fontSize: 11,
-              border: `1px solid ${C.coral}`, borderRadius: 6,
-              fontFamily: "Noto Sans JP, sans-serif", color: C.ink,
-              background: "#fff", boxSizing: "border-box", outline: "none",
-            }}
+      <div style={{ padding: "0 12px 12px" }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, width: "100%" }}>
+          <span style={{ display: "flex", flexShrink: 0 }}>
+            <PencilEdit01Icon size={14} color={item.nota ? C.coral : C.muted} />
+          </span>
+          <input
+            type="text"
+            className="pedido-nota-input"
+            placeholder="Nota: sin pepino, extra picante…"
+            value={item.nota || ""}
+            onChange={e => onNota(e.target.value)}
+            onFocus={scrollCampoVisible}
+            style={{ borderColor: item.nota ? C.coral : C.border }}
           />
-        ) : (
-          <button onClick={() => setEditNota(true)} style={{
-            background: "none", border: "none", padding: 0,
-            fontSize: 11, color: item.nota ? C.coral : C.muted,
-            cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
-            display: "flex", alignItems: "center", gap: 4,
-          }}>
-            <PencilEdit01Icon size={11} color={item.nota ? C.coral : C.muted} />
-            {item.nota ? item.nota : "Agregar nota (sin pepino, etc.)"}
-          </button>
-        )}
+        </label>
       </div>
     </div>
   );

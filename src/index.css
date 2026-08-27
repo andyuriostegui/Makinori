@@ -210,3 +210,243 @@ img { max-width: 100%; }
   }
   .menu-dots { display: none !important; }
 }
+
+/* ── Pedido (carrito) ── */
+.pedido-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+}
+.pedido-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 26, 24, 0.5);
+  backdrop-filter: blur(4px);
+}
+.pedido-panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  height: 100%;
+  background: var(--cream);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 40px rgba(26, 26, 24, 0.15);
+}
+.pedido-header {
+  flex-shrink: 0;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.pedido-handle {
+  display: none;
+}
+.pedido-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 16px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.pedido-footer {
+  flex-shrink: 0;
+  padding: 16px 24px 28px;
+  border-top: 1px solid var(--border);
+  background: var(--cream);
+}
+.pedido-modos {
+  display: flex;
+  gap: 6px;
+}
+.pedido-modo {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 4px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.pedido-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: #fff;
+  box-sizing: border-box;
+  outline: none;
+}
+.pedido-item-top {
+  display: flex;
+  gap: 12px;
+  padding: 12px 12px 8px;
+  align-items: flex-start;
+}
+.pedido-item-qty {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.pedido-qty-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+.pedido-nota-input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 11px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: #fff;
+  box-sizing: border-box;
+  outline: none;
+}
+.pedido-qty-label {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .pedido-shell {
+    align-items: flex-end;
+  }
+  .pedido-panel {
+    max-width: 100%;
+    width: 100%;
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -12px 40px rgba(26, 26, 24, 0.2);
+  }
+  .pedido-handle {
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--border);
+    margin: 0 auto 10px;
+  }
+  .pedido-header {
+    padding: 8px 16px 12px;
+    padding-top: max(8px, env(safe-area-inset-top, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .pedido-close {
+    width: 44px !important;
+    height: 44px !important;
+  }
+  .pedido-body {
+    padding: 14px 16px 24px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    gap: 18px;
+  }
+  .pedido-footer {
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .pedido-footer.kb-open {
+    display: none;
+  }
+  .pedido-modos {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .pedido-modo {
+    flex-direction: column;
+    padding: 12px 6px;
+    min-height: 72px;
+    gap: 6px;
+    font-size: 12px;
+    line-height: 1.2;
+    text-align: center;
+  }
+  .pedido-campos {
+    gap: 10px !important;
+  }
+  .pedido-input {
+    font-size: 16px;
+    padding: 14px;
+    min-height: 48px;
+  }
+  .pedido-item-top {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    grid-template-areas:
+      "foto info"
+      "qty qty";
+    gap: 10px 12px;
+    padding: 12px;
+    align-items: center;
+  }
+  .pedido-item-foto { grid-area: foto; }
+  .pedido-item-info { grid-area: info; min-width: 0; }
+  .pedido-item-qty {
+    grid-area: qty;
+    justify-content: flex-end;
+    background: var(--paper);
+    border-radius: 10px;
+    padding: 4px 6px 4px 12px;
+    gap: 10px;
+  }
+  .pedido-qty-label {
+    display: block;
+    margin-right: auto;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    font-family: var(--font-sans);
+  }
+  .pedido-qty-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+  }
+  .pedido-sugerencia {
+    flex-wrap: wrap;
+  }
+  .pedido-sugerencia button {
+    width: 100%;
+    min-height: 44px;
+  }
+  .pedido-nota-input {
+    font-size: 16px;
+    padding: 12px;
+    min-height: 44px;
+  }
+  .pedido-item-nombre {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    line-height: 1.3;
+  }
+}
