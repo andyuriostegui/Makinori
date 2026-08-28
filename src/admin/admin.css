@@ -360,6 +360,152 @@
 }
 .admin-photo input { display: none; }
 
+.admin-photo-block { display: flex; flex-direction: column; gap: 10px; }
+
+.admin-photo-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: 280px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #e8f6f8;
+  border: 1.5px solid #c5dcdf;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.admin-photo-stage:active { cursor: grabbing; }
+.admin-photo-stage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  display: block;
+}
+.admin-photo-cross {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  font-style: normal;
+}
+.admin-photo-cross::before,
+.admin-photo-cross::after {
+  content: "";
+  position: absolute;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 0 1px rgba(11, 44, 50, 0.2);
+}
+.admin-photo-cross::before {
+  left: 50%;
+  top: 12%;
+  bottom: 12%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+.admin-photo-cross::after {
+  top: 50%;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.admin-photo-nudge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.admin-photo-nudge-mid {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+.admin-photo-nudge button,
+.admin-photo-nudge-mid button {
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: 10px;
+  border: 1.5px solid #c5dcdf;
+  background: #fff;
+  color: #0e3a42;
+  font-weight: 700;
+  font-size: 16px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.admin-photo-nudge-mid button:nth-child(2) {
+  flex: 1;
+  font-size: 14px;
+}
+
+.admin-photo-hint {
+  margin: 0;
+  font-size: 13px;
+  color: #5a6a6e;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.admin-photo-change {
+  display: block;
+  text-align: center;
+  min-height: 44px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1.5px dashed #c5dcdf;
+  background: #f3fafb;
+  color: #14707a;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.admin-photo-change input { display: none; }
+
+.admin-sort-btn {
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1.5px solid #c5dcdf;
+  background: #fff;
+  color: #0e3a42;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.admin-sort-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.admin-row-wrap {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.admin-row-wrap .admin-row { flex: 1; min-width: 0; }
+
+.admin-row-move {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.admin-row-move button {
+  flex: 1;
+  min-width: 44px;
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1.5px solid #c5dcdf;
+  background: #fff;
+  color: #0e3a42;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.admin-row-move button:disabled { opacity: 0.35; cursor: not-allowed; }
+
 .admin-switch {
   width: 100%;
   display: flex;

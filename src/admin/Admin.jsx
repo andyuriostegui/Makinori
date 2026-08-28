@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { importLocalMenu } from "../lib/importCatalog";
-import { formatPrecio } from "../lib/catalog";
+import { formatPrecio, parseFotoPos, withFotoPos } from "../lib/catalog";
 import "./admin.css";
 
 const EMPTY = {
@@ -18,7 +18,71 @@ const EMPTY = {
   wide: false,
   orden: 0,
   feed_orden: 0,
+  imagen_x: 50,
+  imagen_y: 50,
 };
+
+function clampPct(n) {
+  const v = Math.round(Number(n));
+  if (!Number.isFinite(v)) return 50;
+  return Math.max(0, Math.min(100, v));
+}
+
+function FotoThumb({ url }) {
+  const { src, x, y } = parseFotoPos(url);
+  if (!src) return <div className="admin-thumb" />;
+  return <img src={src} alt="" style={{ objectPosition: `${x}% ${y}%` }} />;
+}
+
+function PhotoPositioner({ src, x, y, onChange }) {
+  const stageRef = useRef(null);
+  const dragRef = useRef(null);
+
+  const setPos = (nx, ny) => onChange(clampPct(nx), clampPct(ny));
+
+  const onPointerDown = (e) => {
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    dragRef.current = { px: e.clientX, py: e.clientY, x, y };
+  };
+
+  const onPointerMove = (e) => {
+    const drag = dragRef.current;
+    const box = stageRef.current;
+    if (!drag || !box) return;
+    const r = box.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    setPos(drag.x - ((e.clientX - drag.px) / r.width) * 100, drag.y - ((e.clientY - drag.py) / r.height) * 100);
+  };
+
+  const onPointerUp = () => { dragRef.current = null; };
+
+  return (
+    <div className="admin-photo-block">
+      <div
+        ref={stageRef}
+        className="admin-photo-stage"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+      >
+        <img src={src} alt="" draggable={false} style={{ objectPosition: `${x}% ${y}%` }} />
+        <i className="admin-photo-cross" aria-hidden />
+      </div>
+      <div className="admin-photo-nudge">
+        <button type="button" onClick={() => setPos(x, y + 6)} aria-label="Mover arriba">↑</button>
+        <div className="admin-photo-nudge-mid">
+          <button type="button" onClick={() => setPos(x + 6, y)} aria-label="Mover a la izquierda">←</button>
+          <button type="button" onClick={() => setPos(50, 50)}>Centrar</button>
+          <button type="button" onClick={() => setPos(x - 6, y)} aria-label="Mover a la derecha">→</button>
+        </div>
+        <button type="button" onClick={() => setPos(x, y - 6)} aria-label="Mover abajo">↓</button>
+      </div>
+      <p className="admin-photo-hint">Arrastra la foto o usa las flechas para dejar el platillo al centro del recuadro.</p>
+    </div>
+  );
+}
 
 function friendlyError(msg = "") {
   const t = String(msg).toLowerCase();
@@ -208,18 +272,23 @@ function Catalogo({ categorias, platillos, loading, importing, onImport, onReloa
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("all");
   const [editing, setEditing] = useState(null);
+  const [moving, setMoving] = useState(false);
   const cats = categorias.filter((c) => c.slug);
 
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
-    return platillos.filter((p) => {
+    const list = platillos.filter((p) => {
       if (cat !== "all" && p.categoria_id !== cat) return false;
       if (!query) return true;
       return `${p.nombre} ${p.descripcion || ""} ${p.badge || ""}`.toLowerCase().includes(query);
     });
+    if (cat === "all") return list;
+    return [...list].sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0) || String(a.nombre || "").localeCompare(String(b.nombre || ""), "es"));
   }, [platillos, q, cat]);
 
+  const canReorder = cat !== "all" && !q.trim() && filtered.length > 1;
   const catName = (id) => categorias.find((c) => c.id === id)?.nombre || "";
+  const seccionNombre = cats.find((c) => c.id === cat)?.nombre || "esta sección";
 
   const openNew = () => {
     setEditing({
@@ -229,9 +298,49 @@ function Catalogo({ categorias, platillos, loading, importing, onImport, onReloa
     });
   };
 
+  const writeOrden = async (ordered) => {
+    setMoving(true);
+    setError("");
+    const results = await Promise.all(
+      ordered.map((p, i) => supabase.from("platillos").update({ orden: i }).eq("id", p.id)),
+    );
+    const err = results.find((r) => r.error)?.error;
+    if (err) setError(friendlyError(err.message));
+    else await onReload();
+    setMoving(false);
+  };
+
+  const move = async (index, dir) => {
+    const next = index + dir;
+    if (next < 0 || next >= filtered.length || moving) return;
+    const ordered = filtered.slice();
+    const [item] = ordered.splice(index, 1);
+    ordered.splice(next, 0, item);
+    await writeOrden(ordered);
+  };
+
+  const sortByPrice = async () => {
+    if (moving) return;
+    if (!confirm(`Esto acomoda ${seccionNombre} del más barato al más caro. Después puedes mover uno con las flechas. ¿Seguimos?`)) return;
+    const ordered = [...filtered].sort((a, b) => {
+      const pa = Number(a.precio) || 0;
+      const pb = Number(b.precio) || 0;
+      if (pa !== pb) return pa - pb;
+      return String(a.nombre || "").localeCompare(String(b.nombre || ""), "es");
+    });
+    await writeOrden(ordered);
+    setOk("Listo: quedaron del más barato al más caro.");
+  };
+
   return (
     <>
-      <p className="admin-lead">Toca un platillo para cambiarle el nombre, el precio o la foto.</p>
+      <p className="admin-lead">
+        {canReorder
+          ? "Toca un platillo para editarlo. Con las flechas lo mueves dentro de esta sección."
+          : cat === "all"
+            ? "Toca un platillo para cambiarle el nombre, el precio o la foto. Entra a una categoría para cambiar el orden."
+            : "Toca un platillo para cambiarle el nombre, el precio o la foto."}
+      </p>
       <div className="admin-toolbar">
         <div className="admin-toolbar-row">
           <input className="admin-search" placeholder="Buscar… Philadelphia, ramen" value={q} onChange={(e) => setQ(e.target.value)} />
@@ -245,6 +354,11 @@ function Catalogo({ categorias, platillos, loading, importing, onImport, onReloa
             </button>
           ))}
         </div>
+        {canReorder && (
+          <button type="button" className="admin-sort-btn" disabled={moving} onClick={sortByPrice}>
+            {moving ? "Acomodando…" : "Ordenar esta sección por precio"}
+          </button>
+        )}
       </div>
 
       {loading && <p className="admin-lead">Cargando menú…</p>}
@@ -253,20 +367,28 @@ function Catalogo({ categorias, platillos, loading, importing, onImport, onReloa
       )}
 
       <div className="admin-list">
-        {filtered.map((p) => (
-          <button key={p.id} className="admin-row" onClick={() => setEditing(p)}>
-            {p.imagen_url ? <img src={p.imagen_url} alt="" /> : <div className="admin-thumb" />}
-            <div>
-              <h3>{p.nombre}</h3>
-              <p>{catName(p.categoria_id)} · {formatPrecio(p.precio)}</p>
-              <div className="admin-row-meta">
-                {p.en_feed && <span className="admin-pill">Favoritos</span>}
-                {p.destacado && <span className="admin-pill hot">Grande</span>}
-                {p.wide && <span className="admin-pill">Ancho</span>}
-                {!p.disponible && <span className="admin-pill off">Oculto</span>}
+        {filtered.map((p, i) => (
+          <div key={p.id} className="admin-row-wrap">
+            <button className="admin-row" onClick={() => setEditing(p)}>
+              <FotoThumb url={p.imagen_url} />
+              <div>
+                <h3>{p.nombre}</h3>
+                <p>{catName(p.categoria_id)} · {formatPrecio(p.precio)}</p>
+                <div className="admin-row-meta">
+                  {p.en_feed && <span className="admin-pill">Favoritos</span>}
+                  {p.destacado && <span className="admin-pill hot">Grande</span>}
+                  {p.wide && <span className="admin-pill">Ancho</span>}
+                  {!p.disponible && <span className="admin-pill off">Oculto</span>}
+                </div>
               </div>
-            </div>
-          </button>
+            </button>
+            {canReorder && (
+              <div className="admin-row-move">
+                <button type="button" aria-label="Subir" disabled={moving || i === 0} onClick={() => move(i, -1)}>↑</button>
+                <button type="button" aria-label="Bajar" disabled={moving || i === filtered.length - 1} onClick={() => move(i, 1)}>↓</button>
+              </div>
+            )}
+          </div>
         ))}
       </div>
 
@@ -280,6 +402,7 @@ function Catalogo({ categorias, platillos, loading, importing, onImport, onReloa
 
       {editing && (
         <Editor
+          key={editing.id || "new"}
           initial={editing}
           categorias={cats.length ? cats : categorias}
           onClose={() => setEditing(null)}
@@ -292,8 +415,20 @@ function Catalogo({ categorias, platillos, loading, importing, onImport, onReloa
   );
 }
 
+function editorForm(initial) {
+  const pos = parseFotoPos(initial?.imagen_url);
+  return {
+    ...EMPTY,
+    ...initial,
+    precio: initial?.precio ?? "",
+    imagen_url: pos.src,
+    imagen_x: pos.x,
+    imagen_y: pos.y,
+  };
+}
+
 function Editor({ initial, categorias, onClose, onSaved, onDeleted, setError }) {
-  const [form, setForm] = useState({ ...EMPTY, ...initial, precio: initial.precio ?? "" });
+  const [form, setForm] = useState(() => editorForm(initial));
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showLink, setShowLink] = useState(false);
@@ -314,7 +449,7 @@ function Editor({ initial, categorias, onClose, onSaved, onDeleted, setError }) 
       return;
     }
     const { data } = supabase.storage.from("platillos").getPublicUrl(path);
-    set("imagen_url", data.publicUrl);
+    setForm((f) => ({ ...f, imagen_url: data.publicUrl, imagen_x: 50, imagen_y: 50 }));
     setUploading(false);
   };
 
@@ -327,7 +462,7 @@ function Editor({ initial, categorias, onClose, onSaved, onDeleted, setError }) 
       nombre_jp: form.nombre_jp || null,
       descripcion: form.descripcion || null,
       precio: Number(form.precio) || 0,
-      imagen_url: form.imagen_url || null,
+      imagen_url: withFotoPos(form.imagen_url, form.imagen_x, form.imagen_y) || null,
       badge: form.badge || null,
       categoria_id: form.categoria_id || null,
       disponible: !!form.disponible,
@@ -381,13 +516,25 @@ function Editor({ initial, categorias, onClose, onSaved, onDeleted, setError }) 
           <button type="button" className="admin-btn ghost" onClick={onClose}>Cerrar</button>
         </div>
         <div className="admin-fields">
-          <label className="admin-photo">
-            {form.imagen_url
-              ? <img src={form.imagen_url} alt="" />
-              : null}
-            <span>{uploading ? "Subiendo foto…" : form.imagen_url ? "Toca para cambiar la foto" : "Toca para subir una foto"}</span>
-            <input type="file" accept="image/*" onChange={(e) => upload(e.target.files?.[0])} />
-          </label>
+          {form.imagen_url ? (
+            <>
+              <PhotoPositioner
+                src={form.imagen_url}
+                x={Number.isFinite(Number(form.imagen_x)) ? Number(form.imagen_x) : 50}
+                y={Number.isFinite(Number(form.imagen_y)) ? Number(form.imagen_y) : 50}
+                onChange={(nx, ny) => setForm((f) => ({ ...f, imagen_x: nx, imagen_y: ny }))}
+              />
+              <label className="admin-photo-change">
+                {uploading ? "Subiendo foto…" : "Cambiar foto"}
+                <input type="file" accept="image/*" onChange={(e) => upload(e.target.files?.[0])} />
+              </label>
+            </>
+          ) : (
+            <label className="admin-photo">
+              <span>{uploading ? "Subiendo foto…" : "Toca para subir una foto"}</span>
+              <input type="file" accept="image/*" onChange={(e) => upload(e.target.files?.[0])} />
+            </label>
+          )}
           {!showLink ? (
             <button type="button" className="admin-more" style={{ marginTop: 0 }} onClick={() => setShowLink(true)}>
               Prefiero pegar un link
@@ -395,7 +542,14 @@ function Editor({ initial, categorias, onClose, onSaved, onDeleted, setError }) 
           ) : (
             <div className="admin-field">
               <label>Link de la foto</label>
-              <input placeholder="https://…" value={form.imagen_url || ""} onChange={(e) => set("imagen_url", e.target.value)} />
+              <input
+                placeholder="https://…"
+                value={form.imagen_url || ""}
+                onChange={(e) => {
+                  const pos = parseFotoPos(e.target.value);
+                  setForm((f) => ({ ...f, imagen_url: pos.src, imagen_x: pos.x, imagen_y: pos.y }));
+                }}
+              />
             </div>
           )}
 
@@ -521,7 +675,7 @@ function FeedAdmin({ platillos, onReload, setError }) {
       <div className="admin-feed">
         {feed.map((p, i) => (
           <div key={p.id} className={`admin-feed-card ${p.destacado ? "feat" : ""} ${p.wide ? "wide" : ""}`}>
-            {p.imagen_url ? <img src={p.imagen_url} alt="" /> : <div className="admin-thumb" />}
+            <FotoThumb url={p.imagen_url} />
             <div className="admin-feed-body">
               <h3>{p.nombre}</h3>
               <p>{p.badge || "Sin sello"} · {formatPrecio(p.precio)}</p>

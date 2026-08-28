@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import { C } from "./tokens";
+import { parseFotoPos } from "../lib/catalog";
 import { WA_NUM } from "./data";
 import {
   ShoppingBag01Icon,
@@ -594,12 +595,13 @@ export function CarritoPanel() {
 }
 
 function ItemRow({ item, onQuitar, onAgregar, onNota }) {
+  const foto = parseFotoPos(item.foto);
   return (
     <div style={{ background: "#fff", borderRadius: 10, overflow: "hidden", border: `1px solid ${C.border}` }}>
       <div className="pedido-item-top">
         <div className="pedido-item-foto" style={{ width: 56, height: 56, borderRadius: 8, overflow: "hidden", flexShrink: 0, background: C.paper, display: "flex", alignItems: "center", justifyContent: "center" }}>
           {item.foto
-            ? <img src={item.foto} alt={item.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ? <img src={foto.src} alt={item.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: `${foto.x}% ${foto.y}%` }} />
             : <ServingFoodIcon size={24} color={C.border} />
           }
         </div>

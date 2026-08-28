@@ -3,9 +3,11 @@ import { C, FONT, Section, Container, SectionTitle, FrameCorners } from "./token
 import { ILU_MAP } from "./illustrations";
 import { BtnAgregar } from "./Carrito";
 import { useCatalog } from "../catalog/CatalogContext";
+import { parseFotoPos } from "../lib/catalog";
 
 function ProductCard({ producto, featured = false, wide = false }) {
   const { tag, tagDark, nombre, jp, precio, desc, badges = [], badgePicante, ilu, foto } = producto;
+  const fotoPos = parseFotoPos(foto);
   const [hov, setHov] = useState(false);
   const Ilu = ILU_MAP[ilu];
   const precioNum = parseInt(String(precio || "0").replace("$", ""), 10);
@@ -41,12 +43,12 @@ function ProductCard({ producto, featured = false, wide = false }) {
         position: "relative", overflow: "hidden", flexShrink: 0,
       }}>
         {foto
-          ? <img src={foto} alt={`${nombre} de Maki Nori`}
+          ? <img src={fotoPos.src} alt={`${nombre} de Maki Nori`}
               loading={featured ? "eager" : "lazy"}
               decoding="async"
               style={{
               width: "100%", height: "100%", objectFit: "cover",
-              objectPosition: featured ? "70% 60%" : "center",
+              objectPosition: `${fotoPos.x}% ${fotoPos.y}%`,
               transform: hov ? "scale(1.06)" : "scale(1)",
               transition: "transform 0.5s ease",
             }} />

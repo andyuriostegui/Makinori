@@ -2,6 +2,7 @@ import { useState } from "react";
 import { C, FONT, Section, Container, SectionTitle, FrameCorners } from "./tokens";
 import { useCarritoCtx } from "./Carrito";
 import { useCatalog } from "../catalog/CatalogContext";
+import { parseFotoPos } from "../lib/catalog";
 
 function ItemRow({ item, index, total }) {
   const { items, agregar, quitar } = useCarritoCtx();
@@ -16,6 +17,7 @@ function ItemRow({ item, index, total }) {
     setPop(true);
     setTimeout(() => setPop(false), 300);
   };
+  const foto = parseFotoPos(item.foto);
 
   return (
     <div className="menu-item-row" style={{
@@ -32,7 +34,7 @@ function ItemRow({ item, index, total }) {
         boxShadow: "0 4px 12px rgba(22,19,17,0.08)",
       }}>
         {item.foto
-          ? <img src={item.foto} alt={item.nombre} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          ? <img src={foto.src} alt={item.nombre} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: `${foto.x}% ${foto.y}%`, display: "block" }} />
           : <div style={{
               width: "100%", height: "100%", display: "flex",
               alignItems: "center", justifyContent: "center",

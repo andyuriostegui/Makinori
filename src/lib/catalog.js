@@ -29,6 +29,35 @@ export function formatPrecio(n) {
   return `$${Number.isInteger(v) ? v : v.toFixed(2).replace(/\.00$/, "")}`;
 }
 
+const FOTO_POS_RE = /#(\d{1,3}),(\d{1,3})$/;
+
+function clampPct(n) {
+  const v = Math.round(Number(n));
+  if (!Number.isFinite(v)) return 50;
+  return Math.max(0, Math.min(100, v));
+}
+
+/** Lee el recorte guardado al final de la URL: foto.jpg#40,70 */
+export function parseFotoPos(url) {
+  const raw = String(url || "");
+  const m = raw.match(FOTO_POS_RE);
+  return {
+    src: m ? raw.slice(0, m.index) : raw,
+    x: m ? clampPct(m[1]) : 50,
+    y: m ? clampPct(m[2]) : 50,
+  };
+}
+
+/** Guarda el recorte en la URL. Centro (50,50) se omite para no ensuciar el link. */
+export function withFotoPos(url, x = 50, y = 50) {
+  const { src } = parseFotoPos(url);
+  if (!src) return "";
+  const nx = clampPct(x);
+  const ny = clampPct(y);
+  if (nx === 50 && ny === 50) return src;
+  return `${src}#${nx},${ny}`;
+}
+
 function badgesFor(platillo, slug) {
   const text = `${platillo.badge || ""} ${platillo.nombre || ""}`.toLowerCase();
   const picante = /picante|volcano|buldak|🔥/.test(text);
