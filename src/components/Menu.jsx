@@ -1,30 +1,18 @@
 import { useState } from "react";
 import { C, FONT, Section, Container, SectionTitle, FrameCorners } from "./tokens";
-import { MENU_CATS, SNACKS } from "./data";
 import { useCarritoCtx } from "./Carrito";
-
-const CATS = [
-  { key: "frescos",     label: "Frescos",      jp: "握り",   tint: C.teal  },
-  { key: "empanizados", label: "Empanizados",  jp: "揚げ",   tint: C.coral },
-  { key: "ramen",       label: "Ramen",        jp: "麺",     tint: C.tealD },
-  { key: "snacks",      label: "Snacks",       jp: "おつまみ", tint: C.coralD },
-  { key: "bebidas",     label: "Bebidas",      jp: "酒",     tint: C.teal  },
-];
-
-const SNACKS_META = {
-  jp: "おつまみ",
-  sub: "Botanitas y entradas · Para compartir o para ti solo",
-};
+import { useCatalog } from "../catalog/CatalogContext";
 
 function ItemRow({ item, index, total }) {
   const { items, agregar, quitar } = useCarritoCtx();
-  const precioNum = parseInt(item.precio.replace("$", ""), 10);
-  const enCarrito = items.find(i => i.nombre === item.nombre);
+  const itemId = item.id || item.nombre;
+  const precioNum = parseInt(String(item.precio).replace("$", ""), 10);
+  const enCarrito = items.find(i => i.id === itemId || i.nombre === item.nombre);
   const qty = enCarrito?.qty || 0;
   const [pop, setPop] = useState(false);
 
   const handleAgregar = () => {
-    agregar({ id: item.nombre, nombre: item.nombre, precio: precioNum, foto: item.foto || null });
+    agregar({ id: itemId, nombre: item.nombre, precio: precioNum, foto: item.foto || null });
     setPop(true);
     setTimeout(() => setPop(false), 300);
   };
@@ -87,7 +75,7 @@ function ItemRow({ item, index, total }) {
           }}>+</button>
         ) : (
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <button onClick={() => quitar(item.nombre)} style={{
+            <button onClick={() => quitar(itemId)} style={{
               width: 28, height: 28, borderRadius: 4,
               border: `1.5px solid ${C.border}`, background: "transparent",
               color: C.muted, fontSize: 16, fontWeight: 700,
@@ -110,12 +98,13 @@ function ItemRow({ item, index, total }) {
 }
 
 export default function Menu() {
-  const [cat, setCat] = useState("frescos");
-  const meta = CATS.find(c => c.key === cat);
-  const isSnacks = cat === "snacks";
-  const data = isSnacks
-    ? { ...SNACKS_META, items: SNACKS }
-    : MENU_CATS[cat];
+  const { menuTabs, menuBySlug } = useCatalog();
+  const tabs = menuTabs || [];
+  const [cat, setCat] = useState(tabs[0]?.key || "frescos");
+  const active = tabs.some(c => c.key === cat) ? cat : (tabs[0]?.key || cat);
+
+  const meta = tabs.find(c => c.key === active);
+  const data = menuBySlug?.[active] || { jp: "", sub: "", items: [] };
 
   return (
     <Section id="menu" bg={C.paper} style={{ position: "relative", overflow: "hidden" }}>
@@ -131,8 +120,8 @@ export default function Menu() {
           display: "flex", flexWrap: "wrap", gap: 10,
           justifyContent: "center", marginBottom: 36,
         }}>
-          {CATS.map(c => (
-            <TabBtn key={c.key} active={cat === c.key} tint={c.tint} jp={c.jp} onClick={() => setCat(c.key)}>
+          {tabs.map(c => (
+            <TabBtn key={c.key} active={active === c.key} tint={c.tint} jp={c.jp} onClick={() => setCat(c.key)}>
               {c.label}
             </TabBtn>
           ))}
@@ -158,8 +147,8 @@ export default function Menu() {
           </div>
 
           <div style={{ padding: "0 8px 16px" }}>
-            {data.items.map((item, i) => (
-              <ItemRow key={item.nombre} item={item} index={i} total={data.items.length} />
+            {(data.items || []).map((item, i) => (
+              <ItemRow key={item.id || item.nombre} item={item} index={i} total={data.items.length} />
             ))}
           </div>
         </div>

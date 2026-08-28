@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { C, FONT, Section, Container, SectionTitle, FrameCorners } from "./tokens";
-import { PRODUCTOS } from "./data";
 import { ILU_MAP } from "./illustrations";
 import { BtnAgregar } from "./Carrito";
+import { useCatalog } from "../catalog/CatalogContext";
 
 function ProductCard({ producto, featured = false, wide = false }) {
-  const { tag, tagDark, nombre, jp, precio, desc, badges, badgePicante, ilu, foto } = producto;
+  const { tag, tagDark, nombre, jp, precio, desc, badges = [], badgePicante, ilu, foto } = producto;
   const [hov, setHov] = useState(false);
   const Ilu = ILU_MAP[ilu];
-  const precioNum = parseInt(precio.replace("$", ""), 10);
+  const precioNum = parseInt(String(precio || "0").replace("$", ""), 10);
   const horizontal = featured || wide;
   const cls = [featured ? "feat" : "", wide ? "wide" : "", horizontal ? "prod-card-h" : ""].filter(Boolean).join(" ");
 
@@ -116,13 +116,16 @@ function ProductCard({ producto, featured = false, wide = false }) {
             }}>{b}</span>
           ))}
         </div>
-        <BtnAgregar producto={{ id: nombre, nombre, precio: precioNum, foto }} />
+        <BtnAgregar producto={{ id: producto.id || nombre, nombre, precio: precioNum, foto }} />
       </div>
     </div>
   );
 }
 
 export default function Productos() {
+  const { productos } = useCatalog();
+  const list = productos || [];
+
   return (
     <Section id="productos" style={{ position: "relative", overflow: "hidden", background: C.cream }}>
       <div className="pattern-asanoha" style={{ position: "absolute", inset: 0, opacity: 0.65, pointerEvents: "none" }} />
@@ -139,7 +142,7 @@ export default function Productos() {
         </p>
 
         <div className="productos-bento">
-          {PRODUCTOS.map(p => (
+          {list.map(p => (
             <ProductCard key={p.id} producto={p} featured={!!p.featured} wide={!!p.wide} />
           ))}
         </div>
