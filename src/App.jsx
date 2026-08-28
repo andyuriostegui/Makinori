@@ -15,10 +15,18 @@ import { CarritoCtx, useCarrito, CarritoBtn, CarritoPanel } from "./components/C
 import { CatalogProvider } from "./catalog/CatalogContext";
 import Admin from "./admin/Admin";
 
+function isAdminPath() {
+  if (typeof window === "undefined") return false;
+  const path = window.location.pathname.toLowerCase();
+  return (
+    path.startsWith("/admin") ||
+    path.startsWith("/auth") ||
+    path.startsWith("/login")
+  );
+}
+
 export default function App() {
-  if (typeof window !== "undefined" && window.location.pathname.startsWith("/admin")) {
-    return <Admin />;
-  }
+  if (isAdminPath()) return <Admin />;
   return <PublicSite />;
 }
 
