@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { C, FONT, Section, SectionTitle } from "./tokens";
 import { GALERIA_FOTOS } from "./data";
+import { fetchGaleria } from "../lib/galeria";
+import FotoLightbox from "./FotoLightbox";
 
 const IGO_SVG = (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -9,7 +11,16 @@ const IGO_SVG = (
 );
 
 export default function Galeria() {
+  const [fotos, setFotos] = useState(GALERIA_FOTOS);
   const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetchGaleria().then(({ fotos: next }) => {
+      if (alive && next?.length) setFotos(next);
+    });
+    return () => { alive = false; };
+  }, []);
 
   return (
     <Section id="galeria" style={{ background: C.navy, overflow: "hidden", padding: 0 }}>
@@ -45,15 +56,15 @@ export default function Galeria() {
             gridAutoRows: "180px",
             gap: 10,
           }}>
-            {GALERIA_FOTOS.map((foto) => (
+            {fotos.map((foto, i) => (
               <button
                 type="button"
-                key={foto.src}
-                onClick={() => setSelected(foto)}
-                className={foto.span === 2 ? "span-2" : ""}
+                key={`${foto.src}-${i}`}
+                onClick={() => setSelected(i)}
+                className={`foto-open ${foto.span === 2 ? "span-2" : ""}`}
                 style={{
                   position: "relative",
-                  cursor: "pointer",
+                  cursor: "zoom-in",
                   padding: 0,
                   width: "100%",
                   height: "100%",
@@ -69,14 +80,13 @@ export default function Galeria() {
                   alt={`${foto.alt} — Maki Nori Iguala`}
                   loading="lazy"
                   decoding="async"
+                  draggable={false}
                   style={{
                     width: "100%", height: "100%",
                     objectFit: "cover", display: "block",
                     transition: "transform 0.6s ease, filter 0.4s",
                     filter: "saturate(0.92)",
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.06)"; e.currentTarget.style.filter = "saturate(1.05)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.filter = "saturate(0.92)"; }}
                 />
                 <span style={{
                   position: "absolute", bottom: 10, left: 10,
@@ -117,48 +127,13 @@ export default function Galeria() {
         </div>
       </div>
 
-      {selected && (
-        <div
-          onClick={() => setSelected(null)}
-          style={{
-            position: "fixed", inset: 0, zIndex: 2000,
-            background: "rgba(11,44,50,0.94)", backdropFilter: "blur(8px)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            padding: 24,
-          }}
-        >
-          <button
-            onClick={() => setSelected(null)}
-            style={{
-              position: "absolute", top: 20, right: 20,
-              background: "transparent", border: `1px solid ${C.gold}`,
-              color: C.gold, width: 40, height: 40, borderRadius: "50%",
-              fontSize: 16, fontWeight: 700, cursor: "pointer",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}
-          >
-            &#x2715;
-          </button>
-          <div style={{ position: "relative", display: "inline-block", maxWidth: "90vw" }}
-            onClick={e => e.stopPropagation()}
-          >
-            <img
-              src={selected.src}
-              alt={selected.alt}
-              style={{
-                maxWidth: "86vw", maxHeight: "80vh",
-                objectFit: "contain", display: "block",
-                border: `1px solid ${C.gold}`,
-              }}
-            />
-            <p style={{
-              textAlign: "center", margin: "14px 0 0",
-              fontFamily: FONT.serif, fontSize: 16, color: C.cream, letterSpacing: "0.08em",
-            }}>
-              {selected.alt}
-            </p>
-          </div>
-        </div>
+      {selected !== null && (
+        <FotoLightbox
+          fotos={fotos}
+          index={selected}
+          onIndex={setSelected}
+          onClose={() => setSelected(null)}
+        />
       )}
     </Section>
   );

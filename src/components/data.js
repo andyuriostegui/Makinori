@@ -3,14 +3,14 @@ export const PRODUCTOS = [
     id: 1, tag: "CHEF'S PICK", tagDark: false, featured: true,
     nombre: "Philadelphia Roll", jp: "フィラデルフィア", precio: "$100",
     desc: "Ajonjolí por fuera. Por dentro: salmón, pepino y philadelphia. El clásico de la casa.",
-    badges: ["Fresco", "8 piezas", "Salmón"],
+    badges: ["Fresco", "10 piezas", "Salmón"],
     ilu: "sashimi", foto: "/maki1.jpeg",
   },
   {
     id: 2, tag: "BEST SELLER", tagDark: true,
     nombre: "Mar y Tierra", jp: "海と陸", precio: "$95",
     desc: "Aderezo tampico por fuera. Pepino, camarón, aguacate y philadelphia por dentro.",
-    badges: ["🌶 Picante suave", "8 piezas"],
+    badges: ["🌶 Picante suave", "10 piezas"],
     ilu: "dragon", foto: "/IMG_7027.jpg",
   },
   {
@@ -32,7 +32,7 @@ export const PRODUCTOS = [
     id: 5, tag: "PICANTE", tagDark: false,
     nombre: "Volcano Roll", jp: "ボルカノ", precio: "$95",
     desc: "Aderezo chipotle por fuera. Carne enchilada, tocino, philadelphia y chile.",
-    badges: ["🌶 Picante", "8 piezas"],
+    badges: ["🌶 Picante", "10 piezas"],
     badgePicante: true,
     ilu: "temaki", foto: "/IMG_6996.jpg",
   },
@@ -48,7 +48,7 @@ export const PRODUCTOS = [
 export const MENU_CATS = {
   frescos: {
     jp: "フレッシュロール",
-    sub: "8 piezas por orden · Ingredientes frescos del día",
+    sub: "10 piezas por orden · Ingredientes frescos del día",
     items: [
       { nombre: "California Roll",   desc: "Ajonjolí por fuera, por dentro: pepino, aguacate, philadelphia y surimi.",                    precio: "$85",  foto: "/maki1.jpeg", popular: true },
       { nombre: "Veggi Roll",        desc: "Alga por fuera, por dentro: pepino, aguacate, philadelphia y zanahoria.",                     precio: "$85",  foto: "/IMG_7058.jpg" },
@@ -61,7 +61,7 @@ export const MENU_CATS = {
   },
   empanizados: {
     jp: "エンパニサード",
-    sub: "8 piezas por orden · Zanahoria o aderezo por fuera",
+    sub: "10 piezas por orden · Zanahoria o aderezo por fuera",
     items: [
       { nombre: "Empanizado Roll",   desc: "Zanahoria por fuera, por dentro: pepino, aguacate, philadelphia y surimi.",               precio: "$90", foto: "/IMG_6999.jpg" },
       { nombre: "Teriyaki Roll",     desc: "Zanahoria por fuera, por dentro: pepino, aguacate, philadelphia y pollo teriyaki.",        precio: "$90", foto: "/IMG_7006.jpg" },
@@ -91,6 +91,11 @@ export const MENU_CATS = {
       { nombre: "Kang Pollo y Hongo",       desc: "Pollo, hongos, cebollín, tocino y ajonjolí. Más suave, igual de honesta.",                     precio: "$100", foto: "/ramen.png" },
       { nombre: "Kang Camarón",             desc: "Camarón, cebollín, ajonjolí, hongos y zanahoria. Marina y reconfortante.",                     precio: "$100", foto: "/maki12.jpeg" },
     ],
+  },
+  parrilla: {
+    jp: "焼肉",
+    sub: "A la parrilla · Al estilo coreano",
+    items: [],
   },
   bebidas: {
     jp: "お飲み物",
@@ -142,9 +147,9 @@ export const SNACKS = [
 ];
 
 export const HORARIOS = [
-  { dia: "Lunes – Viernes", hora: "13:00 – 22:00" },
-  { dia: "Sábado",          hora: "12:00 – 23:00" },
-  { dia: "Domingo",         hora: "12:00 – 20:00" },
+  { dia: "Lunes – Viernes", hora: "10:00 – 21:00" },
+  { dia: "Sábado",          hora: "11:00 – 21:00" },
+  { dia: "Domingo",         hora: "11:00 – 21:00" },
 ];
 
 export const WA_NUM = "527331598996";

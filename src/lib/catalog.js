@@ -6,6 +6,7 @@ export const CAT_TINTS = {
   frescos: C.teal,
   empanizados: C.coral,
   ramen: C.tealD,
+  "parrilla-coreana": C.shu,
   snacks: C.coralD,
   bebidas: C.teal,
 };
@@ -62,7 +63,7 @@ function badgesFor(platillo, slug) {
   const text = `${platillo.badge || ""} ${platillo.nombre || ""}`.toLowerCase();
   const picante = /picante|volcano|buldak|🔥/.test(text);
   const out = [];
-  if (slug === "frescos" || slug === "empanizados") out.push("8 piezas");
+  if (slug === "frescos" || slug === "empanizados") out.push("10 piezas");
   if (picante) out.push("🌶 Picante");
   if (slug === "ramen") out.push("Caldoso o seco");
   return out;

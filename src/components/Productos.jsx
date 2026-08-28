@@ -4,8 +4,9 @@ import { ILU_MAP } from "./illustrations";
 import { BtnAgregar } from "./Carrito";
 import { useCatalog } from "../catalog/CatalogContext";
 import { parseFotoPos } from "../lib/catalog";
+import FotoLightbox from "./FotoLightbox";
 
-function ProductCard({ producto, featured = false, wide = false }) {
+function ProductCard({ producto, featured = false, wide = false, onOpenFoto }) {
   const { tag, tagDark, nombre, jp, precio, desc, badges = [], badgePicante, ilu, foto } = producto;
   const fotoPos = parseFotoPos(foto);
   const [hov, setHov] = useState(false);
@@ -13,6 +14,7 @@ function ProductCard({ producto, featured = false, wide = false }) {
   const precioNum = parseInt(String(precio || "0").replace("$", ""), 10);
   const horizontal = featured || wide;
   const cls = [featured ? "feat" : "", wide ? "wide" : "", horizontal ? "prod-card-h" : ""].filter(Boolean).join(" ");
+  const canOpen = !!(fotoPos.src && onOpenFoto);
 
   return (
     <div
@@ -43,15 +45,32 @@ function ProductCard({ producto, featured = false, wide = false }) {
         position: "relative", overflow: "hidden", flexShrink: 0,
       }}>
         {foto
-          ? <img src={fotoPos.src} alt={`${nombre} de Maki Nori`}
-              loading={featured ? "eager" : "lazy"}
-              decoding="async"
+          ? (
+            <button
+              type="button"
+              className="foto-open"
+              aria-label={`Ver foto de ${nombre}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenFoto?.();
+              }}
               style={{
-              width: "100%", height: "100%", objectFit: "cover",
-              objectPosition: `${fotoPos.x}% ${fotoPos.y}%`,
-              transform: hov ? "scale(1.06)" : "scale(1)",
-              transition: "transform 0.5s ease",
-            }} />
+                position: "absolute", inset: 0, width: "100%", height: "100%",
+                cursor: canOpen ? "zoom-in" : "default",
+              }}
+            >
+              <img src={fotoPos.src} alt={`${nombre} de Maki Nori`}
+                loading={featured ? "eager" : "lazy"}
+                decoding="async"
+                draggable={false}
+                style={{
+                width: "100%", height: "100%", objectFit: "cover",
+                objectPosition: `${fotoPos.x}% ${fotoPos.y}%`,
+                transform: hov ? "scale(1.06)" : "scale(1)",
+                transition: "transform 0.5s ease",
+              }} />
+            </button>
+          )
           : Ilu && <Ilu />
         }
         <div style={{
@@ -69,6 +88,7 @@ function ProductCard({ producto, featured = false, wide = false }) {
             padding: "5px 12px", letterSpacing: "0.14em",
             fontFamily: FONT.sans,
             boxShadow: "0 6px 16px rgba(22,19,17,0.25)",
+            pointerEvents: "none",
           }}>{tag}</span>
         )}
         <span style={{
@@ -76,7 +96,18 @@ function ProductCard({ producto, featured = false, wide = false }) {
           fontFamily: FONT.jp, fontSize: featured ? 13 : 11,
           color: "rgba(255,255,255,0.85)", letterSpacing: "0.16em",
           textShadow: "0 2px 10px rgba(0,0,0,0.5)",
+          pointerEvents: "none",
         }}>{jp}</span>
+        {canOpen && (
+          <span aria-hidden style={{
+            position: "absolute", bottom: 10, right: 10,
+            width: 28, height: 28, borderRadius: "50%",
+            background: "rgba(11,44,50,0.55)",
+            color: "#fff", fontSize: 15, lineHeight: "28px",
+            textAlign: "center",
+            pointerEvents: "none",
+          }}>⤢</span>
+        )}
       </div>
 
       <div style={{
@@ -127,6 +158,13 @@ function ProductCard({ producto, featured = false, wide = false }) {
 export default function Productos() {
   const { productos } = useCatalog();
   const list = productos || [];
+  const [viewer, setViewer] = useState(null);
+  const fotos = list
+    .map((p) => {
+      const src = parseFotoPos(p.foto).src;
+      return src ? { src, alt: p.nombre } : null;
+    })
+    .filter(Boolean);
 
   return (
     <Section id="productos" style={{ position: "relative", overflow: "hidden", background: C.cream }}>
@@ -145,10 +183,28 @@ export default function Productos() {
 
         <div className="productos-bento">
           {list.map(p => (
-            <ProductCard key={p.id} producto={p} featured={!!p.featured} wide={!!p.wide} />
+            <ProductCard
+              key={p.id}
+              producto={p}
+              featured={!!p.featured}
+              wide={!!p.wide}
+              onOpenFoto={() => {
+                const src = parseFotoPos(p.foto).src;
+                const idx = fotos.findIndex((f) => f.src === src && f.alt === p.nombre);
+                setViewer(idx >= 0 ? idx : 0);
+              }}
+            />
           ))}
         </div>
       </Container>
+      {viewer !== null && fotos.length > 0 && (
+        <FotoLightbox
+          fotos={fotos}
+          index={viewer}
+          onIndex={setViewer}
+          onClose={() => setViewer(null)}
+        />
+      )}
     </Section>
   );
 }

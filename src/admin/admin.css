@@ -48,7 +48,7 @@
   top: calc(52px + env(safe-area-inset-top));
   z-index: 15;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 8px;
   padding: 10px 16px;
   background: #f3fafb;
@@ -61,9 +61,10 @@
   color: #0e3a42;
   border-radius: 10px;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
   font-family: inherit;
+  padding: 8px 6px;
 }
 
 .admin-nav button.active {
@@ -653,6 +654,39 @@
   border-color: #e07048;
   color: #fff;
 }
+
+.admin-galeria-row {
+  cursor: default;
+  grid-template-columns: 88px 1fr;
+}
+.admin-galeria-thumb {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  margin: 0;
+}
+.admin-galeria-thumb img,
+.admin-galeria-thumb .admin-thumb {
+  width: 88px;
+  height: 88px;
+  border-radius: 10px;
+  object-fit: cover;
+  display: block;
+}
+.admin-galeria-thumb span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(11, 44, 50, 0.72);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  padding: 4px 0;
+  border-radius: 0 0 10px 10px;
+}
+.admin-galeria-thumb input { display: none; }
 
 .admin-more,
 .admin-more button {

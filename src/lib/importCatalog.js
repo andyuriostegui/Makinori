@@ -4,11 +4,12 @@ import { supabase } from "./supabase";
 const SNACKS_SUB = "Botanitas y entradas · Para compartir o para ti solo";
 
 const CAT_DEFS = [
-  { slug: "frescos",     nombre: "Frescos",     nombre_jp: "握り",    subtitulo: MENU_CATS.frescos.sub,     orden: 1, items: MENU_CATS.frescos.items },
-  { slug: "empanizados", nombre: "Empanizados", nombre_jp: "揚げ",    subtitulo: MENU_CATS.empanizados.sub, orden: 2, items: MENU_CATS.empanizados.items },
-  { slug: "ramen",       nombre: "Ramen",       nombre_jp: "麺",      subtitulo: MENU_CATS.ramen.sub,       orden: 3, items: MENU_CATS.ramen.items },
-  { slug: "snacks",      nombre: "Snacks",      nombre_jp: "おつまみ", subtitulo: SNACKS_SUB,                orden: 4, items: SNACKS },
-  { slug: "bebidas",     nombre: "Bebidas",     nombre_jp: "酒",      subtitulo: MENU_CATS.bebidas.sub,     orden: 5, items: MENU_CATS.bebidas.items },
+  { slug: "frescos",           nombre: "Frescos",           nombre_jp: "握り",    subtitulo: MENU_CATS.frescos.sub,     orden: 1, items: MENU_CATS.frescos.items },
+  { slug: "empanizados",       nombre: "Empanizados",       nombre_jp: "揚げ",    subtitulo: MENU_CATS.empanizados.sub, orden: 2, items: MENU_CATS.empanizados.items },
+  { slug: "ramen",             nombre: "Ramen",             nombre_jp: "麺",      subtitulo: MENU_CATS.ramen.sub,       orden: 3, items: MENU_CATS.ramen.items },
+  { slug: "parrilla-coreana",  nombre: "Parrilla Coreana",  nombre_jp: "焼肉",    subtitulo: MENU_CATS.parrilla.sub,    orden: 4, items: MENU_CATS.parrilla.items },
+  { slug: "snacks",            nombre: "Snacks",            nombre_jp: "おつまみ", subtitulo: SNACKS_SUB,                orden: 5, items: SNACKS },
+  { slug: "bebidas",           nombre: "Bebidas",           nombre_jp: "酒",      subtitulo: MENU_CATS.bebidas.sub,     orden: 6, items: MENU_CATS.bebidas.items },
 ];
 
 const FEED_OVERRIDE = {
@@ -112,4 +113,61 @@ export async function importLocalMenu() {
   }
 
   return { categorias: CAT_DEFS.length, platillos: CAT_DEFS.reduce((n, c) => n + c.items.length, 0) };
+}
+
+/** Crea categorías nuevas (Parrilla Coreana) y corrige textos del menú si faltan. */
+export async function ensureCategorias() {
+  if (!supabase) return { changed: false, createdParrilla: false };
+  let changed = false;
+  let createdParrilla = false;
+
+  const { data: cats, error } = await supabase
+    .from("categorias")
+    .select("id, slug, subtitulo, orden");
+  if (error) throw error;
+
+  const list = cats || [];
+  const bySlug = Object.fromEntries(list.map((c) => [c.slug, c]));
+
+  for (const slug of ["frescos", "empanizados"]) {
+    const existing = bySlug[slug];
+    const def = CAT_DEFS.find((c) => c.slug === slug);
+    if (!existing || !def || existing.subtitulo === def.subtitulo) continue;
+    const { error: e } = await supabase
+      .from("categorias")
+      .update({ subtitulo: def.subtitulo })
+      .eq("id", existing.id);
+    if (e) throw e;
+    changed = true;
+  }
+
+  if (!bySlug["parrilla-coreana"]) {
+    const ramen = bySlug["ramen"];
+    const orden = ramen
+      ? Number(ramen.orden || 0) + 1
+      : Math.max(0, ...list.map((c) => c.orden || 0)) + 1;
+    const toShift = [...list]
+      .filter((c) => (c.orden ?? 0) >= orden)
+      .sort((a, b) => (b.orden ?? 0) - (a.orden ?? 0));
+    for (const c of toShift) {
+      const { error: e } = await supabase
+        .from("categorias")
+        .update({ orden: (c.orden || 0) + 1 })
+        .eq("id", c.id);
+      if (e) throw e;
+    }
+    const def = CAT_DEFS.find((c) => c.slug === "parrilla-coreana");
+    const { error: e } = await supabase.from("categorias").insert({
+      slug: def.slug,
+      nombre: def.nombre,
+      nombre_jp: def.nombre_jp,
+      subtitulo: def.subtitulo,
+      orden,
+    });
+    if (e) throw e;
+    changed = true;
+    createdParrilla = true;
+  }
+
+  return { changed, createdParrilla };
 }

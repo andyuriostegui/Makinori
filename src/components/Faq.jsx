@@ -12,7 +12,7 @@ const FAQS = [
   },
   {
     q: "¿Cuál es el horario?",
-    a: "Lunes a viernes 13:00 a 22:00. Sábado 12:00 a 23:00. Domingo 12:00 a 20:00.",
+    a: "Lunes a viernes 10:00 a 21:00. Sábado 11:00 a 21:00. Domingo 11:00 a 21:00.",
   },
   {
     q: "¿Qué es el omakase?",

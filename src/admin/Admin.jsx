@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
-import { importLocalMenu } from "../lib/importCatalog";
+import { importLocalMenu, ensureCategorias } from "../lib/importCatalog";
 import { formatPrecio, parseFotoPos, withFotoPos } from "../lib/catalog";
+import { fetchGaleria, saveGaleria, uploadGaleriaFoto } from "../lib/galeria";
 import "./admin.css";
 
 const EMPTY = {
@@ -139,12 +140,14 @@ export default function Admin() {
         <nav className="admin-tabs">
           <button className={tab === "catalogo" ? "active" : ""} onClick={() => setTab("catalogo")}>Menú</button>
           <button className={tab === "feed" ? "active" : ""} onClick={() => setTab("feed")}>Favoritos</button>
+          <button className={tab === "rollos" ? "active" : ""} onClick={() => setTab("rollos")}>Rollos</button>
         </nav>
         <button className="admin-ghost" onClick={() => supabase.auth.signOut()}>Salir</button>
       </header>
       <nav className="admin-nav">
         <button className={tab === "catalogo" ? "active" : ""} onClick={() => setTab("catalogo")}>Menú</button>
         <button className={tab === "feed" ? "active" : ""} onClick={() => setTab("feed")}>Favoritos</button>
+        <button className={tab === "rollos" ? "active" : ""} onClick={() => setTab("rollos")}>Rollos</button>
       </nav>
       <AdminBody tab={tab} />
     </div>
@@ -217,6 +220,15 @@ function AdminBody({ tab }) {
   useEffect(() => {
     let alive = true;
     (async () => {
+      try {
+        const ensured = await ensureCategorias();
+        if (!alive) return;
+        if (ensured.createdParrilla) {
+          setOk("Listo: ya está Parrilla Coreana. En Menú, elige esa categoría y toca Nuevo para meter el platillo.");
+        }
+      } catch (e) {
+        if (alive) setError(friendlyError(e.message));
+      }
       const [c, p] = await Promise.all([
         supabase.from("categorias").select("*").order("orden"),
         supabase.from("platillos").select("*").order("orden"),
@@ -246,7 +258,7 @@ function AdminBody({ tab }) {
     <div className="admin-body">
       {error && <div className="admin-alert">{error}</div>}
       {ok && <div className="admin-ok">{ok}</div>}
-      {tab === "catalogo" ? (
+      {tab === "catalogo" && (
         <Catalogo
           categorias={categorias}
           platillos={platillos}
@@ -257,12 +269,16 @@ function AdminBody({ tab }) {
           setError={setError}
           setOk={setOk}
         />
-      ) : (
+      )}
+      {tab === "feed" && (
         <FeedAdmin
           platillos={platillos}
           onReload={reload}
           setError={setError}
         />
+      )}
+      {tab === "rollos" && (
+        <GaleriaAdmin setError={setError} setOk={setOk} />
       )}
     </div>
   );
@@ -291,10 +307,11 @@ function Catalogo({ categorias, platillos, loading, importing, onImport, onReloa
   const seccionNombre = cats.find((c) => c.id === cat)?.nombre || "esta sección";
 
   const openNew = () => {
+    const inCat = platillos.filter((p) => cat !== "all" && p.categoria_id === cat);
     setEditing({
       ...EMPTY,
-      categoria_id: cats[0]?.id || categorias[0]?.id || "",
-      orden: platillos.length,
+      categoria_id: (cat !== "all" && cat) || cats[0]?.id || categorias[0]?.id || "",
+      orden: inCat.length || platillos.length,
     });
   };
 
@@ -696,6 +713,150 @@ function FeedAdmin({ platillos, onReload, setError }) {
       {feed.length === 0 && (
         <p className="admin-lead">Todavía no hay favoritos. Ábrelo en Menú y activa “Sale en favoritos”.</p>
       )}
+    </>
+  );
+}
+
+function GaleriaAdmin({ setError, setOk }) {
+  const [fotos, setFotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+
+  const persist = async (next, okMsg) => {
+    setBusy(true);
+    setError("");
+    try {
+      const saved = await saveGaleria(next);
+      setFotos(saved);
+      if (okMsg) setOk(okMsg);
+    } catch (e) {
+      setError(friendlyError(e.message));
+    }
+    setBusy(false);
+  };
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const { fotos: next } = await fetchGaleria();
+        if (alive) setFotos(next);
+      } catch (e) {
+        if (alive) setError(friendlyError(e.message));
+      }
+      if (alive) setLoading(false);
+    })();
+    return () => { alive = false; };
+  }, [setError]);
+
+  const uploadAt = async (file, index) => {
+    if (!file) return;
+    setBusy(true);
+    setError("");
+    try {
+      const src = await uploadGaleriaFoto(file);
+      if (index == null) {
+        await persist([...fotos, { src, alt: "Roll Maki Nori", span: 1 }], "Foto agregada.");
+      } else {
+        const next = fotos.map((f, i) => (i === index ? { ...f, src } : f));
+        await persist(next, "Foto cambiada.");
+      }
+    } catch (e) {
+      setError(friendlyError(e.message));
+      setBusy(false);
+    }
+  };
+
+  const move = (index, dir) => {
+    const nextI = index + dir;
+    if (nextI < 0 || nextI >= fotos.length || busy) return;
+    const next = fotos.slice();
+    const [item] = next.splice(index, 1);
+    next.splice(nextI, 0, item);
+    persist(next);
+  };
+
+  const setAlt = (index, alt) => {
+    setFotos((list) => list.map((f, i) => (i === index ? { ...f, alt } : f)));
+  };
+
+  const toggleSpan = (index) => {
+    const next = fotos.map((f, i) => (i === index ? { ...f, span: f.span === 2 ? 1 : 2 } : f));
+    persist(next);
+  };
+
+  const remove = (index) => {
+    if (!confirm("¿Quitar esta foto de Nuestros rolls?")) return;
+    persist(fotos.filter((_, i) => i !== index), "Foto quitada.");
+  };
+
+  return (
+    <>
+      <p className="admin-lead">
+        Estas fotos salen en “Nuestros rolls”. Toca una para cambiarla, ponle nombre y si quieres que se vea grande.
+      </p>
+      <label className={`admin-photo-change ${busy ? "is-busy" : ""}`} style={{ marginBottom: 14 }}>
+        {busy ? "Subiendo…" : "Agregar foto"}
+        <input
+          type="file"
+          accept="image/*"
+          disabled={busy}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            e.target.value = "";
+            uploadAt(file, null);
+          }}
+        />
+      </label>
+
+      {loading && <p className="admin-lead">Cargando fotos…</p>}
+
+      <div className="admin-list">
+        {fotos.map((f, i) => (
+          <div key={`${f.src}-${i}`} className="admin-row-wrap">
+            <div className="admin-row admin-galeria-row">
+              <label className="admin-galeria-thumb">
+                <FotoThumb url={f.src} />
+                <span>{busy ? "…" : "Cambiar"}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  disabled={busy}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    e.target.value = "";
+                    uploadAt(file, i);
+                  }}
+                />
+              </label>
+              <div>
+                <div className="admin-field" style={{ margin: 0 }}>
+                  <label>Nombre en la foto</label>
+                  <input
+                    value={f.alt || ""}
+                    onChange={(e) => setAlt(i, e.target.value)}
+                    onBlur={(e) => {
+                      const alt = e.target.value;
+                      persist(fotos.map((row, j) => (j === i ? { ...row, alt } : row)));
+                    }}
+                    placeholder="Philadelphia Roll"
+                  />
+                </div>
+                <div className="admin-feed-actions" style={{ marginTop: 8 }}>
+                  <button type="button" className={f.span === 2 ? "on" : ""} onClick={() => toggleSpan(i)} disabled={busy}>
+                    {f.span === 2 ? "Es grande" : "Hacer grande"}
+                  </button>
+                  <button type="button" className="hot" onClick={() => remove(i)} disabled={busy}>Quitar</button>
+                </div>
+              </div>
+            </div>
+            <div className="admin-row-move">
+              <button type="button" aria-label="Subir" disabled={busy || i === 0} onClick={() => move(i, -1)}>↑</button>
+              <button type="button" aria-label="Bajar" disabled={busy || i === fotos.length - 1} onClick={() => move(i, 1)}>↓</button>
+            </div>
+          </div>
+        ))}
+      </div>
     </>
   );
 }
