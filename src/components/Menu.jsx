@@ -3,8 +3,9 @@ import { C, FONT, Section, Container, SectionTitle, FrameCorners } from "./token
 import { useCarritoCtx } from "./Carrito";
 import { useCatalog } from "../catalog/CatalogContext";
 import { parseFotoPos } from "../lib/catalog";
+import FotoLightbox from "./FotoLightbox";
 
-function ItemRow({ item, index, total }) {
+function ItemRow({ item, index, total, onOpenFoto }) {
   const { items, agregar, quitar } = useCarritoCtx();
   const itemId = item.id || item.nombre;
   const precioNum = parseInt(String(item.precio).replace("$", ""), 10);
@@ -18,6 +19,7 @@ function ItemRow({ item, index, total }) {
     setTimeout(() => setPop(false), 300);
   };
   const foto = parseFotoPos(item.foto);
+  const canOpen = !!(foto.src && onOpenFoto);
 
   return (
     <div className="menu-item-row" style={{
@@ -34,7 +36,30 @@ function ItemRow({ item, index, total }) {
         boxShadow: "0 4px 12px rgba(22,19,17,0.08)",
       }}>
         {item.foto
-          ? <img src={foto.src} alt={item.nombre} loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: `${foto.x}% ${foto.y}%`, display: "block" }} />
+          ? (
+            <button
+              type="button"
+              className="foto-open"
+              aria-label={`Ver foto de ${item.nombre}`}
+              onClick={canOpen ? onOpenFoto : undefined}
+              style={{
+                width: "100%", height: "100%",
+                cursor: canOpen ? "zoom-in" : "default",
+              }}
+            >
+              <img
+                src={foto.src}
+                alt={item.nombre}
+                loading="lazy"
+                decoding="async"
+                draggable={false}
+                style={{
+                  width: "100%", height: "100%", objectFit: "cover",
+                  objectPosition: `${foto.x}% ${foto.y}%`, display: "block",
+                }}
+              />
+            </button>
+          )
           : <div style={{
               width: "100%", height: "100%", display: "flex",
               alignItems: "center", justifyContent: "center",
@@ -103,10 +128,24 @@ export default function Menu() {
   const { menuTabs, menuBySlug } = useCatalog();
   const tabs = menuTabs || [];
   const [cat, setCat] = useState(tabs[0]?.key || "frescos");
+  const [viewer, setViewer] = useState(null);
   const active = tabs.some(c => c.key === cat) ? cat : (tabs[0]?.key || cat);
 
   const meta = tabs.find(c => c.key === active);
   const data = menuBySlug?.[active] || { jp: "", sub: "", items: [] };
+  const fotos = (data.items || [])
+    .map((item) => {
+      const src = parseFotoPos(item.foto).src;
+      return src ? { src, alt: item.nombre } : null;
+    })
+    .filter(Boolean);
+
+  const openFoto = (item) => {
+    const src = parseFotoPos(item.foto).src;
+    if (!src) return;
+    const idx = fotos.findIndex((f) => f.src === src && f.alt === item.nombre);
+    setViewer(idx >= 0 ? idx : 0);
+  };
 
   return (
     <Section id="menu" bg={C.paper} style={{ position: "relative", overflow: "hidden" }}>
@@ -123,7 +162,7 @@ export default function Menu() {
           justifyContent: "center", marginBottom: 36,
         }}>
           {tabs.map(c => (
-            <TabBtn key={c.key} active={active === c.key} tint={c.tint} jp={c.jp} onClick={() => setCat(c.key)}>
+            <TabBtn key={c.key} active={active === c.key} tint={c.tint} jp={c.jp} onClick={() => { setCat(c.key); setViewer(null); }}>
               {c.label}
             </TabBtn>
           ))}
@@ -150,11 +189,25 @@ export default function Menu() {
 
           <div style={{ padding: "0 8px 16px" }}>
             {(data.items || []).map((item, i) => (
-              <ItemRow key={item.id || item.nombre} item={item} index={i} total={data.items.length} />
+              <ItemRow
+                key={item.id || item.nombre}
+                item={item}
+                index={i}
+                total={data.items.length}
+                onOpenFoto={item.foto ? () => openFoto(item) : undefined}
+              />
             ))}
           </div>
         </div>
       </Container>
+      {viewer !== null && fotos.length > 0 && (
+        <FotoLightbox
+          fotos={fotos}
+          index={viewer}
+          onIndex={setViewer}
+          onClose={() => setViewer(null)}
+        />
+      )}
     </Section>
   );
 }

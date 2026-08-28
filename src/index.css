@@ -153,6 +153,12 @@ img { max-width: 100%; }
 .menu-item-row:hover {
   background: rgba(42, 139, 139, 0.05);
 }
+.menu-item-row .foto-open img {
+  transition: transform 0.35s ease;
+}
+.menu-item-row .foto-open:hover img {
+  transform: scale(1.08);
+}
 
 .productos-bento {
   display: grid;
