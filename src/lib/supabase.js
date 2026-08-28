@@ -1,7 +1,19 @@
 import { createClient } from "@supabase/supabase-js";
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+function env(name) {
+  const v = import.meta.env[name];
+  if (typeof v !== "string") return "";
+  const t = v.trim();
+  if (!t || t.includes("YOUR_PROJECT") || t.startsWith("your_")) return "";
+  return t;
+}
+
+const url =
+  env("VITE_SUPABASE_URL") || "https://sdqyzzmmfewjrzfnkqhz.supabase.co";
+const key =
+  env("VITE_SUPABASE_ANON_KEY") ||
+  env("VITE_SUPABASE_PUBLISHABLE_KEY") ||
+  "sb_publishable_9hZcmrz1fK0ApXPDtsy1bQ_PeJxY2EV";
 
 export const supabase = url && key ? createClient(url, key) : null;
 
