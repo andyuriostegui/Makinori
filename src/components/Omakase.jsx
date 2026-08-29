@@ -93,7 +93,7 @@ export default function Omakase() {
           padding: "28px 32px", marginBottom: 48, maxWidth: 560,
         }}>
           <p style={{ fontSize: 16, color: "rgba(245,240,232,0.85)", lineHeight: 1.9, margin: "0 0 16px" }}>
-            ¿No sabes qué pedir? Perfectamente. Eso es exactamente para lo que existe el <em style={{ color: C.teal }}>omakase</em>.
+            ¿No sabes qué pedir? Perfecto. Eso es exactamente para lo que existe el <em style={{ color: C.teal }}>omakase</em>.
           </p>
           <p style={{ fontSize: 14, color: "rgba(245,240,232,0.55)", lineHeight: 1.9, margin: 0 }}>
             Solo dinos tus preferencias o restricciones — si te gustan los mariscos, si eres vegetariano, si quieres algo picante — y nuestro chef armará una selección especial para ti con lo mejor del día. Sin presión, sin carta, sin indecisión.

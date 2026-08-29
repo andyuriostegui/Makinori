@@ -6,6 +6,7 @@ import {
   TiktokIcon,
   WhatsappIcon,
   Facebook01Icon,
+  YoutubeIcon,
   Location01Icon,
   Menu01Icon,
 } from "hugeicons-react";
@@ -53,6 +54,13 @@ const LINKS = [
     href: "https://www.facebook.com/makinorisushi/?locale=es_LA",
     Icon: Facebook01Icon,
     color: "#1877F2",
+  },
+  {
+    label: "YouTube",
+    sub: "@Makinorichannel",
+    href: "https://www.youtube.com/@Makinorichannel",
+    Icon: YoutubeIcon,
+    color: "#FF0000",
   },
 ];
 

@@ -4,6 +4,7 @@ import { WA_PEDIDO } from "./data";
 import {
   InstagramIcon,
   Facebook01Icon,
+  YoutubeIcon,
   WhatsappIcon,
   Call02Icon,
   Mail01Icon,
@@ -21,6 +22,7 @@ const LINKS = [
 const SOCIAL = [
   { href: "https://www.instagram.com/sushi.makinori/", label: "Instagram", Icon: InstagramIcon },
   { href: "https://www.facebook.com/makinorisushi/?locale=es_LA",             label: "Facebook",  Icon: Facebook01Icon },
+  { href: "https://www.youtube.com/@Makinorichannel", label: "YouTube", Icon: YoutubeIcon },
   { href: WA_PEDIDO, label: "WhatsApp",  Icon: WhatsappIcon  },
 ];
 
@@ -35,11 +37,10 @@ export default function Footer() {
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
               <div style={{
-                width: 40, height: 40, borderRadius: "50%",
-                border: `1px solid ${C.gold}`,
-                display: "flex", alignItems: "center", justifyContent: "center",
+                width: 44, height: 44, borderRadius: "50%", overflow: "hidden",
+                border: `1px solid ${C.gold}`, flexShrink: 0, background: "#fff",
               }}>
-                <span style={{ fontFamily: FONT.jp, fontSize: 14, color: C.gold }}>海</span>
+                <img src="/icon.png" alt="Maki Nori" width="44" height="44" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               </div>
               <div>
                 <p style={{ fontWeight: 700, fontSize: 20, letterSpacing: "0.04em", margin: 0, fontFamily: FONT.serif }}>Maki Nori</p>

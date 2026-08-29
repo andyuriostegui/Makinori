@@ -57,11 +57,10 @@ export default function Navbar() {
 
           <a href="#" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}>
             <div style={{
-              width: 36, height: 36, borderRadius: "50%",
-              border: `1px solid ${C.gold}`,
-              display: "flex", alignItems: "center", justifyContent: "center",
+              width: 40, height: 40, borderRadius: "50%", overflow: "hidden",
+              border: `1px solid ${C.gold}`, flexShrink: 0, background: "#fff",
             }}>
-              <span style={{ fontFamily: FONT.jp, fontSize: 13, fontWeight: 700, color: C.gold }}>海</span>
+              <img src="/icon.png" alt="Maki Nori" width="40" height="40" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             </div>
             <div>
               <p style={{ fontWeight: 700, fontSize: 15, letterSpacing: "0.04em", color: textColor, lineHeight: 1, margin: 0, fontFamily: FONT.serif }}>Maki Nori</p>
