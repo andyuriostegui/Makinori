@@ -100,7 +100,7 @@ export default function Hero() {
         }}>
           <img
             src="/IMG_7047.jpg"
-            alt="Chimmy Roll de Maki Nori, sushi hecho a mano en Iguala, Guerrero"
+            alt="Burguer Roll de Maki Nori, sushi hecho a mano en Iguala, Guerrero"
             fetchPriority="high"
             decoding="async"
             style={{
@@ -122,7 +122,7 @@ export default function Hero() {
               <p style={{
                 fontFamily: FONT.serif, fontSize: 18, color: "#fff", margin: "10px 0 0",
                 textShadow: "0 8px 24px rgba(0,0,0,0.45)",
-              }}>Chimmy Roll</p>
+              }}>Burguer Roll</p>
               <p style={{
                 fontFamily: FONT.sans, fontSize: 12, color: "rgba(255,255,255,0.75)", margin: "2px 0 0",
               }}>Hecho a mano · Iguala</p>
@@ -130,7 +130,7 @@ export default function Hero() {
             <p style={{
               fontFamily: FONT.serif, fontSize: 22, color: C.gold, margin: 0, fontWeight: 700,
               textShadow: "0 8px 24px rgba(0,0,0,0.45)",
-            }}>$95</p>
+            }}>$100</p>
           </div>
         </div>
       </div>
