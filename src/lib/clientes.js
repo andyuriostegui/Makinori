@@ -18,12 +18,32 @@ export function friendlyAuthError(msg = "") {
   if (t.includes("already registered") || t.includes("already been registered") || t.includes("user already")) {
     return "Ese correo ya tiene cuenta. Entra con tu contraseña.";
   }
-  if (t.includes("password should") || t.includes("password")) return "La contraseña debe tener al menos 6 caracteres.";
+  if (t.includes("same password") || t.includes("different from the old") || t.includes("should be different")) {
+    return "La nueva contraseña tiene que ser distinta a la anterior.";
+  }
+  if (t.includes("auth session missing") || t.includes("not authenticated")) {
+    return "Abre el enlace del correo otra vez.";
+  }
+  if (t.includes("password should") || t.includes("at least") || t.includes("password")) {
+    return "La contraseña debe tener al menos 6 caracteres.";
+  }
   if (t.includes("rate") || t.includes("too many")) return "Demasiados intentos. Espera un momento.";
   if (t.includes("email not confirmed")) return "Revisa tu correo y confirma la cuenta para entrar.";
   if (isMissingTable({ message: msg })) return "Falta correr el SQL de perfiles en Supabase.";
   if (t.includes("row-level security") || t.includes("rls")) return "No hay permiso para guardar. Revisa que hayas iniciado sesión.";
   return msg || "Algo salió mal. Inténtalo de nuevo.";
+}
+
+export async function cambiarPassword(password, confirm) {
+  if (!supabase) throw new Error("Falta conectar.");
+  if (String(password || "").length < 6) {
+    throw new Error("La contraseña debe tener al menos 6 caracteres.");
+  }
+  if (password !== confirm) {
+    throw new Error("Las contraseñas no coinciden.");
+  }
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) throw new Error(friendlyAuthError(error.message));
 }
 
 export async function fetchPerfil(userId) {

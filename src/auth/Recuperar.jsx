@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
-import { supabase } from "../lib/supabase";
-import { friendlyAuthError } from "../lib/clientes";
+import { markRecovery, supabase } from "../lib/supabase";
+import { cambiarPassword } from "../lib/clientes";
 
 function linkError() {
   if (typeof window === "undefined") return "";
@@ -16,11 +16,12 @@ function linkError() {
 }
 
 function goHome() {
+  markRecovery(false);
   window.location.assign("/");
 }
 
 export default function Recuperar() {
-  const { session, loading, isRecovery } = useAuth();
+  const { session, isRecovery } = useAuth();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState(linkError());
@@ -29,30 +30,21 @@ export default function Recuperar() {
 
   useEffect(() => {
     if (!done) return undefined;
-    const t = window.setTimeout(goHome, 1600);
+    const t = window.setTimeout(goHome, 1800);
     return () => window.clearTimeout(t);
   }, [done]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (!supabase) return;
-    if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres.");
-      return;
-    }
-    if (password !== confirm) {
-      setError("Las contraseñas no coinciden.");
-      return;
-    }
     setBusy(true);
     setError("");
-    const { error: err } = await supabase.auth.updateUser({ password });
-    if (err) {
-      setError(friendlyAuthError(err.message));
-      setBusy(false);
-      return;
+    try {
+      await cambiarPassword(password, confirm);
+      markRecovery(false);
+      setDone(true);
+    } catch (err) {
+      setError(err.message || "No se pudo guardar.");
     }
-    setDone(true);
     setBusy(false);
   };
 
@@ -68,20 +60,25 @@ export default function Recuperar() {
     );
   }
 
-  const waiting = loading || session === undefined;
-  const canReset = Boolean(session && isRecovery && !done);
+  const waiting = session === undefined;
+  const canReset = Boolean(session && !done);
 
   return (
     <div className="recuperar-page pattern-seigaiha-dark">
       {waiting ? (
         <div className="recuperar-card">
+          <span className="recuperar-mark">Maki Nori</span>
           <p style={{ color: "#0e3a42" }}>Cargando…</p>
         </div>
       ) : canReset ? (
         <form className="recuperar-card" onSubmit={onSubmit}>
           <span className="recuperar-mark">Maki Nori</span>
           <h1>Nueva contraseña</h1>
-          <p>Elige una contraseña nueva para tu perfil.</p>
+          <p>
+            {isRecovery
+              ? "Elige una contraseña nueva. No entras a tu perfil hasta guardarla."
+              : "Elige una contraseña nueva para tu perfil."}
+          </p>
           {error && <p className="cuenta-alert">{error}</p>}
           <label className="recuperar-field">
             <span>Nueva contraseña</span>
@@ -106,14 +103,14 @@ export default function Recuperar() {
             />
           </label>
           <button className="recuperar-btn" disabled={busy}>
-            {busy ? "Guardando…" : "Guardar contraseña"}
+            {busy ? "Guardando…" : "Guardar"}
           </button>
         </form>
       ) : done ? (
         <div className="recuperar-card">
           <span className="recuperar-mark">Maki Nori</span>
-          <h1>Listo</h1>
-          <p className="cuenta-ok">Listo, ya puedes entrar</p>
+          <h1>Contraseña actualizada</h1>
+          <p className="cuenta-ok">Contraseña actualizada. Sigues dentro de tu cuenta.</p>
           <button type="button" className="recuperar-btn" onClick={goHome}>
             Ir al menú
           </button>

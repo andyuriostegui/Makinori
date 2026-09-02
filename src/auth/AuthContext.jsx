@@ -1,8 +1,28 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { recoveryLinkPresent, supabase } from "../lib/supabase";
+import {
+  ensureRecuperarPath,
+  markRecovery,
+  readRecoveryFromUrl,
+  recoveryLinkPresent,
+  supabase,
+} from "../lib/supabase";
 import { fetchPerfil, touchLastSeen } from "../lib/clientes";
 
 const AuthCtx = createContext(null);
+
+const authFallback = {
+  session: null,
+  user: null,
+  perfil: null,
+  setPerfil: () => {},
+  loading: false,
+  cuentaOpen: false,
+  setCuentaOpen: () => {},
+  refreshPerfil: async () => {},
+  isStaff: false,
+  isRecovery: false,
+  endRecovery: () => {},
+};
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(supabase ? undefined : null);
@@ -10,6 +30,18 @@ export function AuthProvider({ children }) {
   const [perfilReady, setPerfilReady] = useState(!supabase);
   const [cuentaOpen, setCuentaOpen] = useState(false);
   const [isRecovery, setIsRecovery] = useState(recoveryLinkPresent);
+
+  const beginRecovery = () => {
+    markRecovery(true);
+    setIsRecovery(true);
+    setCuentaOpen(false);
+    ensureRecuperarPath();
+  };
+
+  const endRecovery = () => {
+    markRecovery(false);
+    setIsRecovery(false);
+  };
 
   const loadPerfil = async (sess) => {
     if (!sess?.user) {
@@ -24,17 +56,26 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
+    if (recoveryLinkPresent) ensureRecuperarPath();
     if (!supabase) return undefined;
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session ?? null);
       loadPerfil(data.session);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
-      if (event === "PASSWORD_RECOVERY") setIsRecovery(true);
+      if (event === "PASSWORD_RECOVERY") beginRecovery();
+      if (event === "SIGNED_OUT") endRecovery();
       setSession(s);
       loadPerfil(s);
     });
-    return () => subscription.unsubscribe();
+    const onHash = () => {
+      if (readRecoveryFromUrl()) beginRecovery();
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener("hashchange", onHash);
+    };
   }, []);
 
   const refreshPerfil = async () => {
@@ -52,22 +93,12 @@ export function AuthProvider({ children }) {
     refreshPerfil,
     isStaff: perfil?.rol === "admin",
     isRecovery,
+    endRecovery,
   };
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }
 
 export function useAuth() { // eslint-disable-line react-refresh/only-export-components
-  return useContext(AuthCtx) || {
-    session: null,
-    user: null,
-    perfil: null,
-    setPerfil: () => {},
-    loading: false,
-    cuentaOpen: false,
-    setCuentaOpen: () => {},
-    refreshPerfil: async () => {},
-    isStaff: false,
-    isRecovery: false,
-  };
+  return useContext(AuthCtx) || authFallback;
 }

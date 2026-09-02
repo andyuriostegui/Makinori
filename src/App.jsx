@@ -13,14 +13,18 @@ import Footer from "./components/Footer";
 import WAFloat from "./components/WAFloat";
 import { CarritoCtx, useCarrito, CarritoBtn, CarritoPanel } from "./components/Carrito";
 import { CatalogProvider } from "./catalog/CatalogContext";
-import { AuthProvider } from "./auth/AuthContext";
+import { AuthProvider, useAuth } from "./auth/AuthContext";
 import Recuperar from "./auth/Recuperar";
 import { CuentaPanel } from "./components/Cuenta";
 import Admin from "./admin/Admin";
 
+function pathName() {
+  if (typeof window === "undefined") return "";
+  return window.location.pathname.toLowerCase();
+}
+
 function isAdminPath() {
-  if (typeof window === "undefined") return false;
-  const path = window.location.pathname.toLowerCase();
+  const path = pathName();
   return (
     path.startsWith("/admin") ||
     path.startsWith("/auth") ||
@@ -29,16 +33,22 @@ function isAdminPath() {
 }
 
 function isRecuperarPath() {
-  if (typeof window === "undefined") return false;
-  return window.location.pathname.toLowerCase().startsWith("/recuperar");
+  return pathName().startsWith("/recuperar");
 }
 
 export default function App() {
   return (
     <AuthProvider>
-      {isAdminPath() ? <Admin /> : isRecuperarPath() ? <Recuperar /> : <PublicSite />}
+      <Shell />
     </AuthProvider>
   );
+}
+
+function Shell() {
+  const { isRecovery } = useAuth();
+  if (isRecovery || isRecuperarPath()) return <Recuperar />;
+  if (isAdminPath()) return <Admin />;
+  return <PublicSite />;
 }
 
 function PublicSite() {

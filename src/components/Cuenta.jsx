@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { C } from "./tokens";
 import { useAuth } from "../auth/AuthContext";
 import { supabase } from "../lib/supabase";
-import { fetchPerfil, friendlyAuthError, saveMiPerfil } from "../lib/clientes";
+import { cambiarPassword, fetchPerfil, friendlyAuthError, saveMiPerfil } from "../lib/clientes";
 import {
   Cancel01Icon,
   User02Icon,
@@ -11,8 +11,8 @@ import {
 } from "hugeicons-react";
 
 export function CuentaPanel() {
-  const { cuentaOpen } = useAuth();
-  if (!cuentaOpen) return null;
+  const { cuentaOpen, isRecovery } = useAuth();
+  if (!cuentaOpen || isRecovery) return null;
   return <CuentaDialog />;
 }
 
@@ -22,6 +22,7 @@ function CuentaDialog() {
   const [form, setForm] = useState({
     email: user?.email || "",
     password: "",
+    confirm: "",
     nombre: perfil?.nombre || "",
     tel: perfil?.tel || "",
     direccion: perfil?.direccion || "",
@@ -106,6 +107,21 @@ function CuentaDialog() {
     setBusy(false);
   };
 
+  const cambiarClave = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    setOk("");
+    try {
+      await cambiarPassword(form.password, form.confirm);
+      setOk("Contraseña actualizada");
+      setForm((f) => ({ ...f, password: "", confirm: "" }));
+    } catch (err) {
+      setError(err.message || "No se pudo guardar.");
+    }
+    setBusy(false);
+  };
+
   const guardar = async (e) => {
     e.preventDefault();
     if (!user) return;
@@ -158,10 +174,12 @@ function CuentaDialog() {
               <User02Icon size={22} color={C.ink} />
               <div>
                 <h3 id="cuenta-titulo" style={{ fontFamily: "Noto Sans JP, sans-serif", fontWeight: 900, fontSize: 18, margin: 0, color: C.ink }}>
-                  {user ? "Tu perfil" : mode === "crear" ? "Crear perfil" : mode === "olvide" ? "Recuperar acceso" : "Entrar"}
+                  {user && mode === "clave" ? "Nueva contraseña" : user ? "Tu perfil" : mode === "crear" ? "Crear perfil" : mode === "olvide" ? "Recuperar acceso" : "Entrar"}
                 </h3>
                 <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>
-                  {user
+                  {user && mode === "clave"
+                    ? "Elige una contraseña nueva para tu perfil."
+                    : user
                     ? "Tus datos van al pedido. No los vuelves a escribir."
                     : mode === "olvide"
                       ? "Escribe tu correo y te mandamos el enlace."
@@ -179,11 +197,16 @@ function CuentaDialog() {
           </div>
         </div>
 
-        <form className="pedido-body" onSubmit={user ? guardar : mode === "crear" ? registrar : mode === "olvide" ? recuperar : entrar}>
+        <form className="pedido-body" onSubmit={user ? (mode === "clave" ? cambiarClave : guardar) : mode === "crear" ? registrar : mode === "olvide" ? recuperar : entrar}>
           {error && <p className="cuenta-alert">{error}</p>}
           {ok && <p className="cuenta-ok">{ok}</p>}
 
-          {user ? (
+          {user && mode === "clave" ? (
+            <>
+              <Field label="Nueva contraseña" value={form.password} onChange={(v) => set("password", v)} type="password" autoComplete="new-password" required />
+              <Field label="Confirmar" value={form.confirm} onChange={(v) => set("confirm", v)} type="password" autoComplete="new-password" required />
+            </>
+          ) : user ? (
             <>
               {perfil?.destacado && (
                 <div className="cuenta-destacado">
@@ -203,6 +226,13 @@ function CuentaDialog() {
                 <Location01Icon size={14} color={C.muted} />
                 La próxima vez que pidas a domicilio, esto ya va lleno.
               </p>
+              <button
+                type="button"
+                className="cuenta-olvide"
+                onClick={() => { setMode("clave"); setError(""); setOk(""); set("password", ""); set("confirm", ""); }}
+              >
+                Cambiar contraseña
+              </button>
             </>
           ) : mode === "crear" ? (
             <>
@@ -235,10 +265,14 @@ function CuentaDialog() {
             borderRadius: 10, padding: "14px", fontSize: 14, fontWeight: 700,
             cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif", minHeight: 48,
           }}>
-            {busy ? "Un momento…" : user ? "Guardar perfil" : mode === "crear" ? "Crear perfil" : mode === "olvide" ? "Enviar enlace" : "Entrar"}
+            {busy ? "Un momento…" : user && mode === "clave" ? "Guardar" : user ? "Guardar perfil" : mode === "crear" ? "Crear perfil" : mode === "olvide" ? "Enviar enlace" : "Entrar"}
           </button>
 
-          {user ? (
+          {user && mode === "clave" ? (
+            <button type="button" className="cuenta-olvide" onClick={() => { setMode("perfil"); setError(""); setOk(""); set("password", ""); set("confirm", ""); }}>
+              Volver al perfil
+            </button>
+          ) : user ? (
             <button type="button" onClick={salir} style={{
               width: "100%", background: "transparent", color: C.muted, border: "none",
               padding: "12px", fontSize: 13, fontWeight: 700, cursor: "pointer",

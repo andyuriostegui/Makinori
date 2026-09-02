@@ -551,6 +551,7 @@ img { max-width: 100%; }
   font-family: var(--font-sans);
   text-decoration: underline;
   text-underline-offset: 3px;
+  align-self: flex-start;
 }
 
 /* ── Recuperar contraseña ── */
@@ -559,7 +560,7 @@ img { max-width: 100%; }
   min-height: 100dvh;
   display: grid;
   place-items: center;
-  background: #0b2c32;
+  background-color: #0b2c32;
   padding: 24px 16px;
   padding-bottom: max(24px, env(safe-area-inset-bottom));
   font-family: var(--font-sans);
@@ -572,6 +573,8 @@ img { max-width: 100%; }
   display: flex;
   flex-direction: column;
   gap: 12px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(232, 132, 92, 0.35);
 }
 .recuperar-card h1 {
   font-family: var(--font-serif);
@@ -639,6 +642,17 @@ img { max-width: 100%; }
 }
 
 @media (max-width: 640px) {
+  .recuperar-page {
+    place-items: end center;
+    padding: 0;
+  }
+  .recuperar-card {
+    width: 100%;
+    max-width: none;
+    border-radius: 18px 18px 0 0;
+    padding: 28px 20px max(24px, env(safe-area-inset-bottom));
+    box-shadow: 0 -12px 40px rgba(26, 26, 24, 0.2);
+  }
   .pedido-shell {
     align-items: flex-end;
   }
