@@ -13,6 +13,8 @@ import Footer from "./components/Footer";
 import WAFloat from "./components/WAFloat";
 import { CarritoCtx, useCarrito, CarritoBtn, CarritoPanel } from "./components/Carrito";
 import { CatalogProvider } from "./catalog/CatalogContext";
+import { AuthProvider } from "./auth/AuthContext";
+import { CuentaPanel } from "./components/Cuenta";
 import Admin from "./admin/Admin";
 
 function isAdminPath() {
@@ -26,8 +28,11 @@ function isAdminPath() {
 }
 
 export default function App() {
-  if (isAdminPath()) return <Admin />;
-  return <PublicSite />;
+  return (
+    <AuthProvider>
+      {isAdminPath() ? <Admin /> : <PublicSite />}
+    </AuthProvider>
+  );
 }
 
 function PublicSite() {
@@ -51,6 +56,7 @@ function PublicSite() {
         <WAFloat />
         <CarritoBtn />
         <CarritoPanel />
+        <CuentaPanel />
       </CarritoCtx.Provider>
     </CatalogProvider>
   );

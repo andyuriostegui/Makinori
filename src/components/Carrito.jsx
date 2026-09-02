@@ -1,7 +1,9 @@
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect, useRef, createContext, useContext } from "react";
 import { C } from "./tokens";
 import { parseFotoPos } from "../lib/catalog";
 import { WA_NUM } from "./data";
+import { useAuth } from "../auth/AuthContext";
+import { registrarPedido, saveMiPerfil } from "../lib/clientes";
 import {
   ShoppingBag01Icon,
   Timer01Icon,
@@ -32,8 +34,16 @@ function nuevoFolio() {
   return `MN-${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
+function montosPedido(total, perfil) {
+  const pct = Math.max(0, Math.min(100, Number(perfil?.descuento) || 0));
+  const descuento = Math.round((Number(total) || 0) * pct / 100);
+  return { pct, descuento, final: Math.max(0, (Number(total) || 0) - descuento) };
+}
+
 export function useCarrito() {
   const saved = typeof window !== "undefined" ? leerPedido() : null;
+  const { user, perfil } = useAuth();
+  const filledFromPerfil = useRef(false);
   const [items, setItems] = useState(saved?.items || []);
   const [modo, setModo] = useState(saved?.modo || "llevar");
   const [mesa, setMesa] = useState(saved?.mesa || "");
@@ -49,6 +59,20 @@ export function useCarrito() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ items, modo, mesa, cliente }));
   }, [items, modo, mesa, cliente]);
+
+  useEffect(() => {
+    if (!user) filledFromPerfil.current = false;
+  }, [user]);
+
+  useEffect(() => {
+    if (!perfil || perfil.missingTable || filledFromPerfil.current) return;
+    filledFromPerfil.current = true;
+    setCliente((c) => ({
+      nombre: (c.nombre || "").trim() || perfil.nombre || "",
+      tel: (c.tel || "").trim() || perfil.tel || "",
+      direccion: (c.direccion || "").trim() || perfil.direccion || "",
+    }));
+  }, [perfil]);
 
   const agregar = (producto) => {
     const id = producto.id || producto.nombre;
@@ -118,7 +142,7 @@ function pickSugerencia(items) {
   return null;
 }
 
-function armarMensaje({ items, total, modo, mesa, cliente, folio }) {
+function armarMensaje({ items, total, modo, mesa, cliente, folio, descuento, pct }) {
   const modoStr = modo === "mesa"
     ? `En mesa ${mesa.trim()}`
     : modo === "domicilio"
@@ -136,6 +160,10 @@ function armarMensaje({ items, total, modo, mesa, cliente, folio }) {
     modo === "domicilio" && cliente.direccion?.trim() && `📍 ${cliente.direccion.trim()}`,
   ].filter(Boolean).join("\n");
 
+  const cobro = descuento > 0
+    ? [`Subtotal: $${total} MXN`, `Destacado · ${pct}% −$${descuento}`, `*Total: $${total - descuento} MXN*`]
+    : [`*Total: $${total} MXN*`];
+
   return [
     `🍣 *Pedido Maki Nori*`,
     `Folio: *#${folio}*`,
@@ -145,7 +173,7 @@ function armarMensaje({ items, total, modo, mesa, cliente, folio }) {
     "",
     lineas,
     "",
-    `*Total: $${total} MXN*`,
+    ...cobro,
     "",
     "Confirmo cuando me contesten. ¡Gracias!",
   ].filter(block => block !== "").join("\n").replace(/\n{3,}/g, "\n\n");
@@ -287,9 +315,11 @@ export function CarritoPanel() {
     modo, setModo, mesa, setMesa, cliente, setCampo,
     folio, setFolio, enviado, setEnviado,
   } = useCarritoCtx();
+  const { user, perfil, setCuentaOpen } = useAuth();
   const [error, setError] = useState("");
   const sugerencia = pickSugerencia(items);
   const sheet = usePedidoSheet();
+  const { pct, descuento, final } = montosPedido(total, perfil);
 
   useEffect(() => {
     if (!open) return;
@@ -333,15 +363,33 @@ export function CarritoPanel() {
     return "";
   };
 
-  const enviarWA = () => {
+  const enviarWA = async () => {
     const err = validar();
     if (err) { setError(err); return; }
     setError("");
     const f = folio || nuevoFolio();
     setFolio(f);
-    const msg = armarMensaje({ items, total, modo, mesa, cliente, folio: f });
+    const msg = armarMensaje({ items, total, modo, mesa, cliente, folio: f, descuento, pct });
     window.open(`${WA_URL}?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
     setEnviado(true);
+    if (!user) return;
+    try {
+      await registrarPedido({
+        userId: user.id,
+        folio: f,
+        items,
+        total: final,
+        descuento,
+        modo,
+        mesa,
+        cliente,
+      });
+      const patch = { nombre: cliente.nombre, tel: cliente.tel };
+      if (modo === "domicilio") patch.direccion = cliente.direccion;
+      await saveMiPerfil(user.id, patch);
+    } catch {
+      // El WhatsApp ya salió; el historial se puede perder si falla la base.
+    }
   };
 
   const irAlMenu = () => {
@@ -431,6 +479,26 @@ export function CarritoPanel() {
 
             {modo !== "mesa" && (
               <div className="pedido-campos" style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 12 }}>
+                {user ? (
+                  <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.teal, margin: 0, fontWeight: 700 }}>
+                    {perfil?.nombre ? `Hola, ${perfil.nombre.split(" ")[0]}` : "Tu perfil"}
+                    {modo === "domicilio" && (cliente.direccion || "").trim() ? " · dirección guardada" : ""}
+                    {pct > 0 ? ` · ${pct}% de descuento` : ""}
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => { setOpen(false); setCuentaOpen(true); }}
+                    style={{
+                      background: "rgba(42,139,139,0.08)", border: `1.5px dashed ${C.teal}`,
+                      borderRadius: 8, padding: "10px 12px", textAlign: "left",
+                      cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
+                      fontSize: 12, fontWeight: 700, color: C.teal,
+                    }}
+                  >
+                    Crea tu perfil para no volver a escribir tu dirección
+                  </button>
+                )}
                 <input
                   type="text"
                   className="pedido-input"
@@ -534,9 +602,21 @@ export function CarritoPanel() {
         {items.length > 0 && (
           <div className={`pedido-footer${sheet.keyboard ? " kb-open" : ""}`}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12, gap: 12 }}>
-              <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 14, color: C.muted }}>Total estimado</span>
-              <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 20, fontWeight: 900, color: C.ink }}>${total} MXN</span>
+              <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 14, color: C.muted }}>
+                {descuento > 0 ? "Total con descuento" : "Total estimado"}
+              </span>
+              <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 20, fontWeight: 900, color: C.ink }}>
+                {descuento > 0 && (
+                  <span style={{ fontSize: 13, fontWeight: 600, color: C.muted, textDecoration: "line-through", marginRight: 8 }}>${total}</span>
+                )}
+                ${final} MXN
+              </span>
             </div>
+            {descuento > 0 && (
+              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.coral, margin: "-6px 0 12px", fontWeight: 700 }}>
+                Cliente destacado · {pct}% (−${descuento})
+              </p>
+            )}
 
             {error && (
               <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.shu, margin: "0 0 10px", fontWeight: 600 }}>

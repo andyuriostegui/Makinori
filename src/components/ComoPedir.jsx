@@ -20,7 +20,7 @@ const STEPS = [
   {
     n: "03",
     title: "Mándalo por WhatsApp",
-    text: "Pedir arma el ticket con tu nombre, cómo lo quieres y el total. Nosotros confirmamos.",
+    text: "Pedir arma el ticket con tu nombre, cómo lo quieres y el total. Si tienes perfil, la dirección ya va. Nosotros confirmamos.",
     href: WA_PEDIDO,
     cta: "Abrir WhatsApp",
   },

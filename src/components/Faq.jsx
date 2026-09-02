@@ -7,6 +7,10 @@ const FAQS = [
     a: "Entra al menú, toca + en lo que se antoje y pulsa Pedir. Se arma un mensaje de WhatsApp con tu orden, notas y total. También puedes escribirnos directo al 733 159 89 96.",
   },
   {
+    q: "¿Puedo guardar mi dirección?",
+    a: "Sí. Arriba toca Entrar y crea tu perfil con nombre, WhatsApp y colonia. La próxima vez el pedido ya lleva tus datos. Si te hacemos cliente destacado, el descuento se aplica solo.",
+  },
+  {
     q: "¿Hacen domicilio en Iguala?",
     a: "Sí. Entregamos en Iguala de la Independencia y alrededores, en unos 30–45 minutos según la zona. Al mandar el pedido por WhatsApp confirmamos si llegamos a tu colonia.",
   },

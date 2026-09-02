@@ -29,13 +29,75 @@ function altNombre(nombre) {
   return nombre.endsWith(" Roll") ? nombre.replace(/ Roll$/, "") : `${nombre} Roll`;
 }
 
+async function firstRow(query) {
+  const { data, error } = await query.limit(1);
+  if (error) throw error;
+  return data?.[0] || null;
+}
+
 async function findCategoria(slug, nombre) {
-  const bySlug = await supabase.from("categorias").select("id").eq("slug", slug).maybeSingle();
-  if (bySlug.error) throw bySlug.error;
-  if (bySlug.data) return bySlug.data;
-  const byName = await supabase.from("categorias").select("id").eq("nombre", nombre).maybeSingle();
-  if (byName.error) throw byName.error;
-  return byName.data;
+  const bySlug = await firstRow(supabase.from("categorias").select("id").eq("slug", slug));
+  if (bySlug) return bySlug;
+  return firstRow(supabase.from("categorias").select("id").eq("nombre", nombre));
+}
+
+async function platilloCount(categoriaId) {
+  const { count, error } = await supabase
+    .from("platillos")
+    .select("id", { count: "exact", head: true })
+    .eq("categoria_id", categoriaId);
+  if (error) throw error;
+  return count || 0;
+}
+
+async function movePlatillos(fromId, toId) {
+  const { data: froms, error: fromErr } = await supabase
+    .from("platillos")
+    .select("id, nombre")
+    .eq("categoria_id", fromId);
+  if (fromErr) throw fromErr;
+  const { data: tos, error: toErr } = await supabase
+    .from("platillos")
+    .select("nombre")
+    .eq("categoria_id", toId);
+  if (toErr) throw toErr;
+  const taken = new Set((tos || []).map((p) => p.nombre));
+  for (const p of froms || []) {
+    if (taken.has(p.nombre)) {
+      const { error } = await supabase.from("platillos").delete().eq("id", p.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from("platillos").update({ categoria_id: toId }).eq("id", p.id);
+      if (error) throw error;
+      taken.add(p.nombre);
+    }
+  }
+}
+
+/** Junta categorías con el mismo slug (Parrilla Coreana se creó dos veces). */
+async function dedupeCategorias(list) {
+  const groups = new Map();
+  for (const c of list) {
+    const slug = String(c.slug || "").trim();
+    if (!slug) continue;
+    const rows = groups.get(slug) || [];
+    rows.push(c);
+    groups.set(slug, rows);
+  }
+  let merged = 0;
+  for (const rows of groups.values()) {
+    if (rows.length < 2) continue;
+    const scored = await Promise.all(rows.map(async (c) => ({ c, n: await platilloCount(c.id) })));
+    scored.sort((a, b) => b.n - a.n || String(a.c.id).localeCompare(String(b.c.id)));
+    const keeper = scored[0].c;
+    for (const { c } of scored.slice(1)) {
+      await movePlatillos(c.id, keeper.id);
+      const { error } = await supabase.from("categorias").delete().eq("id", c.id);
+      if (error) throw error;
+      merged += 1;
+    }
+  }
+  return merged;
 }
 
 async function findPlatillo(nombre, categoriaId) {
@@ -115,19 +177,27 @@ export async function importLocalMenu() {
   return { categorias: CAT_DEFS.length, platillos: CAT_DEFS.reduce((n, c) => n + c.items.length, 0) };
 }
 
-/** Crea categorías nuevas (Parrilla Coreana) y corrige textos del menú si faltan. */
+/** Crea categorías nuevas (Parrilla Coreana), quita duplicados y corrige textos si faltan. */
 export async function ensureCategorias() {
-  if (!supabase) return { changed: false, createdParrilla: false };
+  if (!supabase) return { changed: false, createdParrilla: false, merged: 0 };
   let changed = false;
   let createdParrilla = false;
 
   const { data: cats, error } = await supabase
     .from("categorias")
-    .select("id, slug, subtitulo, orden");
+    .select("id, slug, nombre, subtitulo, orden");
   if (error) throw error;
 
-  const list = cats || [];
-  const bySlug = Object.fromEntries(list.map((c) => [c.slug, c]));
+  let list = cats || [];
+  const merged = await dedupeCategorias(list);
+  if (merged > 0) {
+    changed = true;
+    const again = await supabase.from("categorias").select("id, slug, nombre, subtitulo, orden");
+    if (again.error) throw again.error;
+    list = again.data || [];
+  }
+
+  const bySlug = Object.fromEntries(list.filter((c) => c.slug).map((c) => [c.slug, c]));
 
   for (const slug of ["frescos", "empanizados"]) {
     const existing = bySlug[slug];
@@ -169,5 +239,5 @@ export async function ensureCategorias() {
     createdParrilla = true;
   }
 
-  return { changed, createdParrilla };
+  return { changed, createdParrilla, merged };
 }

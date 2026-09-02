@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { C, FONT } from "./tokens";
 import { useCarritoCtx } from "./Carrito";
-import { ShoppingBag01Icon, Menu01Icon, Cancel01Icon } from "hugeicons-react";
+import { useAuth } from "../auth/AuthContext";
+import { ShoppingBag01Icon, Menu01Icon, Cancel01Icon, User02Icon } from "hugeicons-react";
 
 const NAV_LINKS = [
   { href: "#",          label: "Inicio"    },
@@ -14,6 +15,8 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { count, setOpen: setCarritoOpen } = useCarritoCtx();
+  const { user, perfil, setCuentaOpen } = useAuth();
+  const cuentaLabel = perfil?.nombre?.trim()?.split(" ")[0] || (user ? "Cuenta" : "Entrar");
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 40);
@@ -70,6 +73,19 @@ export default function Navbar() {
 
           <ul className="nav-desktop" style={{ alignItems: "center", gap: 26, listStyle: "none", margin: 0, padding: 0 }}>
             {NAV_LINKS.map(l => <NavLink key={l.href + l.label} href={l.href} textColor={textColor}>{l.label}</NavLink>)}
+            <li style={{ listStyle: "none" }}>
+              <button onClick={() => setCuentaOpen(true)} style={{
+                background: "transparent",
+                border: `1px solid rgba(244,239,230,0.28)`,
+                color: textColor, padding: "6px 14px", borderRadius: 2,
+                fontSize: 12, fontWeight: 600, cursor: "pointer",
+                fontFamily: FONT.sans,
+                display: "flex", alignItems: "center", gap: 6,
+              }}>
+                <User02Icon size={14} color={textColor} />
+                {cuentaLabel}
+              </button>
+            </li>
             {count > 0 && (
               <li style={{ listStyle: "none" }}>
                 <button onClick={() => setCarritoOpen(true)} style={{
@@ -116,6 +132,18 @@ export default function Navbar() {
                   <a href={l.href} onClick={close} style={{ fontSize: 16, fontWeight: 500, textDecoration: "none", color: C.cream, fontFamily: FONT.serif }}>{l.label}</a>
                 </li>
               ))}
+              <li>
+                <button onClick={() => { setCuentaOpen(true); close(); }} style={{
+                  background: "transparent", color: C.cream,
+                  border: "1px solid rgba(244,239,230,0.28)",
+                  padding: "10px 16px", borderRadius: 2, fontSize: 13,
+                  fontWeight: 700, cursor: "pointer", fontFamily: FONT.sans,
+                  display: "flex", alignItems: "center", gap: 8,
+                }}>
+                  <User02Icon size={14} color={C.cream} />
+                  {user ? `Hola, ${cuentaLabel}` : "Entrar / crear perfil"}
+                </button>
+              </li>
               <li style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <button onClick={pedir} style={{
                   background: C.coral, color: "#fff",

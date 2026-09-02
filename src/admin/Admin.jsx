@@ -3,6 +3,9 @@ import { supabase } from "../lib/supabase";
 import { importLocalMenu, ensureCategorias } from "../lib/importCatalog";
 import { formatPrecio, parseFotoPos, withFotoPos } from "../lib/catalog";
 import { fetchGaleria, saveGaleria, uploadGaleriaFoto } from "../lib/galeria";
+import { asegurarStaff, isMissingTable } from "../lib/clientes";
+import { useAuth } from "../auth/AuthContext";
+import ClientesAdmin from "./Clientes";
 import "./admin.css";
 
 const EMPTY = {
@@ -93,6 +96,21 @@ function friendlyError(msg = "") {
   return msg || "Algo salió mal. Inténtalo de nuevo.";
 }
 
+function uniqueCategorias(categorias, platillos = []) {
+  const counts = {};
+  for (const p of platillos) {
+    counts[p.categoria_id] = (counts[p.categoria_id] || 0) + 1;
+  }
+  const bySlug = new Map();
+  for (const c of categorias) {
+    const slug = String(c.slug || "").trim();
+    if (!slug) continue;
+    const prev = bySlug.get(slug);
+    if (!prev || (counts[c.id] || 0) > (counts[prev.id] || 0)) bySlug.set(slug, c);
+  }
+  return [...bySlug.values()].sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0) || String(a.nombre).localeCompare(String(b.nombre), "es"));
+}
+
 function Switch({ on, onChange, label, hint }) {
   return (
     <button type="button" className={`admin-switch ${on ? "on" : ""}`} onClick={() => onChange(!on)}>
@@ -106,15 +124,21 @@ function Switch({ on, onChange, label, hint }) {
 }
 
 export default function Admin() {
-  const [session, setSession] = useState(supabase ? undefined : null);
+  const { session, perfil, loading, setPerfil } = useAuth();
   const [tab, setTab] = useState("catalogo");
 
   useEffect(() => {
-    if (!supabase) return undefined;
-    supabase.auth.getSession().then(({ data }) => setSession(data.session ?? null));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
-    return () => subscription.unsubscribe();
-  }, []);
+    if (loading || !session) return undefined;
+    if (perfil?.rol === "admin" || perfil?.missingTable || perfil?.rol === "cliente") return undefined;
+    let alive = true;
+    asegurarStaff()
+      .then((p) => { if (alive) setPerfil(p || { rol: "cliente" }); })
+      .catch((e) => {
+        if (!alive) return;
+        setPerfil(isMissingTable(e) ? { missingTable: true } : { rol: "cliente" });
+      });
+    return () => { alive = false; };
+  }, [loading, session, perfil, setPerfil]);
 
   if (!supabase) {
     return (
@@ -127,11 +151,17 @@ export default function Admin() {
     );
   }
 
-  if (session === undefined) {
+  if (loading || session === undefined) {
     return <div className="admin-login"><p style={{ color: "#fff" }}>Cargando…</p></div>;
   }
 
   if (!session) return <Login />;
+  if (!perfil) {
+    return <div className="admin-login"><p style={{ color: "#fff" }}>Cargando…</p></div>;
+  }
+
+  const canAdmin = perfil.missingTable || perfil.rol === "admin";
+  if (!canAdmin) return <NotStaff />;
 
   return (
     <div className="admin-shell">
@@ -141,6 +171,7 @@ export default function Admin() {
           <button className={tab === "catalogo" ? "active" : ""} onClick={() => setTab("catalogo")}>Menú</button>
           <button className={tab === "feed" ? "active" : ""} onClick={() => setTab("feed")}>Favoritos</button>
           <button className={tab === "rollos" ? "active" : ""} onClick={() => setTab("rollos")}>Rollos</button>
+          <button className={tab === "clientes" ? "active" : ""} onClick={() => setTab("clientes")}>Clientes</button>
         </nav>
         <button className="admin-ghost" onClick={() => supabase.auth.signOut()}>Salir</button>
       </header>
@@ -148,8 +179,22 @@ export default function Admin() {
         <button className={tab === "catalogo" ? "active" : ""} onClick={() => setTab("catalogo")}>Menú</button>
         <button className={tab === "feed" ? "active" : ""} onClick={() => setTab("feed")}>Favoritos</button>
         <button className={tab === "rollos" ? "active" : ""} onClick={() => setTab("rollos")}>Rollos</button>
+        <button className={tab === "clientes" ? "active" : ""} onClick={() => setTab("clientes")}>Clientes</button>
       </nav>
       <AdminBody tab={tab} />
+    </div>
+  );
+}
+
+function NotStaff() {
+  return (
+    <div className="admin-login">
+      <form onSubmit={(e) => e.preventDefault()}>
+        <h1>Esta cuenta es de cliente</h1>
+        <p>El panel de cocina es solo para Maki Nori. Entra con la cuenta del restaurante, o vuelve a la web para armar tu pedido.</p>
+        <button type="button" className="admin-btn" onClick={() => { window.location.href = "/"; }}>Ir al menú</button>
+        <button type="button" className="admin-btn ghost" onClick={() => supabase.auth.signOut()}>Salir de esta cuenta</button>
+      </form>
     </div>
   );
 }
@@ -223,7 +268,9 @@ function AdminBody({ tab }) {
       try {
         const ensured = await ensureCategorias();
         if (!alive) return;
-        if (ensured.createdParrilla) {
+        if (ensured.merged > 0) {
+          setOk("Había categorías repetidas. Ya las junté: Parrilla Coreana queda una sola.");
+        } else if (ensured.createdParrilla) {
           setOk("Listo: ya está Parrilla Coreana. En Menú, elige esa categoría y toca Nuevo para meter el platillo.");
         }
       } catch (e) {
@@ -280,6 +327,9 @@ function AdminBody({ tab }) {
       {tab === "rollos" && (
         <GaleriaAdmin setError={setError} setOk={setOk} />
       )}
+      {tab === "clientes" && (
+        <ClientesAdmin setError={setError} setOk={setOk} />
+      )}
     </div>
   );
 }
@@ -289,7 +339,7 @@ function Catalogo({ categorias, platillos, loading, importing, onImport, onReloa
   const [cat, setCat] = useState("all");
   const [editing, setEditing] = useState(null);
   const [moving, setMoving] = useState(false);
-  const cats = categorias.filter((c) => c.slug);
+  const cats = uniqueCategorias(categorias, platillos);
 
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();

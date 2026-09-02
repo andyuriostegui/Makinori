@@ -113,24 +113,35 @@ export function localCatalog() {
   };
 }
 
+function mergeCategorias(categorias) {
+  const map = new Map();
+  const sorted = [...categorias].sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+  for (const c of sorted) {
+    const key = String(c.slug || "").trim() || c.id;
+    const prev = map.get(key);
+    if (!prev) map.set(key, { ...c, ids: [c.id] });
+    else prev.ids.push(c.id);
+  }
+  return [...map.values()];
+}
+
 function buildRemoteCatalog(categorias, platillos) {
   const visibles = platillos.filter((p) => p.disponible !== false);
 
-  const allTabs = [...categorias]
-    .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0))
-    .map((c) => ({
-      key: c.slug || c.id,
-      label: c.nombre,
-      jp: c.nombre_jp || "",
-      tint: CAT_TINTS[c.slug] || C.teal,
-      sub: c.subtitulo || "",
-      id: c.id,
-    }));
+  const allTabs = mergeCategorias(categorias).map((c) => ({
+    key: c.slug || c.id,
+    label: c.nombre,
+    jp: c.nombre_jp || "",
+    tint: CAT_TINTS[c.slug] || C.teal,
+    sub: c.subtitulo || "",
+    id: c.id,
+    ids: c.ids || [c.id],
+  }));
 
   const menuBySlug = {};
   for (const tab of allTabs) {
     const items = visibles
-      .filter((p) => p.categoria_id === tab.id)
+      .filter((p) => tab.ids.includes(p.categoria_id))
       .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0))
       .map(mapPlatilloToMenuItem);
     menuBySlug[tab.key] = {

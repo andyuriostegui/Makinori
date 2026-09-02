@@ -363,6 +363,61 @@ img { max-width: 100%; }
   display: none;
 }
 
+/* ── Cuenta / perfil ── */
+.cuenta-shell { z-index: 1100; }
+.cuenta-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cuenta-field span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-family: var(--font-sans);
+}
+.cuenta-alert,
+.cuenta-ok {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  font-family: var(--font-sans);
+  font-weight: 600;
+}
+.cuenta-alert { background: #fff1eb; color: #7a331f; }
+.cuenta-ok { background: #e8f6f8; color: #0e3a42; }
+.cuenta-destacado {
+  background: rgba(224, 112, 72, 0.12);
+  border: 1px solid var(--coral);
+  color: var(--shu);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+}
+.cuenta-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.cuenta-switch button {
+  background: none;
+  border: none;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  padding: 8px;
+  min-height: 44px;
+}
+
 @media (max-width: 640px) {
   .pedido-shell {
     align-items: flex-end;
