@@ -18,7 +18,24 @@ import {
 } from "hugeicons-react";
 
 const STORAGE_KEY = "makinori-pedido";
+const FIEL_SEEN_KEY = "makinori-fiel-popup";
 const WA_URL = `https://wa.me/${WA_NUM}`;
+
+function fielYaVisto() {
+  try {
+    return sessionStorage.getItem(FIEL_SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function marcarFielVisto() {
+  try {
+    sessionStorage.setItem(FIEL_SEEN_KEY, "1");
+  } catch {
+    /* modo privado / storage bloqueado */
+  }
+}
 
 function leerPedido() {
   try {
@@ -320,13 +337,27 @@ export function CarritoPanel() {
   const sugerencia = pickSugerencia(items);
   const sheet = usePedidoSheet();
   const { pct, descuento, final } = montosPedido(total, perfil);
+  const [fielDismissed, setFielDismissed] = useState(() => fielYaVisto());
+  const fielOpen = open && pct > 0 && !fielDismissed;
+
+  const cerrarFiel = () => {
+    marcarFielVisto();
+    setFielDismissed(true);
+  };
 
   useEffect(() => {
     if (!open) return;
-    const onKey = e => { if (e.key === "Escape") setOpen(false); };
+    const onKey = e => {
+      if (e.key !== "Escape") return;
+      if (fielOpen) {
+        cerrarFiel();
+        return;
+      }
+      setOpen(false);
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, setOpen]);
+  }, [open, setOpen, fielOpen]);
 
   useEffect(() => {
     if (!open) return;
@@ -464,6 +495,13 @@ export function CarritoPanel() {
               ))}
             </div>
 
+            {user && (
+              <p className="pedido-saludo">
+                {perfil?.nombre ? `Hola, ${perfil.nombre.split(" ")[0]}` : "Tu perfil"}
+                {pct > 0 ? ` · ${pct}% de descuento` : ""}
+              </p>
+            )}
+
             {modo === "mesa" && (
               <input
                 type="text"
@@ -479,13 +517,7 @@ export function CarritoPanel() {
 
             {modo !== "mesa" && (
               <div className="pedido-campos" style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 12 }}>
-                {user ? (
-                  <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.teal, margin: 0, fontWeight: 700 }}>
-                    {perfil?.nombre ? `Hola, ${perfil.nombre.split(" ")[0]}` : "Tu perfil"}
-                    {modo === "domicilio" && (cliente.direccion || "").trim() ? " · dirección guardada" : ""}
-                    {pct > 0 ? ` · ${pct}% de descuento` : ""}
-                  </p>
-                ) : (
+                {!user && (
                   <button
                     type="button"
                     onClick={() => { setOpen(false); setCuentaOpen(true); }}
@@ -612,11 +644,6 @@ export function CarritoPanel() {
                 ${final} MXN
               </span>
             </div>
-            {descuento > 0 && (
-              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.coral, margin: "-6px 0 12px", fontWeight: 700 }}>
-                Cliente destacado · {pct}% (−${descuento})
-              </p>
-            )}
 
             {error && (
               <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.shu, margin: "0 0 10px", fontWeight: 600 }}>
@@ -669,6 +696,45 @@ export function CarritoPanel() {
             )}
           </div>
         )}
+      </div>
+
+      {fielOpen && pct > 0 && (
+        <FielPopup pct={pct} onClose={cerrarFiel} />
+      )}
+    </div>
+  );
+}
+
+function FielPopup({ pct, onClose }) {
+  const btnRef = useRef(null);
+
+  useEffect(() => {
+    btnRef.current?.focus();
+  }, []);
+
+  return (
+    <div className="fiel-overlay" onClick={onClose}>
+      <div
+        className="fiel-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="fiel-titulo"
+        onClick={e => e.stopPropagation()}
+      >
+        <button type="button" className="fiel-modal-close" onClick={onClose} aria-label="Cerrar">
+          <Cancel01Icon size={16} color="#F3FAFB" />
+        </button>
+        <div className="fiel-modal-foto">
+          <img src="/fiel-roll.jpg" alt="" />
+        </div>
+        <div className="fiel-modal-body">
+          <span className="fiel-modal-ornament" aria-hidden />
+          <h3 id="fiel-titulo">Cliente fiel</h3>
+          <p>Por ser cliente fiel tienes {pct}% de descuento.</p>
+          <button ref={btnRef} type="button" className="fiel-modal-btn" onClick={onClose}>
+            Aprovecharlo
+          </button>
+        </div>
       </div>
     </div>
   );

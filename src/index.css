@@ -362,6 +362,126 @@ img { max-width: 100%; }
 .pedido-qty-label {
   display: none;
 }
+.pedido-saludo {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--teal);
+  margin: 10px 0 0;
+  line-height: 1.35;
+}
+
+/* ── Popup cliente fiel ── */
+.fiel-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(12px, env(safe-area-inset-top, 0px)) 16px max(12px, env(safe-area-inset-bottom, 0px));
+  background: rgba(7, 24, 28, 0.84);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.fiel-modal {
+  position: relative;
+  width: min(360px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  background: #0B2C32;
+  border: 1px solid rgba(26, 138, 150, 0.5);
+  border-radius: 20px;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(232, 132, 92, 0.22);
+  color: #fff;
+}
+.fiel-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(7, 24, 28, 0.55);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fiel-modal-foto {
+  position: relative;
+  height: clamp(140px, 38vw, 200px);
+  overflow: hidden;
+  background: #0E3A42;
+}
+.fiel-modal-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 58%;
+  display: block;
+}
+.fiel-modal-foto::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 56px;
+  background: linear-gradient(transparent, #0B2C32);
+  pointer-events: none;
+}
+.fiel-modal-body {
+  padding: 6px 20px 22px;
+  text-align: center;
+}
+.fiel-modal-ornament {
+  display: block;
+  width: 36px;
+  height: 2px;
+  margin: 0 auto 12px;
+  background: linear-gradient(90deg, var(--teal), var(--coral));
+  border-radius: 2px;
+}
+.fiel-modal-body h3 {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 800;
+  margin: 0 0 8px;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+.fiel-modal-body p {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(243, 250, 251, 0.86);
+  margin: 0 0 18px;
+  line-height: 1.45;
+}
+.fiel-modal-btn {
+  width: 100%;
+  min-height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: var(--coral);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(232, 132, 92, 0.28);
+}
+.fiel-modal-btn:hover {
+  background: var(--shu);
+}
+.fiel-modal-btn:active {
+  transform: scale(0.98);
+}
 
 /* ── Cuenta / perfil ── */
 .cuenta-shell { z-index: 1100; }
@@ -445,6 +565,13 @@ img { max-width: 100%; }
   .pedido-close {
     width: 44px !important;
     height: 44px !important;
+  }
+  .fiel-modal-close {
+    width: 44px;
+    height: 44px;
+  }
+  .fiel-modal-body h3 {
+    font-size: 24px;
   }
   .pedido-body {
     padding: 14px 16px 24px;
