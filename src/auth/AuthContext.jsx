@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { recoveryLinkPresent, supabase } from "../lib/supabase";
 import { fetchPerfil, touchLastSeen } from "../lib/clientes";
 
 const AuthCtx = createContext(null);
@@ -9,6 +9,7 @@ export function AuthProvider({ children }) {
   const [perfil, setPerfil] = useState(null);
   const [perfilReady, setPerfilReady] = useState(!supabase);
   const [cuentaOpen, setCuentaOpen] = useState(false);
+  const [isRecovery, setIsRecovery] = useState(recoveryLinkPresent);
 
   const loadPerfil = async (sess) => {
     if (!sess?.user) {
@@ -28,7 +29,8 @@ export function AuthProvider({ children }) {
       setSession(data.session ?? null);
       loadPerfil(data.session);
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
+      if (event === "PASSWORD_RECOVERY") setIsRecovery(true);
       setSession(s);
       loadPerfil(s);
     });
@@ -49,6 +51,7 @@ export function AuthProvider({ children }) {
     setCuentaOpen,
     refreshPerfil,
     isStaff: perfil?.rol === "admin",
+    isRecovery,
   };
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
@@ -65,5 +68,6 @@ export function useAuth() { // eslint-disable-line react-refresh/only-export-com
     setCuentaOpen: () => {},
     refreshPerfil: async () => {},
     isStaff: false,
+    isRecovery: false,
   };
 }

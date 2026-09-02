@@ -15,6 +15,21 @@ const key =
   env("VITE_SUPABASE_PUBLISHABLE_KEY") ||
   "sb_publishable_9hZcmrz1fK0ApXPDtsy1bQ_PeJxY2EV";
 
+// Leer el hash/query ANTES de createClient, que consume los tokens de recovery.
+export const recoveryLinkPresent = (() => {
+  if (typeof window === "undefined") return false;
+  try {
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const query = new URLSearchParams(window.location.search);
+    const type = hash.get("type") || query.get("type");
+    if (type === "recovery") return true;
+    const path = window.location.pathname.toLowerCase();
+    return path.startsWith("/recuperar") && Boolean(query.get("code"));
+  } catch {
+    return false;
+  }
+})();
+
 export const supabase = url && key ? createClient(url, key) : null;
 
 export const PLATILLO_COLS =

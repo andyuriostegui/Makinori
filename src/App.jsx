@@ -14,6 +14,7 @@ import WAFloat from "./components/WAFloat";
 import { CarritoCtx, useCarrito, CarritoBtn, CarritoPanel } from "./components/Carrito";
 import { CatalogProvider } from "./catalog/CatalogContext";
 import { AuthProvider } from "./auth/AuthContext";
+import Recuperar from "./auth/Recuperar";
 import { CuentaPanel } from "./components/Cuenta";
 import Admin from "./admin/Admin";
 
@@ -27,10 +28,15 @@ function isAdminPath() {
   );
 }
 
+function isRecuperarPath() {
+  if (typeof window === "undefined") return false;
+  return window.location.pathname.toLowerCase().startsWith("/recuperar");
+}
+
 export default function App() {
   return (
     <AuthProvider>
-      {isAdminPath() ? <Admin /> : <PublicSite />}
+      {isAdminPath() ? <Admin /> : isRecuperarPath() ? <Recuperar /> : <PublicSite />}
     </AuthProvider>
   );
 }

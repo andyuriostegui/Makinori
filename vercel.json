@@ -38,6 +38,8 @@
     { "source": "/auth", "destination": "/index.html" },
     { "source": "/auth/:path*", "destination": "/index.html" },
     { "source": "/login", "destination": "/index.html" },
-    { "source": "/login/:path*", "destination": "/index.html" }
+    { "source": "/login/:path*", "destination": "/index.html" },
+    { "source": "/recuperar", "destination": "/index.html" },
+    { "source": "/recuperar/:path*", "destination": "/index.html" }
   ]
 }

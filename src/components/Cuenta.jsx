@@ -133,11 +133,12 @@ function CuentaDialog() {
     if (!form.email.trim()) { setError("Escribe tu correo."); return; }
     setBusy(true);
     setError("");
+    setOk("");
     const { error: err } = await supabase.auth.resetPasswordForEmail(form.email.trim(), {
-      redirectTo: window.location.origin,
+      redirectTo: `${window.location.origin}/recuperar`,
     });
     if (err) setError(friendlyAuthError(err.message));
-    else setOk("Te mandamos un correo para cambiar la contraseña.");
+    else setOk("Si el correo existe, te mandamos el enlace.");
     setBusy(false);
   };
 
@@ -160,7 +161,11 @@ function CuentaDialog() {
                   {user ? "Tu perfil" : mode === "crear" ? "Crear perfil" : mode === "olvide" ? "Recuperar acceso" : "Entrar"}
                 </h3>
                 <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>
-                  {user ? "Tus datos van al pedido. No los vuelves a escribir." : "Guarda tu dirección y pide más rápido."}
+                  {user
+                    ? "Tus datos van al pedido. No los vuelves a escribir."
+                    : mode === "olvide"
+                      ? "Escribe tu correo y te mandamos el enlace."
+                      : "Guarda tu dirección y pide más rápido."}
                 </p>
               </div>
             </div>
@@ -212,7 +217,16 @@ function CuentaDialog() {
           ) : (
             <>
               <Field label="Correo" value={form.email} onChange={(v) => set("email", v)} type="email" autoComplete="email" required />
-              <Field label="Contraseña" value={form.password} onChange={(v) => set("password", v)} type="password" autoComplete="current-password" required />
+              <div>
+                <Field label="Contraseña" value={form.password} onChange={(v) => set("password", v)} type="password" autoComplete="current-password" required />
+                <button
+                  type="button"
+                  className="cuenta-olvide"
+                  onClick={() => { setMode("olvide"); setError(""); setOk(""); }}
+                >
+                  Olvidé mi contraseña
+                </button>
+              </div>
             </>
           )}
 
@@ -221,7 +235,7 @@ function CuentaDialog() {
             borderRadius: 10, padding: "14px", fontSize: 14, fontWeight: 700,
             cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif", minHeight: 48,
           }}>
-            {busy ? "Un momento…" : user ? "Guardar perfil" : mode === "crear" ? "Crear perfil" : mode === "olvide" ? "Enviar correo" : "Entrar"}
+            {busy ? "Un momento…" : user ? "Guardar perfil" : mode === "crear" ? "Crear perfil" : mode === "olvide" ? "Enviar enlace" : "Entrar"}
           </button>
 
           {user ? (
@@ -236,14 +250,14 @@ function CuentaDialog() {
             </button>
           ) : (
             <div className="cuenta-switch">
-              {mode !== "entrar" && (
-                <button type="button" onClick={() => { setMode("entrar"); setError(""); setOk(""); }}>Ya tengo cuenta</button>
+              {mode === "olvide" && (
+                <button type="button" onClick={() => { setMode("entrar"); setError(""); setOk(""); }}>Volver a entrar</button>
               )}
-              {mode !== "crear" && (
+              {mode === "entrar" && (
                 <button type="button" onClick={() => { setMode("crear"); setError(""); setOk(""); }}>Crear perfil</button>
               )}
-              {mode !== "olvide" && (
-                <button type="button" onClick={() => { setMode("olvide"); setError(""); setOk(""); }}>Olvidé la contraseña</button>
+              {mode === "crear" && (
+                <button type="button" onClick={() => { setMode("entrar"); setError(""); setOk(""); }}>Ya tengo cuenta</button>
               )}
             </div>
           )}
