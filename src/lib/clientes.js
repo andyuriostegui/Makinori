@@ -12,6 +12,11 @@ export function isMissingTable(error) {
   );
 }
 
+export function isMissingRegalo(error) {
+  const t = String(error?.message || error?.code || "").toLowerCase();
+  return t.includes("regalo_id") || error?.code === "PGRST204" || error?.code === "42703";
+}
+
 export function friendlyAuthError(msg = "") {
   const t = String(msg).toLowerCase();
   if (t.includes("invalid login") || t.includes("invalid credentials")) return "Email o contraseña incorrectos.";
@@ -29,6 +34,9 @@ export function friendlyAuthError(msg = "") {
   }
   if (t.includes("rate") || t.includes("too many")) return "Demasiados intentos. Espera un momento.";
   if (t.includes("email not confirmed")) return "Revisa tu correo y confirma la cuenta para entrar.";
+  if (isMissingRegalo({ message: msg })) {
+    return "Falta correr el SQL nuevo de cortesía (columna regalo_id) en Supabase.";
+  }
   if (isMissingTable({ message: msg })) return "Falta correr el SQL de perfiles en Supabase.";
   if (t.includes("row-level security") || t.includes("rls")) return "No hay permiso para guardar. Revisa que hayas iniciado sesión.";
   return msg || "Algo salió mal. Inténtalo de nuevo.";
@@ -88,6 +96,7 @@ export async function registrarPedido({ userId, folio, items, total, descuento, 
       qty: i.qty,
       precio: i.precio,
       nota: i.nota || "",
+      regalo: !!i.regalo,
     })),
     total: Number(total) || 0,
     descuento: Number(descuento) || 0,
@@ -144,23 +153,36 @@ function armarCliente(p, pedidos = []) {
   };
 }
 
-export async function fetchClientesAdmin() {
-  if (!supabase) throw new Error("Supabase no está configurado");
-  const embedded = await supabase
+const PERFIL_COLS = "id, nombre, tel, direccion, rol, destacado, descuento, regalo_id, last_seen_at, created_at";
+const PERFIL_COLS_LEGACY = "id, nombre, tel, direccion, rol, destacado, descuento, last_seen_at, created_at";
+
+async function selectClientes(cols, withPedidos) {
+  const sel = withPedidos
+    ? `${cols}, pedidos(id, total, created_at, folio, modo)`
+    : cols;
+  return supabase
     .from("perfiles")
-    .select("id, nombre, tel, direccion, rol, destacado, descuento, last_seen_at, created_at, pedidos(id, total, created_at, folio, modo)")
+    .select(sel)
     .eq("rol", "cliente")
     .order("created_at", { ascending: false });
+}
+
+export async function fetchClientesAdmin() {
+  if (!supabase) throw new Error("Supabase no está configurado");
+  let embedded = await selectClientes(PERFIL_COLS, true);
+  if (embedded.error && isMissingRegalo(embedded.error)) {
+    embedded = await selectClientes(PERFIL_COLS_LEGACY, true);
+  }
 
   if (!embedded.error) {
     return (embedded.data || []).map((p) => armarCliente(p, p.pedidos)).sort(sortClientes);
   }
 
-  const { data: perfiles, error } = await supabase
-    .from("perfiles")
-    .select("id, nombre, tel, direccion, rol, destacado, descuento, last_seen_at, created_at")
-    .eq("rol", "cliente")
-    .order("created_at", { ascending: false });
+  let perfilesRes = await selectClientes(PERFIL_COLS, false);
+  if (perfilesRes.error && isMissingRegalo(perfilesRes.error)) {
+    perfilesRes = await selectClientes(PERFIL_COLS_LEGACY, false);
+  }
+  const { data: perfiles, error } = perfilesRes;
   if (error) throw error;
   const { data: pedidos, error: pe } = await supabase
     .from("pedidos")

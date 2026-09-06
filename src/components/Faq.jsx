@@ -8,7 +8,7 @@ const FAQS = [
   },
   {
     q: "¿Puedo guardar mi dirección?",
-    a: "Sí. Arriba toca Entrar y crea tu perfil con nombre, WhatsApp y colonia. La próxima vez el pedido ya lleva tus datos. Si te hacemos cliente destacado, el descuento se aplica solo.",
+    a: "Sí. Arriba toca Entrar y crea tu perfil con nombre, WhatsApp y colonia. La próxima vez el pedido ya lleva tus datos. Si te hacemos cliente destacado, el platillo de cortesía se agrega solo.",
   },
   {
     q: "¿Hacen domicilio en Iguala?",

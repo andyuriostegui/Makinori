@@ -30,6 +30,54 @@ export function formatPrecio(n) {
   return `$${Number.isInteger(v) ? v : v.toFixed(2).replace(/\.00$/, "")}`;
 }
 
+export function precioNum(n) {
+  const v = Number(String(n ?? "").replace(/[^0-9.]/g, ""));
+  return Number.isFinite(v) ? v : 0;
+}
+
+/** Platillo de cortesía que el admin asignó al cliente fiel. */
+export function ofertaFromPlatillo(p) {
+  if (!p?.id) return null;
+  return {
+    id: `regalo:${p.id}`,
+    platilloId: p.id,
+    nombre: p.nombre,
+    precio: 0,
+    origPrecio: precioNum(p.precio),
+    qty: 1,
+    foto: p.imagen_url || p.foto || null,
+    regalo: true,
+  };
+}
+
+export async function fetchPlatillo(id) {
+  if (!supabase || !id) return null;
+  const { data, error } = await supabase
+    .from("platillos")
+    .select("id, nombre, precio, imagen_url, disponible")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) {
+    console.warn("platillo:", error.message);
+    return null;
+  }
+  return data;
+}
+
+export async function fetchMenuOferta() {
+  if (!supabase) return { categorias: [], platillos: [] };
+  const [cats, plats] = await Promise.all([
+    supabase.from("categorias").select("id, nombre, slug, orden").order("orden"),
+    supabase.from("platillos").select("id, nombre, precio, imagen_url, disponible, categoria_id").order("nombre"),
+  ]);
+  if (cats.error) console.warn("categorias:", cats.error.message);
+  if (plats.error) console.warn("platillos:", plats.error.message);
+  return {
+    categorias: cats.data || [],
+    platillos: plats.data || [],
+  };
+}
+
 const FOTO_POS_RE = /#(\d{1,3}),(\d{1,3})$/;
 
 function clampPct(n) {

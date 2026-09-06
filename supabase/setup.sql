@@ -310,3 +310,25 @@ create policy "Insert own pedidos"
 grant select, insert, update on public.perfiles to authenticated;
 grant select, insert on public.pedidos to authenticated;
 grant usage, select on all sequences in schema public to authenticated;
+
+-- ── Cliente fiel: platillo de cortesía (en vez de solo un %) ──
+-- Corre esto si la tabla perfiles ya existía.
+alter table public.perfiles
+  add column if not exists regalo_id uuid references public.platillos(id) on delete set null;
+
+create or replace function public.perfiles_guard()
+returns trigger
+language plpgsql
+as $$
+begin
+  if public.es_staff() then
+    return new;
+  end if;
+  new.id := old.id;
+  new.rol := old.rol;
+  new.destacado := old.destacado;
+  new.descuento := old.descuento;
+  new.regalo_id := old.regalo_id;
+  return new;
+end;
+$$;

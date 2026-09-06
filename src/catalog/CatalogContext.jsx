@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { fetchCatalog, localCatalog } from "../lib/catalog";
+import { fetchCatalog, fetchPlatillo, localCatalog, ofertaFromPlatillo } from "../lib/catalog";
 
 const CatalogCtx = createContext(null);
 
@@ -24,4 +24,24 @@ export function CatalogProvider({ children }) {
 export function useCatalog() { // eslint-disable-line react-refresh/only-export-components
   const ctx = useContext(CatalogCtx);
   return ctx || localCatalog();
+}
+
+export function useOferta(perfil) { // eslint-disable-line react-refresh/only-export-components
+  const catalog = useCatalog();
+  const id = perfil?.regalo_id || null;
+  const fromCat = (catalog.platillos || []).find((p) => p.id === id) || null;
+  const [extra, setExtra] = useState(null);
+  const fromCatId = fromCat?.id || null;
+
+  useEffect(() => {
+    if (!id || fromCatId) return undefined;
+    let alive = true;
+    fetchPlatillo(id).then((p) => {
+      if (alive) setExtra(p);
+    });
+    return () => { alive = false; };
+  }, [id, fromCatId]);
+
+  const platillo = fromCat || (extra?.id === id ? extra : null);
+  return id ? ofertaFromPlatillo(platillo) : null;
 }

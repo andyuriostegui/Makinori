@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, createContext, useContext } from "react";
 import { C } from "./tokens";
 import { parseFotoPos } from "../lib/catalog";
+import { useOferta } from "../catalog/CatalogContext";
 import { WA_NUM } from "./data";
 import { useAuth } from "../auth/AuthContext";
 import { registrarPedido, saveMiPerfil } from "../lib/clientes";
@@ -51,10 +52,14 @@ function nuevoFolio() {
   return `MN-${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
-function montosPedido(total, perfil) {
+function montosPedido(total, perfil, oferta) {
+  const subtotal = Number(total) || 0;
+  if (oferta) {
+    return { pct: 0, descuento: Number(oferta.origPrecio) || 0, final: subtotal, gift: oferta };
+  }
   const pct = Math.max(0, Math.min(100, Number(perfil?.descuento) || 0));
-  const descuento = Math.round((Number(total) || 0) * pct / 100);
-  return { pct, descuento, final: Math.max(0, (Number(total) || 0) - descuento) };
+  const descuento = Math.round(subtotal * pct / 100);
+  return { pct, descuento, final: Math.max(0, subtotal - descuento), gift: null };
 }
 
 export function useCarrito() {
@@ -159,7 +164,7 @@ function pickSugerencia(items) {
   return null;
 }
 
-function armarMensaje({ items, total, modo, mesa, cliente, folio, descuento, pct }) {
+function armarMensaje({ items, total, modo, mesa, cliente, folio, descuento, pct, gift }) {
   const modoStr = modo === "mesa"
     ? `En mesa ${mesa.trim()}`
     : modo === "domicilio"
@@ -167,6 +172,9 @@ function armarMensaje({ items, total, modo, mesa, cliente, folio, descuento, pct
       : "Para llevar";
 
   const lineas = items.map(i => {
+    if (i.regalo) {
+      return `• 1x ${i.nombre} — CORTESÍA (cliente fiel) valor $${i.origPrecio}`;
+    }
     const row = `• ${i.qty}x ${i.nombre} — $${i.precio} c/u = $${i.precio * i.qty}`;
     return i.nota ? `${row}\n  nota: ${i.nota}` : row;
   }).join("\n");
@@ -177,9 +185,11 @@ function armarMensaje({ items, total, modo, mesa, cliente, folio, descuento, pct
     modo === "domicilio" && cliente.direccion?.trim() && `📍 ${cliente.direccion.trim()}`,
   ].filter(Boolean).join("\n");
 
-  const cobro = descuento > 0
-    ? [`Subtotal: $${total} MXN`, `Destacado · ${pct}% −$${descuento}`, `*Total: $${total - descuento} MXN*`]
-    : [`*Total: $${total} MXN*`];
+  const cobro = gift
+    ? [`*Total: $${total} MXN*`, `Cortesía: ${gift.nombre} (valor $${gift.origPrecio})`]
+    : descuento > 0
+      ? [`Subtotal: $${total} MXN`, `Destacado · ${pct}% −$${descuento}`, `*Total: $${total - descuento} MXN*`]
+      : [`*Total: $${total} MXN*`];
 
   return [
     `🍣 *Pedido Maki Nori*`,
@@ -336,9 +346,14 @@ export function CarritoPanel() {
   const [error, setError] = useState("");
   const sugerencia = pickSugerencia(items);
   const sheet = usePedidoSheet();
-  const { pct, descuento, final } = montosPedido(total, perfil);
+  const oferta = useOferta(perfil);
+  const [omitidoId, setOmitidoId] = useState(null);
+  const omitirRegalo = !!(oferta && omitidoId === oferta.platilloId);
+  const giftOn = !!(oferta && !omitirRegalo && items.length > 0);
+  const itemsPedido = giftOn ? [...items, oferta] : items;
+  const { pct, descuento, final, gift } = montosPedido(total, perfil, giftOn ? oferta : null);
   const [fielDismissed, setFielDismissed] = useState(() => fielYaVisto());
-  const fielOpen = open && pct > 0 && !fielDismissed;
+  const fielOpen = open && !!(oferta || pct > 0) && !fielDismissed;
 
   const cerrarFiel = () => {
     marcarFielVisto();
@@ -400,7 +415,7 @@ export function CarritoPanel() {
     setError("");
     const f = folio || nuevoFolio();
     setFolio(f);
-    const msg = armarMensaje({ items, total, modo, mesa, cliente, folio: f, descuento, pct });
+    const msg = armarMensaje({ items: itemsPedido, total, modo, mesa, cliente, folio: f, descuento, pct, gift });
     window.open(`${WA_URL}?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
     setEnviado(true);
     if (!user) return;
@@ -408,7 +423,7 @@ export function CarritoPanel() {
       await registrarPedido({
         userId: user.id,
         folio: f,
-        items,
+        items: itemsPedido,
         total: final,
         descuento,
         modo,
@@ -498,7 +513,7 @@ export function CarritoPanel() {
             {user && (
               <p className="pedido-saludo">
                 {perfil?.nombre ? `Hola, ${perfil.nombre.split(" ")[0]}` : "Tu perfil"}
-                {pct > 0 ? ` · ${pct}% de descuento` : ""}
+                {oferta ? ` · cortesía: ${oferta.nombre}` : pct > 0 ? ` · ${pct}% de descuento` : ""}
               </p>
             )}
 
@@ -599,13 +614,38 @@ export function CarritoPanel() {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: C.muted, margin: 0 }}>Tu orden</p>
-              {items.map(item => (
+              {itemsPedido.map(item => (
                 <ItemRow key={item.id} item={item}
-                  onQuitar={() => quitar(item.id)}
-                  onAgregar={() => agregar(item)}
-                  onNota={n => setNota(item.id, n)}
+                  onQuitar={() => item.regalo ? setOmitidoId(item.platilloId) : quitar(item.id)}
+                  onAgregar={() => { if (!item.regalo) agregar(item); }}
+                  onNota={n => { if (!item.regalo) setNota(item.id, n); }}
                 />
               ))}
+            </div>
+          )}
+
+          {oferta && omitirRegalo && items.length > 0 && (
+            <div className="pedido-sugerencia" style={{
+              background: "rgba(232,132,92,0.08)", border: `1px dashed ${C.coral}`,
+              borderRadius: 10, padding: "12px 14px",
+              display: "flex", alignItems: "center", gap: 12,
+            }}>
+              <ServingFoodIcon size={24} color={C.coral} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, fontWeight: 700, color: C.coral, margin: "0 0 2px" }}>
+                  Tu cortesía de cliente fiel
+                </p>
+                <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>
+                  {oferta.nombre} · gratis
+                </p>
+              </div>
+              <button onClick={() => setOmitidoId(null)}
+                style={{
+                  background: C.teal, color: C.cream, border: "none",
+                  borderRadius: 6, padding: "10px 14px", fontSize: 12,
+                  fontWeight: 700, cursor: "pointer", fontFamily: "Noto Sans JP, sans-serif",
+                  flexShrink: 0,
+                }}>+ Sí</button>
             </div>
           )}
 
@@ -635,15 +675,21 @@ export function CarritoPanel() {
           <div className={`pedido-footer${sheet.keyboard ? " kb-open" : ""}`}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12, gap: 12 }}>
               <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 14, color: C.muted }}>
-                {descuento > 0 ? "Total con descuento" : "Total estimado"}
+                {gift ? "Total estimado" : descuento > 0 ? "Total con descuento" : "Total estimado"}
               </span>
               <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 20, fontWeight: 900, color: C.ink }}>
-                {descuento > 0 && (
+                {!gift && descuento > 0 && (
                   <span style={{ fontSize: 13, fontWeight: 600, color: C.muted, textDecoration: "line-through", marginRight: 8 }}>${total}</span>
                 )}
                 ${final} MXN
               </span>
             </div>
+
+            {gift && (
+              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.coral, margin: "-4px 0 12px", fontWeight: 700 }}>
+                Cortesía incluida · {gift.nombre}
+              </p>
+            )}
 
             {error && (
               <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.shu, margin: "0 0 10px", fontWeight: 600 }}>
@@ -698,15 +744,17 @@ export function CarritoPanel() {
         )}
       </div>
 
-      {fielOpen && pct > 0 && (
-        <FielPopup pct={pct} onClose={cerrarFiel} />
+      {fielOpen && (oferta || pct > 0) && (
+        <FielPopup oferta={oferta} pct={pct} onClose={cerrarFiel} />
       )}
     </div>
   );
 }
 
-function FielPopup({ pct, onClose }) {
+function FielPopup({ oferta, pct, onClose }) {
   const btnRef = useRef(null);
+  const foto = parseFotoPos(oferta?.foto);
+  const src = foto.src || "/fiel-roll.jpg";
 
   useEffect(() => {
     btnRef.current?.focus();
@@ -725,12 +773,16 @@ function FielPopup({ pct, onClose }) {
           <Cancel01Icon size={16} color="#F3FAFB" />
         </button>
         <div className="fiel-modal-foto">
-          <img src="/fiel-roll.jpg" alt="" />
+          <img src={src} alt="" style={foto.src ? { objectPosition: `${foto.x}% ${foto.y}%` } : undefined} />
         </div>
         <div className="fiel-modal-body">
           <span className="fiel-modal-ornament" aria-hidden />
           <h3 id="fiel-titulo">Cliente fiel</h3>
-          <p>Por ser cliente fiel tienes {pct}% de descuento.</p>
+          <p>
+            {oferta
+              ? `Por ser cliente fiel te regalamos un ${oferta.nombre} en tu pedido.`
+              : `Por ser cliente fiel tienes ${pct}% de descuento.`}
+          </p>
           <button ref={btnRef} type="button" className="fiel-modal-btn" onClick={onClose}>
             Aprovecharlo
           </button>
@@ -742,8 +794,14 @@ function FielPopup({ pct, onClose }) {
 
 function ItemRow({ item, onQuitar, onAgregar, onNota }) {
   const foto = parseFotoPos(item.foto);
+  const esRegalo = !!item.regalo;
   return (
-    <div style={{ background: "#fff", borderRadius: 10, overflow: "hidden", border: `1px solid ${C.border}` }}>
+    <div style={{
+      background: esRegalo ? "rgba(232,132,92,0.06)" : "#fff",
+      borderRadius: 10,
+      overflow: "hidden",
+      border: `1px solid ${esRegalo ? C.coral : C.border}`,
+    }}>
       <div className="pedido-item-top">
         <div className="pedido-item-foto" style={{ width: 56, height: 56, borderRadius: 8, overflow: "hidden", flexShrink: 0, background: C.paper, display: "flex", alignItems: "center", justifyContent: "center" }}>
           {item.foto
@@ -756,44 +814,69 @@ function ItemRow({ item, onQuitar, onAgregar, onNota }) {
           <p className="pedido-item-nombre" style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 13, fontWeight: 700, color: C.ink, margin: "0 0 2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
             {item.nombre}
           </p>
-          <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>
-            ${item.precio} c/u
-          </p>
-          <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.coral, fontWeight: 700, margin: 0 }}>
-            ${item.precio * item.qty} MXN
-          </p>
+          {esRegalo ? (
+            <>
+              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0, textDecoration: "line-through" }}>
+                ${item.origPrecio} c/u
+              </p>
+              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.coral, fontWeight: 700, margin: 0 }}>
+                Cortesía · $0
+              </p>
+            </>
+          ) : (
+            <>
+              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 11, color: C.muted, margin: 0 }}>
+                ${item.precio} c/u
+              </p>
+              <p style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 12, color: C.coral, fontWeight: 700, margin: 0 }}>
+                ${item.precio * item.qty} MXN
+              </p>
+            </>
+          )}
         </div>
 
-        <div className="pedido-item-qty">
-          <span className="pedido-qty-label">Cantidad</span>
-          <button className="pedido-qty-btn" onClick={onQuitar} aria-label="Quitar uno" style={{
-            border: `1px solid ${C.border}`,
-            background: "transparent", color: C.muted,
-          }}>−</button>
-          <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 15, fontWeight: 700, minWidth: 24, textAlign: "center" }}>{item.qty}</span>
-          <button className="pedido-qty-btn" onClick={onAgregar} aria-label="Agregar uno" style={{
-            border: "none",
-            background: C.teal, color: C.cream,
-          }}>+</button>
-        </div>
+        {esRegalo ? (
+          <div className="pedido-item-qty">
+            <span className="pedido-regalo-tag">Regalo</span>
+            <button className="pedido-qty-btn" onClick={onQuitar} aria-label="Quitar cortesía" style={{
+              border: `1px solid ${C.border}`,
+              background: "transparent", color: C.muted,
+            }}>−</button>
+          </div>
+        ) : (
+          <div className="pedido-item-qty">
+            <span className="pedido-qty-label">Cantidad</span>
+            <button className="pedido-qty-btn" onClick={onQuitar} aria-label="Quitar uno" style={{
+              border: `1px solid ${C.border}`,
+              background: "transparent", color: C.muted,
+            }}>−</button>
+            <span style={{ fontFamily: "Noto Sans JP, sans-serif", fontSize: 15, fontWeight: 700, minWidth: 24, textAlign: "center" }}>{item.qty}</span>
+            <button className="pedido-qty-btn" onClick={onAgregar} aria-label="Agregar uno" style={{
+              border: "none",
+              background: C.teal, color: C.cream,
+            }}>+</button>
+          </div>
+        )}
       </div>
 
-      <div style={{ padding: "0 12px 12px" }}>
-        <label style={{ display: "flex", alignItems: "center", gap: 8, width: "100%" }}>
-          <span style={{ display: "flex", flexShrink: 0 }}>
-            <PencilEdit01Icon size={14} color={item.nota ? C.coral : C.muted} />
-          </span>
-          <input
-            type="text"
-            className="pedido-nota-input"
-            placeholder="Nota: sin pepino, extra picante…"
-            value={item.nota || ""}
-            onChange={e => onNota(e.target.value)}
-            onFocus={scrollCampoVisible}
-            style={{ borderColor: item.nota ? C.coral : C.border }}
-          />
-        </label>
-      </div>
+      {!esRegalo && (
+        <div style={{ padding: "0 12px 12px" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, width: "100%" }}>
+            <span style={{ display: "flex", flexShrink: 0 }}>
+              <PencilEdit01Icon size={14} color={item.nota ? C.coral : C.muted} />
+            </span>
+            <input
+              type="text"
+              className="pedido-nota-input"
+              placeholder="Nota: sin pepino, extra picante…"
+              value={item.nota || ""}
+              onChange={e => onNota(e.target.value)}
+              onFocus={scrollCampoVisible}
+              style={{ borderColor: item.nota ? C.coral : C.border }}
+            />
+          </label>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { C } from "./tokens";
 import { useAuth } from "../auth/AuthContext";
+import { useOferta } from "../catalog/CatalogContext";
 import { supabase } from "../lib/supabase";
 import { cambiarPassword, fetchPerfil, friendlyAuthError, saveMiPerfil } from "../lib/clientes";
 import {
@@ -18,6 +19,7 @@ export function CuentaPanel() {
 
 function CuentaDialog() {
   const { user, perfil, setCuentaOpen, setPerfil, refreshPerfil } = useAuth();
+  const oferta = useOferta(perfil);
   const [mode, setMode] = useState(user ? "perfil" : "entrar");
   const [form, setForm] = useState({
     email: user?.email || "",
@@ -208,9 +210,13 @@ function CuentaDialog() {
             </>
           ) : user ? (
             <>
-              {perfil?.destacado && (
+              {(perfil?.destacado || oferta) && (
                 <div className="cuenta-destacado">
-                  Cliente destacado{Number(perfil.descuento) > 0 ? ` · ${Number(perfil.descuento)}% de descuento` : ""}
+                  {oferta
+                    ? `Cliente destacado · te regalamos un ${oferta.nombre}`
+                    : Number(perfil.descuento) > 0
+                      ? `Cliente destacado · ${Number(perfil.descuento)}% de descuento`
+                      : "Cliente destacado"}
                 </div>
               )}
               <Field label="Nombre" value={form.nombre} onChange={(v) => set("nombre", v)} autoComplete="name" />
