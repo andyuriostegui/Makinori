@@ -48,7 +48,7 @@
   top: calc(52px + env(safe-area-inset-top));
   z-index: 15;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   padding: 10px 16px;
   background: #f3fafb;
@@ -782,6 +782,111 @@
 }
 .admin-clientes-block .admin-list { gap: 10px; }
 
+.admin-visitas-kpis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.admin-visitas-kpi {
+  background: #fff;
+  border: 1.5px solid #c5dcdf;
+  border-radius: 14px;
+  padding: 16px 14px 14px;
+  box-shadow: 0 6px 16px rgba(11, 44, 50, 0.04);
+}
+.admin-visitas-kpi p {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5a6a6e;
+}
+.admin-visitas-kpi strong {
+  display: block;
+  margin-top: 8px;
+  font-family: "Shippori Mincho", serif;
+  font-size: 36px;
+  line-height: 1;
+  color: #0b2c32;
+  font-weight: 700;
+}
+.admin-visitas-kpi span {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #5a6a6e;
+  line-height: 1.35;
+}
+
+.admin-visitas-chart {
+  background: #fff;
+  border: 1.5px solid #c5dcdf;
+  border-radius: 14px;
+  padding: 14px 12px 12px;
+  box-shadow: 0 6px 16px rgba(11, 44, 50, 0.04);
+}
+.admin-visitas-chart h3 {
+  margin: 0 0 14px;
+  font-family: "Shippori Mincho", serif;
+  font-size: 18px;
+}
+.admin-visitas-bars {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  height: 176px;
+}
+.admin-visitas-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+}
+.admin-visitas-track {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.admin-visitas-spacer {
+  width: 0;
+}
+.admin-visitas-col b {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0e3a42;
+  line-height: 1;
+}
+.admin-visitas-bar {
+  display: block;
+  width: 70%;
+  max-width: 28px;
+  background: #1a8a96;
+  border-radius: 6px 6px 2px 2px;
+  min-height: 2px;
+  font-style: normal;
+}
+.admin-visitas-col.today .admin-visitas-bar {
+  background: #e07048;
+}
+.admin-visitas-col.today b {
+  color: #c45a38;
+}
+.admin-visitas-col small {
+  font-size: 10px;
+  font-weight: 700;
+  color: #5a6a6e;
+  text-align: center;
+  line-height: 1.2;
+}
+
 .admin-more,
 .admin-more button {
   margin-top: 18px;
@@ -801,6 +906,8 @@
   .admin-top { padding: 14px 24px; }
   .admin-tabs {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 8px;
   }
   .admin-tabs button {

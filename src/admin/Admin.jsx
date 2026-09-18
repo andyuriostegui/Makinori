@@ -6,6 +6,7 @@ import { fetchGaleria, saveGaleria, uploadGaleriaFoto } from "../lib/galeria";
 import { asegurarStaff, isMissingTable } from "../lib/clientes";
 import { useAuth } from "../auth/AuthContext";
 import ClientesAdmin from "./Clientes";
+import VisitasAdmin from "./Visitas";
 import "./admin.css";
 
 const EMPTY = {
@@ -172,6 +173,7 @@ export default function Admin() {
           <button className={tab === "feed" ? "active" : ""} onClick={() => setTab("feed")}>Favoritos</button>
           <button className={tab === "rollos" ? "active" : ""} onClick={() => setTab("rollos")}>Rollos</button>
           <button className={tab === "clientes" ? "active" : ""} onClick={() => setTab("clientes")}>Clientes</button>
+          <button className={tab === "visitas" ? "active" : ""} onClick={() => setTab("visitas")}>Visitas</button>
         </nav>
         <button className="admin-ghost" onClick={() => supabase.auth.signOut()}>Salir</button>
       </header>
@@ -180,6 +182,7 @@ export default function Admin() {
         <button className={tab === "feed" ? "active" : ""} onClick={() => setTab("feed")}>Favoritos</button>
         <button className={tab === "rollos" ? "active" : ""} onClick={() => setTab("rollos")}>Rollos</button>
         <button className={tab === "clientes" ? "active" : ""} onClick={() => setTab("clientes")}>Clientes</button>
+        <button className={tab === "visitas" ? "active" : ""} onClick={() => setTab("visitas")}>Visitas</button>
       </nav>
       <AdminBody tab={tab} />
     </div>
@@ -329,6 +332,9 @@ function AdminBody({ tab }) {
       )}
       {tab === "clientes" && (
         <ClientesAdmin setError={setError} setOk={setOk} />
+      )}
+      {tab === "visitas" && (
+        <VisitasAdmin setError={setError} />
       )}
     </div>
   );

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Productos from "./components/Productos";
@@ -17,6 +18,7 @@ import { AuthProvider, useAuth } from "./auth/AuthContext";
 import Recuperar from "./auth/Recuperar";
 import { CuentaPanel } from "./components/Cuenta";
 import Admin from "./admin/Admin";
+import { registrarVisita } from "./lib/visitas";
 
 function pathName() {
   if (typeof window === "undefined") return "";
@@ -53,6 +55,18 @@ function Shell() {
 
 function PublicSite() {
   const carrito = useCarrito();
+  const { loading, isStaff } = useAuth();
+
+  useEffect(() => {
+    if (loading || isStaff) return undefined;
+    const run = () => { registrarVisita(); };
+    if (typeof document !== "undefined" && document.prerendering) {
+      document.addEventListener("prerenderingchange", run, { once: true });
+      return () => document.removeEventListener("prerenderingchange", run);
+    }
+    run();
+    return undefined;
+  }, [loading, isStaff]);
 
   return (
     <CatalogProvider>
